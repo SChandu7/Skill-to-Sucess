@@ -24,6 +24,9 @@ STS.api = (function () {
   var KEY = 'sts:access', FLAG = 'sts:li', GUEST = 'sts:guest', RKEY = 'sts:refresh';
   // The API on another domain cannot use the login cookie, so the refresh token comes back in the reply.
   var CROSS_SITE = !!ORIGIN && ORIGIN.replace(/^https?:\/\//, '').split(':')[0] !== location.hostname;
+  // Cookies are only used when the API is on the same domain. Across domains we send tokens instead,
+  // so we must NOT ask for cookies: browsers refuse that when the server answers with '*'.
+  var CREDS = CROSS_SITE ? 'omit' : 'include';
   var access = null, refreshing = null;
 
   function store(k, v) { try { if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) { /* */ } }
@@ -52,7 +55,7 @@ STS.api = (function () {
     if (refreshing) return refreshing;
     var h = { 'Content-Type': 'application/json' };
     if (CROSS_SITE) h['X-Client'] = 'mobile';
-    refreshing = fetch(BASE + '/auth/refresh/', { method: 'POST', credentials: 'include', headers: h,
+    refreshing = fetch(BASE + '/auth/refresh/', { method: 'POST', credentials: CREDS, headers: h,
       body: JSON.stringify(CROSS_SITE ? { refresh: getRefresh() || '' } : {}) })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j.access) throw ApiError(j, r.status); setAccess(j.access); setRefresh(j.refresh); return j.access; }); })
       .catch(function (e) { clearSession(); throw e; })
@@ -67,7 +70,7 @@ STS.api = (function () {
     var isForm = typeof FormData !== 'undefined' && body instanceof FormData;
     if (body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
     if (access) headers.Authorization = 'Bearer ' + access;
-    return fetch(BASE + path, { method: method, credentials: 'include', headers: headers, body: body === undefined ? undefined : (isForm ? body : JSON.stringify(body)) })
+    return fetch(BASE + path, { method: method, credentials: CREDS, headers: headers, body: body === undefined ? undefined : (isForm ? body : JSON.stringify(body)) })
       .then(function (r) {
         if (r.status === 401 && !opts.retried && !opts.noRefresh && maybeLoggedIn()) {
           return refresh().then(function () { return request(method, path, body, Object.assign({}, opts, { retried: true })); }, function () {

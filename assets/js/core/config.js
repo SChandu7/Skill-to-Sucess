@@ -6,7 +6,7 @@ window.STS = window.STS || {};
 
 // Where the Django server is.
 //  ''                              -> same domain as the website (Nginx proxies /api to Django)
-//  'https://api.chandus7.in'       -> website on GitHub Pages / another host, Django on its own domain (current)
+//  'https://api.skilltosuccess.in' -> website on GitHub Pages / another host, Django on its own domain
 var STS_API_ORIGIN = 'https://api.chandus7.in';
 
 STS.config = {
