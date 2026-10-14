@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<title>Log in | SkillToSuccess</title>
+<meta name="description" content="Log in to continue your courses, check your wallet and share your referral code.">
+<!--HEAD-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A7BC2">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/app.css?v=1">
+<!--/HEAD-->
+</head>
+<body class="min-h-screen bg-white">
+<div class="grid min-h-screen lg:grid-cols-[1fr_1.05fr]">
+  <main id="main" class="flex flex-col px-4 py-6 sm:px-10">
+    <a href="index.html" class="flex w-fit items-center gap-2.5" aria-label="SkillToSuccess home"><img src="assets/img/logo.svg" alt="" width="36" height="36"><span class="font-display text-[19px] font-semibold tracking-tight">Skill<span class="text-orange-500">To</span>Success</span></a>
+    <div class="mx-auto my-auto w-full max-w-[420px] py-10">
+      <div class="seg mb-8 w-full" role="tablist"><button class="flex-1" role="tab" id="t-login" aria-pressed="true" aria-controls="p-login">Log in</button><button class="flex-1" role="tab" id="t-reg" aria-pressed="false" aria-controls="p-reg">Create free account</button></div>
+      <section id="p-login" role="tabpanel" aria-labelledby="t-login">
+        <h1 class="text-display-md">Welcome back</h1><p class="mt-2 text-ink-600">Pick up where you left off.</p>
+        <form class="mt-8 grid gap-5" id="f-login" novalidate>
+          <div><label class="label" for="l-id">Email or mobile number</label><input class="input" id="l-id" name="identifier" autocomplete="username" required></div>
+          <div><div class="flex items-center justify-between"><label class="label" for="l-pass">Password</label><button type="button" class="mb-1.5 text-sm font-semibold text-sky-700 hover:underline" id="forgot">Forgot password?</button></div>
+            <div class="relative" data-field><input class="input pr-12" id="l-pass" name="password" type="password" autocomplete="current-password" required><button type="button" class="absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg text-ink-500 hover:bg-cloud" data-eye="l-pass" aria-label="Show password"><svg class="i i-sm" aria-hidden="true"><use href="#i-eye"></use></svg></button></div></div>
+          <button class="btn btn-primary btn-lg btn-block">Log in</button>
+        </form>
+        <p class="mt-6 text-center text-sm text-ink-500">New here? <button class="link" id="to-reg">Create a free account</button></p>
+      </section>
+      <section id="p-reg" role="tabpanel" aria-labelledby="t-reg" hidden>
+        <h1 class="text-display-md">Start for free</h1><p class="mt-2 text-ink-600" id="reg-lead">A free account opens every preview lesson and keeps your play rewards.</p>
+        <form class="mt-8 grid gap-5" id="f-reg" novalidate>
+          <div><label class="label" for="r-name">Full name</label><input class="input" id="r-name" name="name" autocomplete="name" required></div>
+          <div><label class="label" for="r-phone">Mobile number</label><div class="flex" data-field><span class="grid place-items-center rounded-l-xl border border-r-0 border-line bg-cloud px-3 text-sm text-ink-600">+91</span><input class="input !rounded-l-none tabular" id="r-phone" name="phone" inputmode="numeric" maxlength="10" autocomplete="tel-national" required></div></div>
+          <div><label class="label" for="r-email">Email</label><input class="input" id="r-email" name="email" type="email" autocomplete="email" required></div>
+          <div><label class="label" for="r-pass">Password</label><div class="relative" data-field><input class="input pr-12" id="r-pass" name="password" type="password" minlength="8" autocomplete="new-password" placeholder="At least 8 characters, not only numbers" required><button type="button" class="absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg text-ink-500 hover:bg-cloud" data-eye="r-pass" aria-label="Show password"><svg class="i i-sm" aria-hidden="true"><use href="#i-eye"></use></svg></button></div></div>
+          <label class="flex items-start gap-2.5 text-[15px]"><input type="checkbox" class="check" name="agree"><span>I agree to the <a class="link" href="legal.html#terms">Terms</a> and <a class="link" href="legal.html#privacy">Privacy policy</a>.</span></label>
+          <p class="error -mt-3 hidden" id="agree-err">Please accept the terms to continue.</p>
+          <button class="btn btn-buy btn-lg btn-block">Create account</button>
+        </form>
+      </section>
+    </div>
+    <p class="text-center text-sm text-ink-500">Need help? WhatsApp <span class="select-all font-semibold text-ink-700" id="help-phone"></span></p>
+  </main>
+  <aside class="relative hidden overflow-hidden bg-gradient-to-br from-sky-800 via-sky-700 to-sky-500 p-12 text-white lg:flex lg:flex-col">
+    <svg class="pointer-events-none absolute -bottom-16 -right-16 h-[560px] w-[560px] text-white/10" viewBox="0 0 32 32" aria-hidden="true"><path d="M2 28 11 19l7 5 12-15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="relative mt-auto max-w-md">
+      <p class="font-display text-[32px] font-semibold leading-tight">Short lessons. A quiz after each one. Real work to show at the end.</p>
+      <ul class="mt-6 space-y-2.5 text-sky-100" id="quote-by"></ul>
+      <div class="mt-12 grid grid-cols-3 gap-4 border-t border-white/15 pt-8" id="side-stats"></div>
+    </div>
+  </aside>
+</div>
+<!--CORE-->
+<script src="assets/js/core/icons.js?v=1"></script>
+<script src="assets/js/core/config.js?v=1"></script>
+<script src="assets/js/core/api.js?v=1"></script>
+<script src="assets/js/core/app.js?v=1"></script>
+<!--/CORE-->
+<script src="assets/js/pages/login.js?v=1"></script>
+</body>
+</html>

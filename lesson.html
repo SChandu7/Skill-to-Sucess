@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<title>Lesson | SkillToSuccess</title>
+<meta name="robots" content="noindex">
+<!--HEAD-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A7BC2">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/app.css?v=1">
+<!--/HEAD-->
+</head>
+<body class="min-h-screen bg-white">
+<header class="sticky z-40 border-b border-line bg-white" style="top:env(safe-area-inset-top,0px)">
+  <div class="flex h-16 items-center gap-3 px-4 lg:px-6">
+    <button class="grid h-10 w-10 place-items-center rounded-lg hover:bg-sky-50 lg:hidden" id="toc-btn" aria-label="Show lessons" aria-controls="toc"><svg class="i" aria-hidden="true"><use href="#i-list-checks"></use></svg></button>
+    <a href="index.html" class="hidden h-9 w-9 flex-none sm:block" aria-label="SkillToSuccess home"><img src="assets/img/logo.svg" alt="" width="36" height="36"></a>
+    <div class="min-w-0 flex-1 sm:border-l sm:border-line sm:pl-4">
+      <a id="crumb" href="courses.html" class="block truncate text-sm font-medium text-ink-600 hover:text-sky-700">Course</a>
+      <div class="flex items-center gap-3"><div class="meter !h-1.5 max-w-[220px] flex-1"><span id="top-meter" style="width:0%"></span></div><span class="text-xs font-semibold text-ink-600 tabular" id="top-pct"></span></div>
+    </div>
+    <div id="top-right" class="flex items-center gap-2"></div>
+  </div>
+</header>
+<div class="lg:grid lg:grid-cols-[340px_1fr]">
+  <aside id="toc" class="fixed inset-y-0 left-0 z-50 w-[86%] max-w-sm -translate-x-full overflow-y-auto border-r border-line bg-white transition-transform duration-200 lg:sticky lg:top-16 lg:z-auto lg:h-[calc(100vh-4rem)] lg:w-auto lg:max-w-none lg:translate-x-0" aria-label="Course lessons"></aside>
+  <div id="toc-shade" class="fixed inset-0 z-40 bg-ink-900/40 lg:hidden" hidden></div>
+  <main id="main" class="min-w-0"><div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:py-10" id="lesson-root"><div class="skel aspect-video w-full rounded-3xl"></div><div class="skel mt-6 h-8 w-2/3"></div></div></main>
+</div>
+<!--CORE-->
+<script src="assets/js/core/icons.js?v=1"></script>
+<script src="assets/js/core/config.js?v=1"></script>
+<script src="assets/js/core/api.js?v=1"></script>
+<script src="assets/js/core/app.js?v=1"></script>
+<!--/CORE-->
+<script src="assets/js/chatbot.js?v=1"></script>
+<script src="assets/js/quiz.js?v=1"></script>
+<script src="assets/js/pages/lesson.js?v=1"></script>
+</body>
+</html>

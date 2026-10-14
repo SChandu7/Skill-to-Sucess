@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<title>About us | SkillToSuccess</title>
+<meta name="description" content="SkillToSuccess teaches practical digital skills in short lessons, with a quiz after each one and a certificate anyone can verify.">
+<meta property="og:image" content="assets/img/og-image.jpg">
+<!--HEAD-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A7BC2">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/app.css?v=1">
+<!--/HEAD-->
+</head>
+<body class="flex min-h-screen flex-col">
+<div id="site-header" class="h-[72px]"></div>
+<main id="main" class="flex-1 pb-20" tabindex="-1">
+  <section class="hero-sky border-b border-line">
+    <div class="container grid gap-10 py-14 sm:py-20 lg:grid-cols-[1.2fr_1fr] lg:items-center">
+      <div>
+        <p class="eyebrow">About SkillToSuccess</p>
+        <h1 class="text-display-xl">Skills you can show, not just certificates you can frame.</h1>
+        <p class="lead mt-5">We started in Guntur with one question from students and small-business owners: "What can I learn this month that someone will actually pay me for?" Every course here is built to answer that.</p>
+      </div>
+      <div class="grid grid-cols-2 gap-3" id="stats"></div>
+    </div>
+  </section>
+
+  <section class="container py-16">
+    <div class="grid gap-10 lg:grid-cols-[1fr_1.2fr]">
+      <div><h2 class="text-display-md">What we believe</h2><p class="mt-3 text-ink-600">Four rules shape every course, price and feature on this site.</p></div>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div class="card p-6"><span class="grid h-11 w-11 place-items-center rounded-2xl bg-sky-50 text-sky-700"><svg class="i" aria-hidden="true"><use href="#i-briefcase"></use></svg></span><h3 class="mt-4 text-lg">Work first</h3><p class="mt-1.5 text-[15px] text-ink-600">Every module ends with a task you could show a client: a post, a design, an edit, a page.</p></div>
+        <div class="card p-6"><span class="grid h-11 w-11 place-items-center rounded-2xl bg-orange-50 text-orange-700"><svg class="i" aria-hidden="true"><use href="#i-clock"></use></svg></span><h3 class="mt-4 text-lg">Short lessons</h3><p class="mt-1.5 text-[15px] text-ink-600">Most lessons take under 10 minutes, so you can learn between classes or after work.</p></div>
+        <div class="card p-6"><span class="grid h-11 w-11 place-items-center rounded-2xl bg-good-50 text-good-700"><svg class="i" aria-hidden="true"><use href="#i-badge-check"></use></svg></span><h3 class="mt-4 text-lg">Earned certificates</h3><p class="mt-1.5 text-[15px] text-ink-600">A certificate is issued only when every quiz is passed, and anyone can verify it online.</p></div>
+        <div class="card p-6"><span class="grid h-11 w-11 place-items-center rounded-2xl bg-sky-50 text-sky-700"><svg class="i" aria-hidden="true"><use href="#i-shield-check"></use></svg></span><h3 class="mt-4 text-lg">Honest rewards</h3><p class="mt-1.5 text-[15px] text-ink-600">Referral cashback is one level only. No teams, no targets, no promises of income.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bleed-cloud py-16">
+    <div class="container">
+      <h2 class="text-display-md">Who teaches</h2><p class="mt-2 text-ink-600">Working professionals who do this every day for real clients.</p>
+      <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" id="team"></div>
+    </div>
+  </section>
+
+  <section class="container py-16">
+    <div class="grid gap-6 rounded-[28px] bg-gradient-to-br from-sky-700 to-sky-500 p-8 text-white sm:p-12 lg:grid-cols-[1.4fr_1fr] lg:items-center">
+      <div><h2 class="text-display-md text-white">Start with a free lesson today</h2><p class="mt-3 text-sky-100">Every course has free preview lessons. No card needed.</p></div>
+      <div class="flex flex-wrap gap-3 lg:justify-end"><a href="courses.html" class="btn btn-buy btn-lg">Browse courses</a><a href="contact.html" class="btn btn-lg border border-white/40 text-white hover:bg-white/10">Talk to us</a></div>
+    </div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<!--CORE-->
+<script src="assets/js/core/icons.js?v=1"></script>
+<script src="assets/js/core/config.js?v=1"></script>
+<script src="assets/js/core/api.js?v=1"></script>
+<script src="assets/js/core/app.js?v=1"></script>
+<!--/CORE-->
+<script src="assets/js/chatbot.js?v=1"></script>
+<script>
+(function () {
+  var U = STS.ui;
+  U.boot().then(function (st) {
+    var x = st.site.stats;
+    U.$('#stats').innerHTML = U.proof(x, 4).map(function (s, i) { s = s.concat([{ learners: 'users', lessons: 'list-checks', 'practical courses': 'book-open', 'average rating': 'star', 'free preview lessons': 'lock-open', 'certificates issued': 'award' }[s[1]] || 'sparkles']);
+      return '<div class="stat ' + (i === 1 ? 'bg-sky-600 !border-sky-600 text-white' : '') + '">' + U.icon(s[2], i === 1 ? 'text-sky-100' : 'text-sky-600') + '<p class="v mt-3 ' + (i === 1 ? '!text-white' : '') + '">' + s[0] + '</p><p class="k ' + (i === 1 ? '!text-sky-100' : '') + '">' + s[1] + '</p></div>';
+    }).join('');
+    U.$('#team').innerHTML = st.site.instructors.map(function (p) {
+      var courses = st.site.courses.filter(function (c) { return c.instructor && c.instructor.name === p.name; });
+      return '<div class="card flex gap-4 p-5">' + (p.photo ? '<img src="' + U.esc(p.photo) + '" alt="" class="h-14 w-14 flex-none rounded-full object-cover">' : U.avatar(p.name, 56)) +
+        '<div class="min-w-0"><p class="font-semibold">' + U.esc(p.name) + '</p><p class="text-sm text-sky-700">' + U.esc(p.role || '') + (p.years ? ' · ' + p.years + ' years' : '') + '</p>' + (p.bio ? '<p class="mt-2 text-[15px] text-ink-600">' + U.esc(p.bio) + '</p>' : '') +
+        (courses.length ? '<p class="mt-2 text-sm text-ink-500">Teaches ' + courses.map(function (c) { return '<a class="link" href="course.html?c=' + c.slug + '">' + U.esc(c.title) + '</a>'; }).join(', ') + '</p>' : '') + '</div></div>';
+    }).join('');
+  });
+})();
+</script>
+</body>
+</html>

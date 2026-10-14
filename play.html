@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<title>Play &amp; earn | SkillToSuccess</title>
+<meta name="description" content="Free skill quizzes and quick learning games. Earn small rewards every day and use them at checkout.">
+<meta property="og:image" content="assets/img/og-image.jpg">
+<!--HEAD-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A7BC2">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/app.css?v=1">
+<!--/HEAD-->
+</head>
+<body class="flex min-h-screen flex-col">
+<div id="site-header" class="h-[72px]"></div>
+<main id="main" class="flex-1 pb-20" tabindex="-1">
+  <div id="lobby">
+    <section class="wash border-b border-line">
+      <div class="container grid gap-8 py-12 sm:py-16 lg:grid-cols-[1.3fr_1fr] lg:items-center">
+        <div>
+          <p class="eyebrow">Play &amp; earn</p>
+          <h1 class="text-display-lg">Learn something small. Earn something small. Every day.</h1>
+          <p class="lead mt-4" id="lead">Free quizzes and 60-second games built from our course content. Rewards go to your wallet and take money off your first package.</p>
+        </div>
+        <div class="card p-6" id="today"><div class="skel h-36"></div></div>
+      </div>
+    </section>
+
+    <div id="paused" class="container mt-10" hidden>
+      <div class="flex items-start gap-4 rounded-3xl border border-warn-600/30 bg-warn-50 p-6"><svg class="i i-lg flex-none text-warn-600" aria-hidden="true"><use href="#i-pause"></use></svg><div><p class="font-semibold">Play &amp; earn is paused right now</p><p class="mt-1 text-ink-600">You can still browse courses and try free preview lessons. Please check back later.</p></div></div>
+    </div>
+
+    <div class="container mt-12 grid gap-10 lg:grid-cols-[1fr_320px]">
+      <div class="min-w-0">
+        <section aria-labelledby="h-games">
+          <div class="flex items-end justify-between gap-4"><div><h2 id="h-games" class="text-display-md">Quick games</h2><p class="mt-1 text-ink-600">Under a minute each. Paid once a day per game.</p></div></div>
+          <div class="mt-6 grid gap-4 sm:grid-cols-3" id="games"><div class="skel h-56 rounded-3xl"></div><div class="skel h-56 rounded-3xl"></div><div class="skel h-56 rounded-3xl"></div></div>
+        </section>
+        <section class="mt-14" aria-labelledby="h-quiz">
+          <h2 id="h-quiz" class="text-display-md">Skill quizzes</h2><p class="mt-1 text-ink-600" id="quiz-sub">One quiz per course. Each correct answer earns a reward.</p>
+          <div class="mt-6 grid gap-4 sm:grid-cols-2" id="topics"><div class="skel h-40 rounded-3xl"></div><div class="skel h-40 rounded-3xl"></div></div>
+        </section>
+      </div>
+      <aside class="space-y-6">
+        <div class="card p-6"><h2 class="flex items-center gap-2 text-lg"><svg class="i text-orange-500" aria-hidden="true"><use href="#i-trophy"></use></svg>Top learners</h2><p class="text-sm text-ink-500">By XP from lessons, quizzes and games</p><ol class="mt-4 space-y-1" id="board"></ol></div>
+        <div class="card p-6"><h2 class="text-lg">How rewards work</h2><ul class="mt-3 space-y-3 text-[15px] text-ink-700" id="rules"></ul><a href="legal.html#play" class="link mt-4 inline-block text-sm">Full play &amp; earn rules</a></div>
+      </aside>
+    </div>
+  </div>
+
+  <section id="stage" class="container max-w-3xl py-8 sm:py-12" hidden aria-live="polite"></section>
+</main>
+<div id="site-footer"></div>
+<!--CORE-->
+<script src="assets/js/core/icons.js?v=1"></script>
+<script src="assets/js/core/config.js?v=1"></script>
+<script src="assets/js/core/api.js?v=1"></script>
+<script src="assets/js/core/app.js?v=1"></script>
+<!--/CORE-->
+<script src="assets/js/chatbot.js?v=1"></script>
+<script src="assets/js/quiz.js?v=1"></script>
+<script src="assets/js/pages/play.js?v=1"></script>
+</body>
+</html>

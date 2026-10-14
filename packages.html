@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<title>Pricing and packages | SkillToSuccess</title>
+<meta name="description" content="Compare SkillToSuccess packages. One-time payment, lifetime access, certificates and one-level referral cashback.">
+<meta property="og:image" content="assets/img/og-image.jpg">
+<!--HEAD-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A7BC2">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/app.css?v=1">
+<!--/HEAD-->
+</head>
+<body class="flex min-h-screen flex-col">
+<div id="site-header" class="h-[72px]"></div>
+<main id="main" class="pb-20">
+  <section class="hero-sky">
+    <div class="container pb-12 pt-12 text-center sm:pt-16">
+      <p class="eyebrow">Pricing</p>
+      <h1 class="mx-auto max-w-3xl text-display-lg">One payment. Lifetime access. Upgrade by paying the difference.</h1>
+      <p class="lead mx-auto mt-4">Prices include GST. No subscription, no auto-renewal. Free preview lessons in every course before you pay.</p>
+      <p class="mx-auto mt-4 hidden w-fit items-center gap-2 rounded-full bg-orange-50 px-4 py-2 text-sm font-semibold text-orange-800" id="ref-note"><svg class="i i-sm" aria-hidden="true"><use href="#i-gift"></use></svg><span></span></p>
+    </div>
+  </section>
+  <section class="container"><div class="grid gap-4 md:grid-cols-2 xl:grid-cols-5" id="plans"></div></section>
+  <section class="container mt-20" aria-labelledby="cmp-h">
+    <div class="mb-6 flex flex-wrap items-end justify-between gap-4"><h2 id="cmp-h" class="text-display-md">Compare everything</h2><p class="text-sm text-ink-500 md:hidden">Scroll sideways to see all packages</p></div>
+    <div class="table-wrap"><table class="tbl min-w-[880px]" id="cmp"></table></div>
+  </section>
+  <section class="container mt-20 grid gap-6 lg:grid-cols-2">
+    <div class="card p-6 sm:p-8">
+      <h2 class="text-2xl">Upgrade cost</h2><p class="mt-2 text-ink-600">Already have a package? You only pay the gap. Progress, certificates and your referral code stay.</p>
+      <div class="mt-6 grid grid-cols-2 gap-3"><div><label for="up-from" class="label">I have</label><select id="up-from" class="input"></select></div><div><label for="up-to" class="label">I want</label><select id="up-to" class="input"></select></div></div>
+      <div class="mt-5 flex items-center justify-between gap-4 rounded-2xl bg-sky-50 p-5"><div><p class="text-sm text-ink-500">You pay</p><p class="font-display text-3xl font-semibold tabular" id="up-cost">₹0</p></div><p class="max-w-[220px] text-right text-sm text-ink-600" id="up-gain"></p></div>
+    </div>
+    <div class="card p-6 sm:p-8"><h2 class="text-2xl">Need just one course?</h2><p class="mt-2 text-ink-600">Every course can be bought on its own, with the same lessons, quizzes and certificate.</p><ul class="mt-5 divide-y divide-line" id="single"></ul></div>
+  </section>
+  <section class="container mt-20 grid gap-10 lg:grid-cols-[1fr_2fr]">
+    <div><h2 class="text-display-md">Before you pay</h2><p class="mt-3 text-ink-600">Short answers to the questions people ask most. <a class="link" href="legal.html#refund">Refund policy</a></p></div>
+    <div class="divide-y divide-line border-y border-line" id="pfaq"></div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<!--CORE-->
+<script src="assets/js/core/icons.js?v=1"></script>
+<script src="assets/js/core/config.js?v=1"></script>
+<script src="assets/js/core/api.js?v=1"></script>
+<script src="assets/js/core/app.js?v=1"></script>
+<!--/CORE-->
+<script src="assets/js/chatbot.js?v=1"></script>
+<script>
+(function () {
+  var U = STS.ui, A = STS.api;
+  U.boot().then(function (st) {
+    var me = st.me, P = st.site.packages, cur = me && me.package ? st.packageMap[me.package.slug] : null, R = st.site.settings.referral;
+    if (U.savedRef() && !(me && me.has_purchased)) { var n = U.$('#ref-note'); n.classList.remove('hidden'); n.classList.add('flex'); n.querySelector('span').textContent = 'Your friend\'s code saves you ' + U.inr(R.friend_discount) + ' at checkout.'; }
+    U.$('#plans').innerHTML = P.map(function (p) {
+      var owned = cur && cur.slug === p.slug, below = cur && cur.price > p.price, pop = p.is_popular;
+      var cta = owned ? '<span class="btn btn-soft btn-block">' + U.icon('check', 'i-sm') + 'Your package</span>' : below ? '<span class="btn btn-block border border-line text-ink-400">Included in yours</span>' :
+        '<a class="btn btn-block ' + (pop ? 'btn-buy' : 'btn-primary') + '" href="checkout.html?plan=' + p.slug + '">' + (cur ? 'Upgrade for ' + U.inr(p.price - cur.price) : 'Enroll in ' + U.esc(p.name)) + '</a>';
+      return '<article class="relative flex flex-col rounded-3xl border ' + (pop ? 'border-sky-600 bg-gradient-to-b from-sky-50 to-white shadow-lift ring-1 ring-sky-600' : 'border-line bg-white') + ' p-6">' +
+        (pop ? '<span class="absolute -top-3 left-6 tag bg-orange-400 !px-2.5 !py-1 text-ink-900">' + U.esc(p.tagline || 'Most chosen') + '</span>' : '<p class="text-sm font-semibold text-sky-700">' + U.esc(p.tagline) + '</p>') +
+        '<h2 class="mt-1 text-2xl">' + U.esc(p.name) + '</h2>' +
+        '<p class="mt-3 flex items-baseline gap-2"><span class="font-display text-4xl font-semibold tabular">' + U.inr(p.price) + '</span>' + (p.mrp ? '<s class="text-sm text-ink-400 tabular">' + U.inr(p.mrp) + '</s>' : '') + '</p>' +
+        (p.mrp && p.mrp > p.price ? '<p class="text-sm font-semibold text-good-600">Save ' + Math.round((1 - p.price / p.mrp) * 100) + '%</p>' : '<p class="text-sm">&nbsp;</p>') +
+        '<ul class="mt-5 space-y-2.5 text-[15px]">' + (p.perks.length ? p.perks : [p.courses.length + ' courses, ' + p.lesson_count + ' lessons']).map(function (k) { return '<li class="flex gap-2.5">' + U.icon('check', 'i-sm mt-1 flex-none text-sky-600') + '<span>' + U.esc(k) + '</span></li>'; }).join('') + '</ul>' +
+        '<details class="mt-5 rounded-2xl bg-cloud px-4 py-3 text-sm"><summary class="cursor-pointer font-semibold">Courses included</summary><ul class="mt-2 space-y-1 text-ink-700">' + p.courses.map(function (s) { var c = st.courseMap[s]; return c ? '<li><a class="hover:text-sky-700" href="course.html?c=' + s + '">' + U.esc(c.title) + '</a></li>' : ''; }).join('') + '</ul></details>' +
+        '<div class="mt-auto pt-6">' + cta + '</div></article>';
+    }).join('');
+
+    var yes = '<span class="inline-grid h-6 w-6 place-items-center rounded-full bg-sky-50 text-sky-700">' + U.icon('check', 'i-sm') + '<span class="sr-only">Included</span></span>';
+    var no = '<span class="text-ink-300" aria-label="Not included">—</span>';
+    var row = function (label, fn) { return '<tr><th scope="row" class="!bg-white !text-sm !font-medium !text-ink-800">' + label + '</th>' + P.map(function (p) { return '<td class="text-center">' + fn(p) + '</td>'; }).join('') + '</tr>'; };
+    var group = function (t) { return '<tr><th colspan="' + (P.length + 1) + '" class="!bg-cloud !pt-5 font-display !text-sm !text-ink-900">' + t + '</th></tr>'; };
+    U.$('#cmp').innerHTML = '<thead><tr><th class="!bg-white w-[240px]"></th>' + P.map(function (p) { return '<th class="!bg-white text-center"><span class="block font-display text-lg text-ink-900">' + U.esc(p.name) + '</span><span class="block font-display text-xl font-semibold tabular text-sky-700">' + U.inr(p.price) + '</span></th>'; }).join('') + '</tr></thead><tbody>' +
+      group('Courses') + st.site.courses.map(function (c) { return row('<a class="hover:text-sky-700" href="course.html?c=' + c.slug + '">' + U.esc(c.title) + '</a>', function (p) { return p.courses.indexOf(c.slug) >= 0 ? yes : no; }); }).join('') +
+      row('<b>Total lessons</b>', function (p) { return '<b class="tabular">' + p.lesson_count + '</b>'; }) +
+      group('Learning') + row('Lesson quizzes and certificates', function () { return yes; }) + row('Free resources and cheat sheets', function () { return yes; }) + row('New courses added later', function (p) { return p.includes_future_courses ? yes : no; }) +
+      group('Support') + row('Support', function (p) { return '<span class="text-xs text-ink-600">' + U.esc(p.support_text || 'Email') + '</span>'; }) +
+      group('Refer &amp; earn (one level)') + row('Your cashback per friend\'s purchase', function (p) { return '<b class="tabular text-orange-600">' + p.cashback_percent + '%</b>'; }) + row('Discount your friend gets', function () { return U.inr(R.friend_discount) + ' off'; }) +
+      '<tr><th class="!bg-white"></th>' + P.map(function (p) { return '<td class="text-center">' + (cur && cur.price >= p.price ? '' : '<a class="btn btn-sm ' + (p.is_popular ? 'btn-buy' : 'btn-ghost') + '" href="checkout.html?plan=' + p.slug + '">' + (cur ? 'Upgrade' : 'Choose') + '</a>') + '</td>'; }).join('') + '</tr></tbody>';
+
+    var from = U.$('#up-from'), to = U.$('#up-to');
+    from.innerHTML = P.slice(0, -1).map(function (p) { return '<option value="' + p.slug + '">' + U.esc(p.name) + ' (' + U.inr(p.price) + ')</option>'; }).join('');
+    if (cur && P.indexOf(cur) < P.length - 1) from.value = cur.slug;
+    function fillTo() { var f = st.packageMap[from.value]; to.innerHTML = P.filter(function (p) { return p.price > f.price; }).map(function (p) { return '<option value="' + p.slug + '">' + U.esc(p.name) + ' (' + U.inr(p.price) + ')</option>'; }).join(''); up(); }
+    function up() { var f = st.packageMap[from.value], t = st.packageMap[to.value]; if (!f || !t) return; U.$('#up-cost').textContent = U.inr(t.price - f.price); var g = t.courses.length - f.courses.length; U.$('#up-gain').textContent = '+' + g + ' course' + (g === 1 ? '' : 's') + ', cashback rate ' + f.cashback_percent + '% to ' + t.cashback_percent + '%'; }
+    if (P.length > 1) { from.addEventListener('change', fillTo); to.addEventListener('change', up); fillTo(); } else from.closest('.card').hidden = true;
+
+    U.$('#single').innerHTML = st.site.courses.slice().sort(function (a, b) { return a.price - b.price; }).map(function (c) {
+      return '<li class="flex items-center gap-3 py-3"><span class="h-9 w-9 flex-none overflow-hidden rounded-xl" style="background:' + c.color + '">' + U.cover(c) + '</span><a class="min-w-0 flex-1 truncate font-medium hover:text-sky-700" href="course.html?c=' + c.slug + '">' + U.esc(c.title) + '</a>' +
+        (U.owned(c.slug) ? '<span class="tag tag-good">Owned</span>' : '<a class="btn btn-ghost btn-sm tabular" href="checkout.html?course=' + c.slug + '">' + U.inr(c.price) + '</a>') + '</li>';
+    }).join('');
+
+    A.faqs().then(function (list) {
+      var pick = list.filter(function (f) { return /pay|refer|refund|upgrade/i.test(f.category + ' ' + f.question); }).slice(0, 8);
+      U.$('#pfaq').innerHTML = pick.map(function (f, i) { return '<div><button class="acc-btn" data-acc aria-expanded="false" aria-controls="pf-' + i + '">' + U.esc(f.question) + U.icon('chevron-down', 'text-ink-400') + '</button><div id="pf-' + i + '" class="pb-5 pr-8 text-ink-600" hidden>' + U.esc(f.answer) + '</div></div>'; }).join('');
+      U.accordions(U.$('#pfaq'));
+    });
+  });
+})();
+</script>
+</body>
+</html>

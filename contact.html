@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<title>Contact us | SkillToSuccess</title>
+<meta name="description" content="Talk to the SkillToSuccess team about courses, payments, refunds or referral cashback. We reply within one working day.">
+<!--HEAD-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A7BC2">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/app.css?v=1">
+<!--/HEAD-->
+</head>
+<body class="flex min-h-screen flex-col">
+<div id="site-header" class="h-[72px]"></div>
+<main id="main" class="flex-1 pb-20" tabindex="-1">
+  <section class="wash border-b border-line">
+    <div class="container py-12 sm:py-16">
+      <nav class="mb-4 text-sm text-ink-500" aria-label="Breadcrumb"><a href="index.html" class="hover:text-sky-700">Home</a><span class="mx-2">/</span><span class="text-ink-800">Contact</span></nav>
+      <h1 class="text-display-lg">We are here to help</h1>
+      <p class="lead mt-3">Questions about a course, a payment or your cashback? Send us a message and a real person replies within one working day.</p>
+    </div>
+  </section>
+  <div class="container mt-10 grid gap-8 lg:grid-cols-[1fr_380px]">
+    <section class="card p-6 sm:p-8" id="form-card">
+      <h2 class="text-display-md">Send a message</h2>
+      <form id="cf" class="mt-6 grid gap-5 sm:grid-cols-2" novalidate>
+        <div><label class="label" for="c-name">Your name</label><input class="input" id="c-name" name="name" autocomplete="name" required></div>
+        <div><label class="label" for="c-phone">Mobile number <span class="font-normal text-ink-400">(optional)</span></label><input class="input tabular" id="c-phone" name="phone" inputmode="numeric" maxlength="10" autocomplete="tel-national"></div>
+        <div class="sm:col-span-2"><label class="label" for="c-email">Email</label><input class="input" id="c-email" name="email" type="email" autocomplete="email" required></div>
+        <div><label class="label" for="c-topic">Topic</label><select class="input" id="c-topic" name="topic"><option>Choosing a course</option><option>Payment or order</option><option>Refund</option><option>Referral cashback</option><option>Withdrawal</option><option>Certificate</option><option>Login or account</option><option>Something else</option></select></div>
+        <div id="ref-wrap"><label class="label" for="c-order">Order number <span class="font-normal text-ink-400">(optional)</span></label><input class="input" id="c-order" name="order_ref" placeholder="ord_..." autocomplete="off"></div>
+        <div class="sm:col-span-2"><label class="label" for="c-msg">How can we help?</label><textarea class="input min-h-[150px]" id="c-msg" name="message" maxlength="3000" required></textarea><p class="mt-1 text-right text-xs text-ink-400"><span id="c-count">0</span>/3000</p></div>
+        <div class="sm:col-span-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><p class="text-sm text-ink-500">We only use your details to reply to this message.</p><button class="btn btn-primary btn-lg">Send message</button></div>
+      </form>
+    </section>
+    <aside class="space-y-4" id="ways"><div class="skel h-64 rounded-3xl"></div></aside>
+  </div>
+</main>
+<div id="site-footer"></div>
+<!--CORE-->
+<script src="assets/js/core/icons.js?v=1"></script>
+<script src="assets/js/core/config.js?v=1"></script>
+<script src="assets/js/core/api.js?v=1"></script>
+<script src="assets/js/core/app.js?v=1"></script>
+<!--/CORE-->
+<script src="assets/js/chatbot.js?v=1"></script>
+<script>
+(function () {
+  var U = STS.ui, A = STS.api;
+  U.boot().then(function (st) {
+    var s = st.site.settings, me = st.me, f = U.$('#cf');
+    U.$('#ways').innerHTML =
+      '<div class="card p-6"><h2 class="text-lg">Other ways to reach us</h2><ul class="mt-4 space-y-4 text-[15px]">' +
+      '<li class="flex gap-3">' + U.icon('message-circle', 'mt-0.5 flex-none text-good-600') + '<div><p class="font-semibold">WhatsApp</p><a class="link" target="_blank" rel="noopener" href="https://wa.me/' + U.esc(s.whatsapp) + '">Chat with us</a></div></li>' +
+      '<li class="flex gap-3">' + U.icon('phone', 'mt-0.5 flex-none text-sky-600') + '<div><p class="font-semibold">Phone</p><a class="text-ink-700 hover:text-sky-700" href="tel:' + U.esc(s.phone.replace(/\s/g, '')) + '">' + U.esc(s.phone) + '</a></div></li>' +
+      '<li class="flex gap-3">' + U.icon('mail', 'mt-0.5 flex-none text-sky-600') + '<div><p class="font-semibold">Email</p><a class="text-ink-700 hover:text-sky-700" href="mailto:' + U.esc(s.email) + '">' + U.esc(s.email) + '</a></div></li>' +
+      '<li class="flex gap-3">' + U.icon('clock', 'mt-0.5 flex-none text-sky-600') + '<div><p class="font-semibold">Hours</p><p class="text-ink-700">' + U.esc(s.hours) + '</p></div></li>' +
+      '<li class="flex gap-3">' + U.icon('map-pin', 'mt-0.5 flex-none text-sky-600') + '<div><p class="font-semibold">Office</p><p class="text-ink-700">' + U.esc(s.address) + '</p></div></li></ul></div>' +
+      '<div class="rounded-3xl bg-sky-50 p-6"><p class="font-semibold">Quick answers</p><p class="mt-1 text-[15px] text-ink-600">Most questions about payments, refunds and cashback are answered in our help centre.</p><a class="btn btn-ghost btn-sm mt-4" href="help.html">Open help centre</a></div>';
+
+    if (me) { U.$('#c-name').value = me.name; U.$('#c-email').value = me.email; U.$('#c-phone').value = me.phone || ''; }
+    var topic = U.param('topic'); if (topic) { U.$$('#c-topic option').forEach(function (o) { if (o.value.toLowerCase().indexOf(topic.toLowerCase()) === 0) o.selected = true; }); }
+    var ord = U.param('order'); if (ord) U.$('#c-order').value = ord;
+    var msg = U.$('#c-msg'); msg.addEventListener('input', function () { U.$('#c-count').textContent = msg.value.length; });
+    U.$('#c-phone').addEventListener('input', function (e) { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10); });
+
+    f.addEventListener('submit', function (e) {
+      e.preventDefault(); U.fieldError(f, null);
+      var d = { name: U.$('#c-name').value.trim(), email: U.$('#c-email').value.trim(), phone: U.$('#c-phone').value.trim(), topic: U.$('#c-topic').value, order_ref: U.$('#c-order').value.trim(), message: msg.value.trim() };
+      if (d.name.length < 2) return U.fieldError(f, 'name', 'Enter your name.');
+      if (!/^\S+@\S+\.\S+$/.test(d.email)) return U.fieldError(f, 'email', 'Enter a valid email address.');
+      if (d.phone && d.phone.length !== 10) return U.fieldError(f, 'phone', 'Enter a 10-digit mobile number, or leave it empty.');
+      if (d.message.length < 10) return U.fieldError(f, 'message', 'Add a few more details so we can help.');
+      var b = f.querySelector('button.btn-primary'); U.busy(b, true, 'Sending');
+      A.contact(d).then(function (r) {
+        U.$('#form-card').innerHTML = '<div class="py-8 text-center"><span class="mx-auto grid h-16 w-16 place-items-center rounded-3xl bg-good-50 text-good-600 animate-pop">' + U.icon('check-check', 'i-lg') + '</span><h2 class="mt-5 text-display-md">Message received</h2><p class="mx-auto mt-2 max-w-md text-ink-600">Your ticket number is <b class="tabular text-ink-900">' + U.esc(r.ticket) + '</b>. We reply to ' + U.esc(d.email) + ' within one working day.</p><div class="mt-6 flex justify-center gap-2"><a class="btn btn-ghost" href="help.html">Browse help</a><a class="btn btn-primary" href="courses.html">Back to courses</a></div></div>';
+      }, function (err) { U.busy(b, false); U.failure(err, f); });
+    });
+  });
+})();
+</script>
+</body>
+</html>

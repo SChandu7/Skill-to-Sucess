@@ -1,0 +1,21 @@
+{
+  "name": "skilltosuccess-frontend",
+  "version": "1.0.0",
+  "description": "SkillToSuccess website and admin panel (static HTML + Tailwind CSS + JavaScript)",
+  "scripts": {
+    "build:css": "tailwindcss -i src/input.css -o assets/css/app.css --minify",
+    "watch:css": "tailwindcss -i src/input.css -o assets/css/app.css --watch",
+    "build:icons": "node scripts/build-icons.js"
+  },
+  "keywords": [],
+  "author": "InfuTechz",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@fontsource/figtree": "^5.3.0",
+    "@fontsource/lexend": "^5.3.0",
+    "lucide-static": "^1.55.0",
+    "qrcode-generator": "^2.0.4",
+    "tailwindcss": "^3.4.17"
+  },
+  "private": true
+}

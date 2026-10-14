@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<title>Terms, refunds and privacy | SkillToSuccess</title>
+<meta name="description" content="Terms of use, refund policy, referral cashback terms, play & earn rules and privacy policy for SkillToSuccess.">
+<!--HEAD-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A7BC2">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/app.css?v=1">
+<!--/HEAD-->
+</head>
+<body class="flex min-h-screen flex-col">
+<div id="site-header" class="h-[72px]"></div>
+<main id="main" class="flex-1 pb-20" tabindex="-1">
+  <section class="wash border-b border-line">
+    <div class="container py-12 sm:py-14">
+      <h1 class="text-display-lg">Policies</h1>
+      <p class="lead mt-3">Plain-English rules for using SkillToSuccess. Last updated <span id="updated">1 October 2026</span>.</p>
+    </div>
+  </section>
+  <div class="container mt-10 grid gap-10 lg:grid-cols-[220px_1fr]">
+    <nav class="flex gap-2 overflow-x-auto scrollbar-none lg:sticky lg:top-[96px] lg:flex-col lg:self-start" aria-label="Policies" id="lnav">
+      <a class="side-link flex-none" href="#terms">Terms of use</a>
+      <a class="side-link flex-none" href="#refund">Refund policy</a>
+      <a class="side-link flex-none" href="#referral">Referral terms</a>
+      <a class="side-link flex-none" href="#play">Play &amp; earn rules</a>
+      <a class="side-link flex-none" href="#privacy">Privacy policy</a>
+    </nav>
+    <article class="prose-lesson min-w-0 !max-w-[72ch]" id="doc"><div class="skel h-96"></div></article>
+  </div>
+</main>
+<div id="site-footer"></div>
+<!--CORE-->
+<script src="assets/js/core/icons.js?v=1"></script>
+<script src="assets/js/core/config.js?v=1"></script>
+<script src="assets/js/core/api.js?v=1"></script>
+<script src="assets/js/core/app.js?v=1"></script>
+<!--/CORE-->
+<script src="assets/js/chatbot.js?v=1"></script>
+<script>
+(function () {
+  var U = STS.ui;
+  U.boot().then(function (st) {
+    var s = st.site.settings, r = s.referral, p = s.play, B = U.esc(s.brand), inr = U.inr;
+    function sec(id, title, html) { return '<section id="' + id + '" class="scroll-mt-28 border-b border-line pb-10 pt-2 last:border-0"><h2 class="!mt-0 font-display text-2xl font-semibold text-ink-900">' + title + '</h2>' + html + '</section>'; }
+    U.$('#doc').innerHTML =
+      sec('terms', 'Terms of use',
+        '<p>These terms apply when you use ' + B + ' (the "site"), run from ' + U.esc(s.address) + '. By creating an account or buying a course you agree to them.</p>' +
+        '<h3>Your account</h3><ul><li>You need a valid email and Indian mobile number. One person, one account.</li><li>Keep your password private. You are responsible for activity on your account.</li><li>We may block accounts that share course content, abuse rewards or harass others.</li></ul>' +
+        '<h3>What you buy</h3><ul><li>A package or single course gives you lifetime access to its lessons, quizzes and certificate for personal learning.</li><li>Course videos, text, images and files belong to ' + B + ' and our instructors. Do not download, re-upload or resell them.</li><li>Prices are in Indian rupees and include GST. Payments are processed by Razorpay.</li></ul>' +
+        '<h3>No income promise</h3><p>' + B + ' sells education. We do not promise jobs, clients or any income. Results depend on your own effort.</p>') +
+      sec('refund', 'Refund policy',
+        '<p>Access starts right after payment, so purchases are generally non-refundable. We do refund in full when:</p><ul><li>you were charged twice for the same order,</li><li>you were charged but did not get access within 24 hours and we cannot fix it, or</li><li>you were charged by mistake and have not opened any paid lesson.</li></ul>' +
+        '<p>Write to <a class="link" href="contact.html?topic=refund">support</a> within ' + r.hold_days + ' days of payment with your order number. Approved refunds go back to the original payment method in 5 to 7 working days.</p>' +
+        '<p>When an order is refunded, access to its courses ends, any certificates from those courses are withdrawn, and referral cashback paid on that order is reversed.</p>') +
+      sec('referral', 'Referral cashback terms',
+        '<ul><li><b>One level only.</b> You earn cashback only when someone buys with your own code. You never earn from people your friends refer. There are no teams, targets or joining fees.</li>' +
+        '<li>You get a referral code after your first purchase. Your cashback rate depends on your package and is shown in your dashboard.</li>' +
+        '<li>Your friend gets ' + inr(r.friend_discount) + ' off their first package. Cashback counts only on their first purchase.</li>' +
+        '<li>Cashback is held for ' + r.hold_days + ' days (the refund window), then becomes available.' + (r.learn_first ? ' To withdraw, you must also have completed at least one course.' : '') + '</li>' +
+        '<li>Minimum withdrawal is ' + inr(r.min_withdraw) + ' to your own UPI ID. Payouts are processed within ' + r.payout_days + ' working days.</li>' +
+        '<li>Self-referrals, fake accounts and purchases from the same device or network may be held for review or reversed.</li>' +
+        '<li>We may change cashback rates for future purchases. Cashback already earned is not reduced.</li></ul>') +
+      sec('play', 'Play &amp; earn rules',
+        '<ul><li>Free quizzes pay ' + inr(p.per_correct) + ' per correct answer, up to ' + inr(p.per_quiz_cap) + ' a quiz. Games pay small fixed rewards.</li>' +
+        '<li>Each quiz and each game pays once a day. You can play again for practice.</li>' +
+        '<li>You can earn up to ' + inr(p.daily_cap) + ' a day in total. Rounds are timed on our server.</li>' +
+        '<li>Play rewards can be used for up to ' + inr(p.checkout_max) + ' off your first package. They cannot be withdrawn as cash.</li>' +
+        '<li>Rewards earned as a guest are kept for 7 days and move to your wallet when you create an account in the same browser.</li>' +
+        '<li>Bots, scripts and multiple accounts are not allowed. We may remove rewards earned this way.</li></ul>') +
+      sec('privacy', 'Privacy policy',
+        '<h3>What we collect</h3><ul><li>Account details: name, email, mobile number and city.</li><li>Learning data: lessons completed, quiz scores and certificates.</li><li>Payment records: order amounts and Razorpay payment IDs. We never see or store your card details or UPI PIN.</li><li>For withdrawals: your UPI ID, and PAN when the law requires it.</li><li>Basic technical data such as IP address, used to stop fraud.</li></ul>' +
+        '<h3>How we use it</h3><ul><li>To give you access, issue certificates and pay cashback.</li><li>To send important messages about your account and orders.</li><li>We do not sell your data. Your certificate name, course and date are public on the verify page.</li></ul>' +
+        '<h3>Your choices</h3><p>You can update your details in your dashboard and ask us to delete your account from the profile page. Some records, such as invoices, must be kept for tax reasons.</p>' +
+        '<p>Questions? Email <a class="link" href="mailto:' + U.esc(s.email) + '">' + U.esc(s.email) + '</a>.</p>');
+    var links = U.$$('#lnav a');
+    function mark() { var h = location.hash || '#terms'; links.forEach(function (a) { if (a.getAttribute('href') === h) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }); }
+    window.addEventListener('hashchange', mark); mark();
+    if (location.hash) { var t = document.querySelector(location.hash); if (t) t.scrollIntoView(); }
+  });
+})();
+</script>
+</body>
+</html>

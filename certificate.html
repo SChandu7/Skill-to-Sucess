@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<title>Certificate | SkillToSuccess</title>
+<meta name="robots" content="noindex">
+<!--HEAD-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A7BC2">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/app.css?v=1">
+<!--/HEAD-->
+<style>
+@media print {
+  @page { size: A4 landscape; margin: 0; }
+  body { background: #fff !important; }
+  .no-print { display: none !important; }
+  #print-area { padding: 0 !important; max-width: none !important; }
+  #print-area .cert { box-shadow: none !important; border: 0 !important; border-radius: 0 !important; width: 100vw; }
+}
+</style>
+</head>
+<body class="flex min-h-screen flex-col bg-cloud">
+<div class="no-print"><div id="site-header" class="h-[72px]"></div></div>
+<main id="main" class="flex-1 pb-16" tabindex="-1">
+  <div class="container max-w-5xl py-8 sm:py-12" id="print-area"><div class="skel aspect-[1.414/1] rounded-xl"></div></div>
+</main>
+<div class="no-print"><div id="site-footer"></div></div>
+<!--CORE-->
+<script src="assets/js/core/icons.js?v=1"></script>
+<script src="assets/js/core/config.js?v=1"></script>
+<script src="assets/js/core/api.js?v=1"></script>
+<script src="assets/js/core/app.js?v=1"></script>
+<!--/CORE-->
+<script src="assets/vendor/qrcode.js"></script>
+<script src="assets/js/cert.js?v=1"></script>
+<script>
+(function () {
+  var U = STS.ui, A = STS.api;
+  U.boot({ noChat: true }).then(function (st) {
+    var host = U.$('#print-area'), id = U.param('id');
+    function miss(msg) { host.innerHTML = '<div class="mx-auto max-w-md py-16 text-center"><span class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-white text-ink-500 shadow-card">' + U.icon('award', 'i-lg') + '</span><h1 class="mt-5 text-2xl">' + msg + '</h1><p class="mt-2 text-ink-600">Check the link, or search for the certificate ID.</p><a class="btn btn-primary mt-6" href="verify.html">Verify a certificate</a></div>'; }
+    if (!id) return miss('No certificate selected');
+    A.verifyCertificate(id).then(function (c) {
+      document.title = c.course.title + ' certificate, ' + c.name + ' | SkillToSuccess';
+      var link = STS.cert.verifyUrl(c.code);
+      var share = encodeURIComponent('I completed ' + c.course.title + ' on SkillToSuccess. Verify my certificate: ' + link);
+      var d = new Date(c.issued_at);
+      var li = 'https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=' + encodeURIComponent(c.course.title) + '&organizationName=SkillToSuccess&issueYear=' + d.getFullYear() + '&issueMonth=' + (d.getMonth() + 1) + '&certId=' + encodeURIComponent(c.code) + '&certUrl=' + encodeURIComponent(link);
+      var mine = st.me && st.me.certificates > 0 && st.me.name === c.name;
+      host.innerHTML =
+        '<div class="no-print mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">' +
+        '<div><nav class="mb-2 text-sm text-ink-500" aria-label="Breadcrumb">' + (mine ? '<a href="dashboard.html#certificates" class="hover:text-sky-700">My certificates</a>' : '<a href="verify.html" class="hover:text-sky-700">Verify</a>') + '<span class="mx-2">/</span><span class="text-ink-800">' + U.esc(c.code) + '</span></nav>' +
+        '<h1 class="text-display-md">' + U.esc(c.course.title) + '</h1><p class="mt-1 text-ink-600">' + (c.revoked ? '<span class="tag tag-bad">Withdrawn</span>' : '<span class="tag tag-good">' + U.icon('badge-check', 'i-sm') + 'Verified</span>') + ' Issued to ' + U.esc(c.name) + ' on ' + U.date(c.issued_at) + '</p></div>' +
+        '<div class="flex flex-wrap gap-2">' + (c.revoked ? '' : '<button class="btn btn-primary" data-print>' + U.icon('download', 'i-sm') + 'Download PDF</button>' +
+          '<a class="btn btn-ghost" target="_blank" rel="noopener" href="' + li + '">Add to LinkedIn</a>' +
+          '<a class="btn btn-ghost" target="_blank" rel="noopener" href="https://wa.me/?text=' + share + '">Share on WhatsApp</a>') +
+        '<button class="btn btn-ghost" data-copy>' + U.icon('copy', 'i-sm') + 'Copy link</button></div></div>' +
+        STS.cert.render(c) +
+        '<p class="no-print mt-5 text-center text-sm text-ink-500">Anyone can check this certificate at <a class="link" href="verify.html?id=' + encodeURIComponent(c.code) + '">verify.html</a> with ID <b class="tabular">' + U.esc(c.code) + '</b>.</p>';
+      var pb = host.querySelector('[data-print]'); if (pb) pb.addEventListener('click', function () { U.toast('In the print window, choose "Save as PDF".', 'info'); setTimeout(function () { window.print(); }, 300); });
+      host.querySelector('[data-copy]').addEventListener('click', function () { U.copy(link, 'Certificate link'); });
+    }, function (err) { miss(err.status === 404 ? 'Certificate not found' : U.esc(err.message)); });
+  });
+})();
+</script>
+</body>
+</html>

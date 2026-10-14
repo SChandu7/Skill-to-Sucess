@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<title>Help &amp; FAQ | SkillToSuccess</title>
+<meta name="description" content="Answers about courses, packages, payments, refunds, referral cashback, withdrawals, play rewards and certificates.">
+<!--HEAD-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A7BC2">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/app.css?v=1">
+<!--/HEAD-->
+</head>
+<body class="flex min-h-screen flex-col">
+<div id="site-header" class="h-[72px]"></div>
+<main id="main" class="flex-1 pb-20" tabindex="-1">
+  <section class="wash border-b border-line">
+    <div class="container max-w-3xl py-12 text-center sm:py-16">
+      <h1 class="text-display-lg">How can we help?</h1>
+      <p class="lead mx-auto mt-3">Search the questions learners ask most. Still stuck? Ask Mitra or message the team.</p>
+      <div class="relative mx-auto mt-8 max-w-xl"><svg class="i pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-400" aria-hidden="true"><use href="#i-search"></use></svg><label for="hq" class="sr-only">Search help</label><input id="hq" type="search" class="input !py-3.5 pl-11 text-base" placeholder="Try &quot;refund&quot; or &quot;withdraw&quot;"></div>
+    </div>
+  </section>
+  <div class="container mt-10 grid max-w-5xl gap-10 lg:grid-cols-[220px_1fr]">
+    <nav class="flex gap-2 overflow-x-auto scrollbar-none lg:sticky lg:top-[96px] lg:flex-col lg:self-start" id="hcats" aria-label="Help topics"></nav>
+    <div class="min-w-0">
+      <div id="hlist" class="divide-y divide-line rounded-3xl border border-line bg-white px-5 sm:px-6"><div class="skel my-5 h-10"></div><div class="skel my-5 h-10"></div><div class="skel my-5 h-10"></div></div>
+      <p id="hnone" class="py-12 text-center text-ink-500" hidden>Nothing matches that search. Try a shorter word, or <a class="link" href="contact.html">ask the team</a>.</p>
+      <div class="mt-10 grid gap-4 sm:grid-cols-2">
+        <div class="card flex items-start gap-4 p-5"><span class="grid h-11 w-11 flex-none place-items-center rounded-2xl bg-sky-50 text-sky-700"><svg class="i" aria-hidden="true"><use href="#i-bot"></use></svg></span><div><p class="font-semibold">Ask Mitra</p><p class="mt-1 text-[15px] text-ink-600">Our assistant answers in seconds, any time.</p><button class="btn btn-soft btn-sm mt-3" id="ask">Start a chat</button></div></div>
+        <div class="card flex items-start gap-4 p-5"><span class="grid h-11 w-11 flex-none place-items-center rounded-2xl bg-orange-50 text-orange-700"><svg class="i" aria-hidden="true"><use href="#i-headphones"></use></svg></span><div><p class="font-semibold">Talk to a person</p><p class="mt-1 text-[15px] text-ink-600" id="hours"></p><a class="btn btn-ghost btn-sm mt-3" href="contact.html">Contact support</a></div></div>
+      </div>
+    </div>
+  </div>
+</main>
+<div id="site-footer"></div>
+<!--CORE-->
+<script src="assets/js/core/icons.js?v=1"></script>
+<script src="assets/js/core/config.js?v=1"></script>
+<script src="assets/js/core/api.js?v=1"></script>
+<script src="assets/js/core/app.js?v=1"></script>
+<!--/CORE-->
+<script src="assets/js/chatbot.js?v=1"></script>
+<script>
+(function () {
+  var U = STS.ui, A = STS.api;
+  U.boot().then(function (st) {
+    U.$('#hours').textContent = st.site.settings.hours + '. We reply within one working day.';
+    U.$('#ask').addEventListener('click', function () { STS.chat.open ? STS.chat.open() : STS.chat.ask('Hi'); });
+    A.faqs().then(function (list) {
+      var cats = ['All'].concat(list.map(function (f) { return f.category; }).filter(function (c, i, a) { return a.indexOf(c) === i; }));
+      var cur = 'All', q = '';
+      U.$('#hcats').innerHTML = cats.map(function (c) { return '<button class="chip flex-none lg:justify-start" data-c="' + U.esc(c) + '" aria-pressed="' + (c === cur) + '">' + U.esc(c) + '</button>'; }).join('');
+      U.$('#hcats').addEventListener('click', function (e) { var b = e.target.closest('[data-c]'); if (!b) return; cur = b.dataset.c; U.$$('[data-c]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); render(); });
+      var t; U.$('#hq').addEventListener('input', function (e) { clearTimeout(t); t = setTimeout(function () { q = e.target.value.trim().toLowerCase(); render(); }, 120); });
+      function render() {
+        var rows = list.filter(function (f) {
+          if (cur !== 'All' && f.category !== cur) return false;
+          if (!q) return true;
+          var hay = (f.question + ' ' + f.answer).toLowerCase();
+          return q.split(/\s+/).every(function (w) { return hay.indexOf(w) >= 0; });
+        });
+        U.$('#hlist').hidden = !rows.length; U.$('#hnone').hidden = !!rows.length;
+        U.$('#hlist').innerHTML = rows.map(function (f) {
+          return '<div><button class="acc-btn" data-acc aria-expanded="' + (q ? 'true' : 'false') + '" aria-controls="h-' + f.id + '"><span><span class="mb-1 block text-xs font-semibold uppercase tracking-wide text-sky-700">' + U.esc(f.category) + '</span>' + U.esc(f.question) + '</span>' + U.icon('chevron-down', 'flex-none text-ink-400') + '</button><div id="h-' + f.id + '" class="whitespace-pre-line pb-5 pr-8 text-ink-600"' + (q ? '' : ' hidden') + '>' + U.esc(f.answer) + '</div></div>';
+        }).join('');
+        U.accordions(U.$('#hlist'));
+      }
+      var topic = U.param('q'); if (topic) { U.$('#hq').value = topic; q = topic.toLowerCase(); }
+      render();
+    }, function (err) { U.$('#hlist').innerHTML = '<p class="py-6 text-bad-600">' + U.esc(err.message) + '</p>'; });
+  });
+})();
+</script>
+</body>
+</html>

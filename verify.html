@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<title>Verify a certificate | SkillToSuccess</title>
+<meta name="description" content="Check any SkillToSuccess certificate in seconds. Enter the certificate ID or scan the QR code on it.">
+<!--HEAD-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A7BC2">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/app.css?v=1">
+<!--/HEAD-->
+</head>
+<body class="flex min-h-screen flex-col">
+<div id="site-header" class="h-[72px]"></div>
+<main id="main" class="flex-1 pb-20" tabindex="-1">
+  <section class="wash border-b border-line">
+    <div class="container max-w-3xl py-12 text-center sm:py-16">
+      <span class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-sky-600 text-white shadow-lift"><svg class="i i-lg" aria-hidden="true"><use href="#i-badge-check"></use></svg></span>
+      <h1 class="mt-5 text-display-lg">Verify a certificate</h1>
+      <p class="lead mx-auto mt-3">Employers and clients can check any certificate here. Enter the ID printed on it, or scan its QR code.</p>
+      <form id="vf" class="mx-auto mt-8 flex max-w-xl flex-col gap-2 sm:flex-row" novalidate>
+        <label for="code" class="sr-only">Certificate ID</label>
+        <div class="relative flex-1" data-field><svg class="i pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400" aria-hidden="true"><use href="#i-search"></use></svg><input id="code" name="code" class="input pl-10 font-display uppercase tracking-wider" placeholder="STS-26-DM-00001" autocomplete="off" spellcheck="false"></div>
+        <button class="btn btn-primary btn-lg">Verify</button>
+      </form>
+    </div>
+  </section>
+  <section class="container max-w-4xl pt-10" id="out" aria-live="polite"></section>
+  <section class="container max-w-4xl pt-10" id="how">
+    <div class="grid gap-4 sm:grid-cols-3">
+      <div class="card p-5"><span class="grid h-10 w-10 place-items-center rounded-xl bg-sky-50 text-sky-700"><svg class="i" aria-hidden="true"><use href="#i-list-checks"></use></svg></span><p class="mt-3 font-semibold">Earned, not bought</p><p class="mt-1 text-[15px] text-ink-600">A certificate is issued only after every lesson and quiz in the course is passed.</p></div>
+      <div class="card p-5"><span class="grid h-10 w-10 place-items-center rounded-xl bg-orange-50 text-orange-700"><svg class="i" aria-hidden="true"><use href="#i-qr-code"></use></svg></span><p class="mt-3 font-semibold">One ID per certificate</p><p class="mt-1 text-[15px] text-ink-600">Every certificate has a unique ID and a QR code that opens this page.</p></div>
+      <div class="card p-5"><span class="grid h-10 w-10 place-items-center rounded-xl bg-good-50 text-good-700"><svg class="i" aria-hidden="true"><use href="#i-shield-check"></use></svg></span><p class="mt-3 font-semibold">Always up to date</p><p class="mt-1 text-[15px] text-ink-600">If a certificate is ever withdrawn, this page shows it straight away.</p></div>
+    </div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<!--CORE-->
+<script src="assets/js/core/icons.js?v=1"></script>
+<script src="assets/js/core/config.js?v=1"></script>
+<script src="assets/js/core/api.js?v=1"></script>
+<script src="assets/js/core/app.js?v=1"></script>
+<!--/CORE-->
+<script src="assets/js/chatbot.js?v=1"></script>
+<script src="assets/vendor/qrcode.js"></script>
+<script src="assets/js/cert.js?v=1"></script>
+<script>
+(function () {
+  var U = STS.ui, A = STS.api;
+  U.boot().then(function () {
+    var f = U.$('#vf'), inp = U.$('#code'), out = U.$('#out');
+    function check(code) {
+      code = String(code || '').trim().toUpperCase().replace(/\s+/g, '');
+      U.fieldError(f, null);
+      if (!code) return U.fieldError(f, 'code', 'Enter the certificate ID, for example STS-26-DM-00001.');
+      var b = f.querySelector('button'); U.busy(b, true, 'Checking');
+      out.innerHTML = '<div class="skel h-64 rounded-3xl"></div>';
+      A.verifyCertificate(code).then(function (c) {
+        U.busy(b, false);
+        try { history.replaceState(null, '', 'verify.html?id=' + encodeURIComponent(c.code)); } catch (e) { /* */ }
+        var ok = !c.revoked;
+        out.innerHTML =
+          '<div class="flex items-start gap-4 rounded-3xl border p-5 sm:p-6 ' + (ok ? 'border-good-500/30 bg-good-50' : 'border-bad-500/30 bg-bad-50') + '">' +
+          '<span class="grid h-12 w-12 flex-none place-items-center rounded-2xl ' + (ok ? 'bg-good-500' : 'bg-bad-500') + ' text-white">' + U.icon(ok ? 'badge-check' : 'ban', 'i-lg') + '</span>' +
+          '<div class="min-w-0"><p class="font-display text-xl font-semibold ' + (ok ? 'text-good-700' : 'text-bad-600') + '">' + (ok ? 'This certificate is genuine' : 'This certificate has been withdrawn') + '</p>' +
+          '<p class="mt-1 text-[15px] text-ink-700">' + (ok ? 'Issued by SkillToSuccess to <b>' + U.esc(c.name) + '</b> for completing <b>' + U.esc(c.course.title) + '</b>.' : 'It is no longer valid.' + (c.revoked_reason ? ' Reason: ' + U.esc(c.revoked_reason) : '')) + '</p></div></div>' +
+          '<dl class="mt-6 grid grid-cols-2 gap-4 rounded-3xl border border-line bg-white p-5 sm:grid-cols-4">' +
+          [['Certificate ID', c.code], ['Issued on', U.date(c.issued_at)], ['Quiz score', c.score + '%'], ['Lessons completed', c.course.lesson_count]].map(function (x) { return '<div><dt class="text-sm text-ink-500">' + x[0] + '</dt><dd class="mt-0.5 font-semibold tabular">' + U.esc(x[1]) + '</dd></div>'; }).join('') + '</dl>' +
+          '<div class="mt-6">' + STS.cert.render(c) + '</div>' +
+          '<div class="mt-6 flex flex-wrap justify-center gap-2"><a class="btn btn-ghost" href="course.html?c=' + encodeURIComponent(c.course.slug) + '">' + U.icon('book-open', 'i-sm') + 'See what this course covers</a><button class="btn btn-ghost" data-copy>' + U.icon('copy', 'i-sm') + 'Copy verify link</button></div>';
+        out.querySelector('[data-copy]').addEventListener('click', function () { U.copy(STS.cert.verifyUrl(c.code), 'Verify link'); });
+        out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, function (err) {
+        U.busy(b, false);
+        out.innerHTML = '<div class="flex items-start gap-4 rounded-3xl border border-line bg-white p-6"><span class="grid h-12 w-12 flex-none place-items-center rounded-2xl bg-cloud text-ink-500">' + U.icon('search', 'i-lg') + '</span><div><p class="font-display text-xl font-semibold">' + (err.status === 404 ? 'No certificate found' : 'We could not check right now') + '</p><p class="mt-1 text-[15px] text-ink-600">' + (err.status === 404 ? 'Check the ID for typos. It looks like STS-26-DM-00001. If it still does not match, the certificate was not issued by us.' : U.esc(err.message)) + '</p></div></div>';
+      });
+    }
+    f.addEventListener('submit', function (e) { e.preventDefault(); check(inp.value); });
+    var id = U.param('id'); if (id) { inp.value = id; check(id); }
+  });
+})();
+</script>
+</body>
+</html>
