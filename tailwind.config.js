@@ -2,7 +2,7 @@
 module.exports = {
   content: ['./*.html', './admin/**/*.{html,js}', './assets/js/**/*.js'],
   theme: {
-    container: { center: true, padding: { DEFAULT: '1rem', sm: '1.5rem', lg: '2rem' }, screens: { xl: '1220px' } },
+    container: { center: true, padding: { DEFAULT: '1rem', sm: '1.5rem', lg: '2rem' }, screens: { xl: '1560px' } },
     extend: {
       colors: {
         sky: { 50: '#F1F8FE', 100: '#E1F0FC', 200: '#BCE0F9', 300: '#86C8F3', 400: '#45A8E8', 500: '#1A8FD6', 600: '#0A7BC2', 700: '#075E95', 800: '#0A4C77', 900: '#0C3E61', 950: '#082840' },
