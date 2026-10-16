@@ -5,6 +5,7 @@
 
   U.boot().then(function (st) {
     var site = st.site, s = site.settings, me = st.me;
+    var CR = s.course_reward || { amount: 0, enabled: false }, UPD = s.upgrade_discount || 0;
 
     /* Hero */
     U.$('#hero-faces').innerHTML = ['Priya L', 'Mohammed I', 'Keerthana S', 'Ravi T'].map(function (n) { return '<span class="rounded-full ring-2 ring-white">' + U.avatar(n, 26) + '</span>'; }).join('');
@@ -34,7 +35,9 @@
     gl.innerHTML = GOALS.map(function (g, i) { return '<button class="chip flex-none !px-4 !py-2.5 !text-[15px]" role="tab" aria-pressed="' + (i === 0) + '" data-g="' + i + '">' + U.icon(g[0], 'i-sm') + g[1] + '</button>'; }).join('');
     function showGoal(i) {
       var want = GOALS[i][2];
-      var pk = site.packages.slice().sort(function (a, b) { return a.price - b.price; }).filter(function (p) { return want.every(function (x) { return p.courses.indexOf(x) >= 0; }); })[0] || site.packages[site.packages.length - 1];
+      var pk = site.packages.slice().sort(function (a, b) { return a.price - b.price; }).filter(function (p) {
+        return p.includes_future_courses || (p.course_slots ? p.course_slots >= want.length : want.every(function (x) { return p.courses.indexOf(x) >= 0; }));
+      })[0] || site.packages[site.packages.length - 1];
       var sum = want.reduce(function (t, x) { return t + st.courseMap[x].price; }, 0);
       U.$('#goal-panel').innerHTML = '<div class="grid gap-6 rounded-[28px] border border-line bg-white p-5 shadow-card sm:p-7 lg:grid-cols-[1.6fr_1fr]">' +
         '<div class="grid gap-4 ' + ['', 'sm:grid-cols-1', 'sm:grid-cols-2', 'sm:grid-cols-3'][Math.min(3, want.length)] + '">' + want.slice(0, 3).map(function (x) {
@@ -42,7 +45,7 @@
           return '<a href="course.html?c=' + c.slug + '" class="group flex flex-col overflow-hidden rounded-2xl border border-line transition hover:border-sky-300"><div class="aspect-[16/9] overflow-hidden" style="background:' + c.color + '">' + U.cover(c, 'h-full w-full object-cover transition duration-500 group-hover:scale-105') + '</div><div class="p-4"><p class="font-semibold leading-snug">' + U.esc(c.title) + '</p><p class="mt-1 text-sm text-ink-500">' + c.lesson_count + ' lessons, ' + c.hours + ' h</p></div></a>';
         }).join('') + '</div>' +
         '<div class="flex flex-col rounded-2xl bg-sky-50 p-6"><p class="text-sm font-semibold text-sky-700">Recommended</p><p class="mt-1 font-display text-2xl font-semibold">' + U.esc(pk.name) + ' package</p>' +
-        '<p class="mt-1 text-ink-600">' + pk.courses.length + ' courses, including ' + (want.length > 1 ? 'all ' + want.length + ' above' : 'the one above') + '.</p>' +
+        '<p class="mt-1 text-ink-600">' + U.packageCourseLine(pk) + ' — ' + (want.length > 1 ? 'the ' + want.length + ' above fit inside' : 'the one above fits inside') + '.</p>' +
         '<p class="mt-4 flex items-baseline gap-2"><span class="font-display text-4xl font-semibold tabular">' + U.inr(pk.price) + '</span>' + (sum > pk.price ? '<span class="text-sm text-ink-500">vs ' + U.inr(sum) + ' bought separately</span>' : '') + '</p>' +
         '<div class="mt-auto flex flex-wrap gap-2 pt-6"><a class="btn btn-buy" href="checkout.html?plan=' + pk.slug + '">Enroll in ' + U.esc(pk.name) + '</a><a class="btn btn-ghost" href="course.html?c=' + want[0] + '">Try free lessons</a></div></div></div>';
     }
@@ -68,13 +71,14 @@
     U.$('#home-packages').innerHTML = site.packages.map(function (p) {
       var own = cur && cur.slug === p.slug, below = cur && cur.price > p.price, pop = p.is_popular;
       var cta = own ? '<span class="btn btn-soft btn-block">' + U.icon('check', 'i-sm') + 'Your package</span>' : below ? '<span class="btn btn-block border border-line text-ink-400">Included in yours</span>' :
-        '<a class="btn btn-block ' + (pop ? 'btn-buy' : 'btn-primary') + '" href="checkout.html?plan=' + p.slug + '">' + (cur ? 'Upgrade for ' + U.inr(p.price - cur.price) : 'Enroll now') + '</a>';
+        '<a class="btn btn-block ' + (pop ? 'btn-buy' : 'btn-primary') + '" href="checkout.html?plan=' + p.slug + '">' + (cur ? 'Upgrade for ' + U.inr(Math.max(1, (p.price - cur.price) - Math.round((p.price - cur.price) * UPD / 100))) : 'Enroll now') + '</a>';
       return '<article class="relative flex flex-col rounded-3xl border ' + (pop ? 'border-sky-600 bg-gradient-to-b from-sky-50 to-white shadow-lift ring-1 ring-sky-600' : 'border-line bg-white') + ' p-6">' +
         (pop ? '<span class="absolute -top-3 left-6 tag bg-orange-400 !px-2.5 !py-1 text-ink-900">' + U.esc(p.tagline || 'Most chosen') + '</span>' : '<p class="text-sm font-semibold text-sky-700">' + U.esc(p.tagline) + '</p>') +
         '<h3 class="' + (pop ? 'mt-1' : 'mt-1') + ' text-2xl">' + U.esc(p.name) + '</h3>' +
         '<p class="mt-3 flex items-baseline gap-2"><span class="font-display text-[34px] font-semibold leading-none tabular">' + U.inr(p.price) + '</span>' + (p.mrp ? '<s class="text-sm text-ink-400 tabular">' + U.inr(p.mrp) + '</s>' : '') + '</p>' +
         '<ul class="mt-5 space-y-2.5 text-[15px] text-ink-700">' +
-        '<li class="flex gap-2">' + U.icon('book-open', 'i-sm mt-1 text-sky-600') + p.courses.length + ' courses, ' + p.lesson_count + ' lessons</li>' +
+        '<li class="flex gap-2">' + U.icon('book-open', 'i-sm mt-1 text-sky-600') + U.packageCourseLine(p) + '</li>' +
+        (CR.enabled && CR.amount ? '<li class="flex gap-2">' + U.icon('wallet', 'i-sm mt-1 text-good-600') + 'Up to ' + U.inr(CR.amount * U.packageCourseCount(p)) + ' back when you finish them</li>' : '') +
         '<li class="flex gap-2">' + U.icon('gift', 'i-sm mt-1 text-orange-500') + p.cashback_percent + '% referral cashback</li>' +
         (p.support_text ? '<li class="flex gap-2">' + U.icon('headphones', 'i-sm mt-1 text-sky-600') + U.esc(p.support_text) + '</li>' : '') + '</ul>' +
         '<div class="mt-auto pt-6">' + cta + '</div></article>';

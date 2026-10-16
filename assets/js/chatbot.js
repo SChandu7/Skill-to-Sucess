@@ -19,13 +19,14 @@ STS.chat = (function () {
 
   function pkgList() {
     return 'Here are the packages. Each is a one-time payment with lifetime access:<br>' +
-      S().packages.map(function (p) { return '• <b>' + U.esc(p.name) + '</b>: ' + U.inr(p.price) + ' for ' + p.courses.length + ' courses (' + p.lesson_count + ' lessons), refer & earn at ' + p.cashback_percent + '%'; }).join('<br>') +
+      S().packages.map(function (p) { return '• <b>' + U.esc(p.name) + '</b>: ' + U.inr(p.price) + ' — ' + U.packageCourseLine(p).toLowerCase() + ', refer & earn at ' + p.cashback_percent + '%'; }).join('<br>') +
+      '<br>You choose your own courses from the dashboard right after paying.' +
       '<br><a href="packages.html">Compare packages side by side</a>';
   }
   function courseInfo(c) {
     var p = U.cheapestPackageFor(c.slug);
     return '<b>' + U.esc(c.title) + '</b> (' + c.level + ', ' + c.lesson_count + ' lessons, about ' + c.hours + ' hours)' + (c.instructor ? ' with ' + U.esc(c.instructor.name) : '') + '.<br>' + U.esc(c.short_description) +
-      '<br>Free preview lessons are open. Get it alone for ' + U.inr(c.price) + (p ? ' or in the ' + U.esc(p.name) + ' package (' + U.inr(p.price) + ') and up' : '') + '.<br><a href="course.html?c=' + c.slug + '">Open the course page</a>';
+      '<br>Free preview lessons are open. Get it alone for ' + U.inr(c.price) + (p ? ' or pick it inside the ' + U.esc(p.name) + ' package (' + U.inr(p.price) + ') or any bigger one' : '') + '.<br><a href="course.html?c=' + c.slug + '">Open the course page</a>';
   }
   function findCourse(t) {
     var best = null;
@@ -47,11 +48,22 @@ STS.chat = (function () {
       return 'Refer & earn, in short:<br>1. Buy any package and get your personal code<br>2. A friend buys with your code and gets ' + U.inr(r.friend_discount) + ' off<br>3. You get cashback: ' + Math.min.apply(null, rates) + '% to ' + Math.max.apply(null, rates) + '% of what they paid, based on your package<br><br>Only people <b>you</b> invite count. One level, nothing more.' + you;
     } },
     { id: 'refund', re: /refund|money back|cancel|return/, a: function () { return 'Course access opens right after payment, so purchases are generally non-refundable.<br>If you were charged twice, charged by mistake, or did not get access, write to <b>' + U.esc(S().settings.email) + '</b> within 7 days with your order ID.<br><a href="legal.html#refund">Read the refund policy</a>'; } },
-    { id: 'upgrade', re: /upgrade|switch package|higher package|change plan/, a: function () { var ps = S().packages; return 'You can upgrade any time and pay only the difference.' + (ps.length > 1 ? ' Example: ' + U.esc(ps[0].name) + ' to ' + U.esc(ps[1].name) + ' costs ' + U.inr(ps[1].price - ps[0].price) + '.' : '') + ' Progress and certificates stay.<br><a href="packages.html">See packages</a>'; } },
+    { id: 'upgrade', re: /upgrade|switch package|higher package|change plan/, a: function () { var ps = S().packages; var d = S().settings.upgrade_discount || 0, gap = ps.length > 1 ? ps[1].price - ps[0].price : 0;
+      return 'You can upgrade any time and pay only the difference' + (d ? ', with ' + d + '% off that difference' : '') + '.' +
+        (ps.length > 1 ? ' Example: ' + U.esc(ps[0].name) + ' to ' + U.esc(ps[1].name) + ' costs ' + U.inr(Math.max(1, gap - Math.round(gap * d / 100))) + '.' : '') +
+        ' You then pick the extra courses, and your progress and certificates stay.<br><a href="packages.html">See packages</a>'; } },
     { id: 'cert', re: /certif|verify|verification/, a: function () { var q = S().settings.quiz; return 'Pass the quiz after each lesson (' + q.pass + ' of ' + q.questions + ' correct). Finish all lessons and your certificate is issued with a unique ID that anyone can check on our <a href="verify.html">verify page</a>.'; } },
     { id: 'pay', re: /pay|upi|card|emi|razorpay|gpay|phonepe|paytm|netbank/, a: function () { return 'We accept UPI (GPay, PhonePe, Paytm), debit and credit cards, and netbanking through Razorpay. Prices include GST. Access starts as soon as the payment is confirmed.'; } },
     { id: 'play', re: /play|game|quiz|reward|coin|free money/, a: function () { var p = P(); return 'Play & earn: learn and win small rewards.<br>• Free quizzes: ' + U.inr(p.per_correct) + ' per correct answer, up to ' + U.inr(p.per_quiz_cap) + ' a quiz<br>• Mini games: memory match, word scramble, rapid fire<br>• Up to ' + U.inr(p.daily_cap) + ' a day, and up to ' + U.inr(p.checkout_max) + ' can be used on your first package<br><a href="play.html">Start playing</a>'; } },
     { id: 'free', re: /free|preview|trial|demo|sample|before buy/, a: function () { return 'Every course has free preview lessons, an intro video and a PDF cheat sheet. Open any course from the <a href="courses.html">course list</a> and look for the "Free" tags.'; } },
+    { id: 'coursereward', re: /finish|complete|reward for course|50|cashback for course|course reward/, a: function () {
+      var cr = S().settings.course_reward || {};
+      if (!cr.enabled || !cr.amount) return 'Finish your lessons and you earn a certificate for each course.';
+      return 'Finish a course and <b>' + U.inr(cr.amount) + '</b> goes to your wallet.<br>• It counts when you pass every lesson quiz in that course<br>• Example: a 5-course package pays up to ' + U.inr(cr.amount * 5) + '<br>• It waits ' + cr.hold_days + ' days (the refund window), then you can withdraw it<br><a href="dashboard.html#wallet">Open your wallet</a>';
+    } },
+    { id: 'choose', re: /choose|pick|select course|which course|my courses/, a: function () {
+      return 'You pick your own courses.<br>1. Buy a package<br>2. Open <a href="dashboard.html#choose">Choose your courses</a> in your dashboard<br>3. Pick any courses from the library, up to the number your package allows<br>Choices are final, so pick carefully. Contact support if you need a change.';
+    } },
     { id: 'access', re: /lifetime|validity|expire|how long|access/, a: function () { return 'Access is lifetime for the courses in your package, including updates to them.'; } },
     { id: 'login', re: /login|log in|password|forgot|account|sign up|register/, a: function () { return 'Log in with your email or mobile number on the <a href="login.html">login page</a>. Forgot the password? Tap "Forgot password" there to get a reset code by SMS.'; } },
     { id: 'progress', re: /my progress|my course|continue|where was i/, a: function () {

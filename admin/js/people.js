@@ -75,10 +75,32 @@
     if (tab === 'courses') {
       host.innerHTML = '<div class="card overflow-hidden">' + AD.table([
         { label: 'Course', render: function (c) { return '<a class="font-semibold hover:text-sky-700" href="#/courses/' + c.id + '">' + esc(c.title) + '</a>'; } },
-        { label: 'Access', render: function (c) { return c.via === 'package' ? '<span class="tag tag-sky">Package</span>' : '<span class="tag tag-orange whitespace-nowrap">Single course</span>'; } },
+        { label: 'Access', render: function (c) {
+          return c.via === 'package' ? '<span class="tag tag-sky whitespace-nowrap">Chosen with package</span>'
+            : c.via === 'admin' ? '<span class="tag tag-warn">Given by admin</span>'
+            : '<span class="tag tag-orange whitespace-nowrap">Single course</span>'; } },
         { label: 'Progress', render: function (c) { var p = c.progress; return '<div class="flex min-w-[160px] items-center gap-2"><div class="meter flex-1"><span style="width:' + p.pct + '%"></span></div><span class="w-20 text-right text-xs tabular text-ink-600">' + p.done + '/' + p.total + '</span></div>'; } },
-        { label: '', cls: 'w-px text-right', render: function (c) { return write && c.via !== 'package' ? '<button class="btn btn-ghost btn-sm !text-bad-600" data-revoke="' + c.id + '">Remove access</button>' : ''; } }
-      ], u.courses, { empty: 'No course access yet', emptyHint: 'Access comes from a package, a single-course order or a manual grant.', emptyIcon: 'book-open' }) + '</div>';
+        { label: '', cls: 'w-px whitespace-nowrap text-right', render: function (c) {
+          if (!write) return '';
+          return (c.via === 'package' ? '<button class="btn btn-ghost btn-sm" data-swap="' + c.id + '" data-title="' + esc(c.title) + '">Change course</button>' : '')
+            + '<button class="btn btn-ghost btn-sm !text-bad-600" data-revoke="' + c.id + '">Remove</button>'; } }
+      ], u.courses, { empty: 'No course access yet', emptyHint: 'Access comes from a package, a single-course order or a manual grant.', emptyIcon: 'book-open' }) + '</div>' +
+      (u.slots && u.slots.slots ? '<p class="mt-3 text-sm text-ink-600">' + esc(u.slots.package) + ' package: ' + u.slots.chosen + ' of ' + u.slots.slots + ' courses chosen'
+        + (u.slots.remaining ? ', <b>' + u.slots.remaining + ' still to pick</b> by the learner.' : '.') + '</p>'
+        : u.slots && u.slots.all_courses ? '<p class="mt-3 text-sm text-ink-600">' + esc(u.slots.package) + ' package: every course is included.</p>' : '');
+      U.$$('[data-swap]', host).forEach(function (b) {
+        b.addEventListener('click', function () {
+          var avail = o.courses.filter(function (c) { return ownedIds.indexOf(c.id) < 0; });
+          if (!avail.length) return U.toast('This learner already has every course.', 'info');
+          AD.editor({
+            title: 'Change ' + b.dataset.title, icon: 'repeat', wide: false, cols: 1,
+            sub: 'Swaps one course the learner chose with their package. Their progress on ' + b.dataset.title + ' is deleted and any reward for it is cancelled.',
+            fields: [{ name: 'new', label: 'New course', type: 'select', numeric: true, options: avail.map(function (c) { return { value: c.id, label: c.title }; }) }],
+            ok: 'Change course', saved: 'Course changed',
+            save: function (d) { return AD.api.post('/users/' + u.id + '/swap-course/', { old: Number(b.dataset.swap), new: d.new }); }, done: reload
+          });
+        });
+      });
       U.$$('[data-revoke]', host).forEach(function (b) {
         b.addEventListener('click', function () {
           AD.confirm({ title: 'Remove course access?', text: 'The learner keeps their progress, but cannot open paid lessons until access is given again.', danger: true, ok: 'Remove access' }).then(function (ok) {

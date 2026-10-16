@@ -121,6 +121,8 @@ STS.api = (function () {
     notifications: function () { return get('/me/notifications/'); },
     readNotifications: function () { return post('/me/notifications/read/'); },
     myCourses: function () { return get('/me/courses/'); },
+    courseChoices: function () { return get('/me/courses/choose/'); },
+    chooseCourses: function (slugs) { return post('/me/courses/choose/', { courses: slugs }); },
     myCertificates: function () { return get('/me/certificates/'); },
     myOrders: function () { return get('/me/orders/'); },
     wallet: function (kind) { return get('/me/wallet/' + (kind && kind !== 'all' ? '?kind=' + kind : '')); },

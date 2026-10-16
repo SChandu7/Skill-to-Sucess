@@ -75,7 +75,16 @@ STS.ui = (function () {
 
   function owned(slug) { return !!(state.me && state.me.owned_courses.indexOf(slug) >= 0); }
   function progress(slug) { return state.me && state.me.progress[slug] || null; }
-  function cheapestPackageFor(slug) { return state.site.packages.filter(function (p) { return p.courses.indexOf(slug) >= 0; }).sort(function (a, b) { return a.price - b.price; })[0]; }
+  // A package covers a course when the buyer picks their own courses (course_slots), when it
+  // includes every course, or when the course is in its fixed list.
+  function packageCovers(p, slug) { return p.course_slots > 0 || p.includes_future_courses || p.courses.indexOf(slug) >= 0; }
+  function cheapestPackageFor(slug) { return state.site.packages.filter(function (p) { return packageCovers(p, slug); }).sort(function (a, b) { return a.price - b.price; })[0]; }
+  function packageCourseCount(p) { return p.course_count || (p.includes_future_courses ? state.site.courses.length : p.course_slots || p.courses.length); }
+  function packageCourseLine(p) {
+    if (p.includes_future_courses) return 'Every course (' + state.site.courses.length + '), plus new ones';
+    if (p.course_slots) return 'Pick any ' + p.course_slots + ' course' + (p.course_slots === 1 ? '' : 's');
+    return p.courses.length + ' courses';
+  }
 
   /* ------------------------------------------------------------------ referral links */
   function captureRef() {
@@ -312,7 +321,8 @@ STS.ui = (function () {
 
   return {
     page: page, state: state, esc: esc, icon: icon, inr: inr, num: num, $: $, $$: $$, h: h, date: date, ago: ago, avatar: avatar, logo: logo, LOGO_SVG: LOGO_SVG,
-    shuffle: shuffle, param: param, savedRef: savedRef, owned: owned, progress: progress, cheapestPackageFor: cheapestPackageFor, setMe: setMe, refreshMe: refreshMe,
+    shuffle: shuffle, param: param, savedRef: savedRef, owned: owned, progress: progress, cheapestPackageFor: cheapestPackageFor,
+    packageCovers: packageCovers, packageCourseCount: packageCourseCount, packageCourseLine: packageCourseLine, setMe: setMe, refreshMe: refreshMe,
     header: header, toast: toast, modal: modal, unlock: unlock, cover: cover, stars: stars, proof: proof, courseCard: courseCard, confetti: confetti,
     accordions: accordions, copy: copy, busy: busy, fieldError: fieldError, failure: failure, requireAuth: requireAuth, boot: boot
   };

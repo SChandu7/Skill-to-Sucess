@@ -11,7 +11,7 @@
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/app.css?v=3">
+<link rel="stylesheet" href="assets/css/app.css?v=5">
 <!--/HEAD-->
 </head>
 <body class="flex min-h-screen flex-col">
@@ -25,7 +25,7 @@
       <p class="mx-auto mt-4 hidden w-fit items-center gap-2 rounded-full bg-orange-50 px-4 py-2 text-sm font-semibold text-orange-800" id="ref-note"><svg class="i i-sm" aria-hidden="true"><use href="#i-gift"></use></svg><span></span></p>
     </div>
   </section>
-  <section class="container"><div class="grid gap-4 md:grid-cols-2 xl:grid-cols-5" id="plans"></div></section>
+  <section class="container"><div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" id="plans"></div></section>
   <section class="container mt-20" aria-labelledby="cmp-h">
     <div class="mb-6 flex flex-wrap items-end justify-between gap-4"><h2 id="cmp-h" class="text-display-md">Compare everything</h2><p class="text-sm text-ink-500 md:hidden">Scroll sideways to see all packages</p></div>
     <div class="table-wrap"><table class="tbl min-w-[880px]" id="cmp"></table></div>
@@ -45,29 +45,35 @@
 </main>
 <div id="site-footer"></div>
 <!--CORE-->
-<script src="assets/js/core/icons.js?v=3"></script>
-<script src="assets/js/core/config.js?v=3"></script>
-<script src="assets/js/core/api.js?v=3"></script>
-<script src="assets/js/core/app.js?v=3"></script>
+<script src="assets/js/core/icons.js?v=5"></script>
+<script src="assets/js/core/config.js?v=5"></script>
+<script src="assets/js/core/api.js?v=5"></script>
+<script src="assets/js/core/app.js?v=5"></script>
 <!--/CORE-->
-<script src="assets/js/chatbot.js?v=3"></script>
+<script src="assets/js/chatbot.js?v=5"></script>
 <script>
 (function () {
   var U = STS.ui, A = STS.api;
   U.boot().then(function (st) {
     var me = st.me, P = st.site.packages, cur = me && me.package ? st.packageMap[me.package.slug] : null, R = st.site.settings.referral;
+    var CR = st.site.settings.course_reward || { amount: 0, enabled: false }, UPD = st.site.settings.upgrade_discount || 0;
     if (U.savedRef() && !(me && me.has_purchased)) { var n = U.$('#ref-note'); n.classList.remove('hidden'); n.classList.add('flex'); n.querySelector('span').textContent = 'Your friend\'s code saves you ' + U.inr(R.friend_discount) + ' at checkout.'; }
     U.$('#plans').innerHTML = P.map(function (p) {
       var owned = cur && cur.slug === p.slug, below = cur && cur.price > p.price, pop = p.is_popular;
       var cta = owned ? '<span class="btn btn-soft btn-block">' + U.icon('check', 'i-sm') + 'Your package</span>' : below ? '<span class="btn btn-block border border-line text-ink-400">Included in yours</span>' :
-        '<a class="btn btn-block ' + (pop ? 'btn-buy' : 'btn-primary') + '" href="checkout.html?plan=' + p.slug + '">' + (cur ? 'Upgrade for ' + U.inr(p.price - cur.price) : 'Enroll in ' + U.esc(p.name)) + '</a>';
+        '<a class="btn btn-block ' + (pop ? 'btn-buy' : 'btn-primary') + '" href="checkout.html?plan=' + p.slug + '">' + (cur ? 'Upgrade for ' + U.inr(Math.max(1, (p.price - cur.price) - Math.round((p.price - cur.price) * UPD / 100))) : 'Enroll in ' + U.esc(p.name)) + '</a>';
       return '<article class="relative flex flex-col rounded-3xl border ' + (pop ? 'border-sky-600 bg-gradient-to-b from-sky-50 to-white shadow-lift ring-1 ring-sky-600' : 'border-line bg-white') + ' p-6">' +
         (pop ? '<span class="absolute -top-3 left-6 tag bg-orange-400 !px-2.5 !py-1 text-ink-900">' + U.esc(p.tagline || 'Most chosen') + '</span>' : '<p class="text-sm font-semibold text-sky-700">' + U.esc(p.tagline) + '</p>') +
         '<h2 class="mt-1 text-2xl">' + U.esc(p.name) + '</h2>' +
         '<p class="mt-3 flex items-baseline gap-2"><span class="font-display text-4xl font-semibold tabular">' + U.inr(p.price) + '</span>' + (p.mrp ? '<s class="text-sm text-ink-400 tabular">' + U.inr(p.mrp) + '</s>' : '') + '</p>' +
         (p.mrp && p.mrp > p.price ? '<p class="text-sm font-semibold text-good-600">Save ' + Math.round((1 - p.price / p.mrp) * 100) + '%</p>' : '<p class="text-sm">&nbsp;</p>') +
-        '<ul class="mt-5 space-y-2.5 text-[15px]">' + (p.perks.length ? p.perks : [p.courses.length + ' courses, ' + p.lesson_count + ' lessons']).map(function (k) { return '<li class="flex gap-2.5">' + U.icon('check', 'i-sm mt-1 flex-none text-sky-600') + '<span>' + U.esc(k) + '</span></li>'; }).join('') + '</ul>' +
-        '<details class="mt-5 rounded-2xl bg-cloud px-4 py-3 text-sm"><summary class="cursor-pointer font-semibold">Courses included</summary><ul class="mt-2 space-y-1 text-ink-700">' + p.courses.map(function (s) { var c = st.courseMap[s]; return c ? '<li><a class="hover:text-sky-700" href="course.html?c=' + s + '">' + U.esc(c.title) + '</a></li>' : ''; }).join('') + '</ul></details>' +
+        '<ul class="mt-5 space-y-2.5 text-[15px]">' + (p.perks.length ? p.perks : [U.packageCourseLine(p) + ', ' + p.lesson_count + ' lessons']).map(function (k) { return '<li class="flex gap-2.5">' + U.icon('check', 'i-sm mt-1 flex-none text-sky-600') + '<span>' + U.esc(k) + '</span></li>'; }).join('') + '</ul>' +
+        '<details class="mt-5 rounded-2xl bg-cloud px-4 py-3 text-sm"><summary class="cursor-pointer font-semibold">' +
+          (p.course_slots ? 'Choose any ' + p.course_slots + ' of these' : p.includes_future_courses ? 'Every course is included' : 'Courses included') +
+          '</summary><ul class="mt-2 space-y-1 text-ink-700">' +
+          (p.course_slots || p.includes_future_courses ? st.site.courses : p.courses.map(function (x) { return st.courseMap[x]; }))
+            .map(function (c) { return c ? '<li><a class="hover:text-sky-700" href="course.html?c=' + c.slug + '">' + U.esc(c.title) + '</a></li>' : ''; }).join('') +
+          '</ul>' + (p.course_slots ? '<p class="mt-2 text-xs text-ink-500">You pick your courses from your dashboard right after paying.</p>' : '') + '</details>' +
         '<div class="mt-auto pt-6">' + cta + '</div></article>';
     }).join('');
 
@@ -76,8 +82,12 @@
     var row = function (label, fn) { return '<tr><th scope="row" class="!bg-white !text-sm !font-medium !text-ink-800">' + label + '</th>' + P.map(function (p) { return '<td class="text-center">' + fn(p) + '</td>'; }).join('') + '</tr>'; };
     var group = function (t) { return '<tr><th colspan="' + (P.length + 1) + '" class="!bg-cloud !pt-5 font-display !text-sm !text-ink-900">' + t + '</th></tr>'; };
     U.$('#cmp').innerHTML = '<thead><tr><th class="!bg-white w-[240px]"></th>' + P.map(function (p) { return '<th class="!bg-white text-center"><span class="block font-display text-lg text-ink-900">' + U.esc(p.name) + '</span><span class="block font-display text-xl font-semibold tabular text-sky-700">' + U.inr(p.price) + '</span></th>'; }).join('') + '</tr></thead><tbody>' +
-      group('Courses') + st.site.courses.map(function (c) { return row('<a class="hover:text-sky-700" href="course.html?c=' + c.slug + '">' + U.esc(c.title) + '</a>', function (p) { return p.courses.indexOf(c.slug) >= 0 ? yes : no; }); }).join('') +
-      row('<b>Total lessons</b>', function (p) { return '<b class="tabular">' + p.lesson_count + '</b>'; }) +
+      group('Courses') +
+      row('<b>Courses you get</b>', function (p) { return '<b class="tabular text-sky-700">' + U.packageCourseCount(p) + '</b>'; }) +
+      row('You choose them yourself', function (p) { return p.course_slots ? yes : p.includes_future_courses ? '<span class="text-xs text-ink-600">all included</span>' : no; }) +
+      row('Any course in the library', function () { return yes; }) +
+      row('<b>Lessons (about)</b>', function (p) { return '<b class="tabular">' + p.lesson_count + '</b>'; }) +
+      row('<b>Cashback for finishing them</b>', function (p) { return '<b class="tabular text-good-600">' + U.inr(CR.amount * U.packageCourseCount(p)) + '</b>'; }) +
       group('Learning') + row('Lesson quizzes and certificates', function () { return yes; }) + row('Free resources and cheat sheets', function () { return yes; }) + row('New courses added later', function (p) { return p.includes_future_courses ? yes : no; }) +
       group('Support') + row('Support', function (p) { return '<span class="text-xs text-ink-600">' + U.esc(p.support_text || 'Email') + '</span>'; }) +
       group('Refer &amp; earn (one level)') + row('Your cashback per friend\'s purchase', function (p) { return '<b class="tabular text-orange-600">' + p.cashback_percent + '%</b>'; }) + row('Discount your friend gets', function () { return U.inr(R.friend_discount) + ' off'; }) +
@@ -87,7 +97,13 @@
     from.innerHTML = P.slice(0, -1).map(function (p) { return '<option value="' + p.slug + '">' + U.esc(p.name) + ' (' + U.inr(p.price) + ')</option>'; }).join('');
     if (cur && P.indexOf(cur) < P.length - 1) from.value = cur.slug;
     function fillTo() { var f = st.packageMap[from.value]; to.innerHTML = P.filter(function (p) { return p.price > f.price; }).map(function (p) { return '<option value="' + p.slug + '">' + U.esc(p.name) + ' (' + U.inr(p.price) + ')</option>'; }).join(''); up(); }
-    function up() { var f = st.packageMap[from.value], t = st.packageMap[to.value]; if (!f || !t) return; U.$('#up-cost').textContent = U.inr(t.price - f.price); var g = t.courses.length - f.courses.length; U.$('#up-gain').textContent = '+' + g + ' course' + (g === 1 ? '' : 's') + ', cashback rate ' + f.cashback_percent + '% to ' + t.cashback_percent + '%'; }
+    function up() {
+      var f = st.packageMap[from.value], t = st.packageMap[to.value]; if (!f || !t) return;
+      var gap = t.price - f.price, pay = Math.max(1, gap - Math.round(gap * UPD / 100));
+      U.$('#up-cost').innerHTML = U.inr(pay) + (UPD ? ' <s class="text-sm font-normal text-ink-400 tabular">' + U.inr(gap) + '</s>' : '');
+      var g = U.packageCourseCount(t) - U.packageCourseCount(f);
+      U.$('#up-gain').textContent = (UPD ? UPD + '% off the difference. ' : '') + '+' + g + ' course' + (g === 1 ? '' : 's') + ', cashback rate ' + f.cashback_percent + '% to ' + t.cashback_percent + '%';
+    }
     if (P.length > 1) { from.addEventListener('change', fillTo); to.addEventListener('change', up); fillTo(); } else from.closest('.card').hidden = true;
 
     U.$('#single').innerHTML = st.site.courses.slice().sort(function (a, b) { return a.price - b.price; }).map(function (c) {

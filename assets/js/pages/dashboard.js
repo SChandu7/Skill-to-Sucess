@@ -20,7 +20,7 @@
     U.$('#me-card').innerHTML = U.avatar(me.name, 44) + '<div class="min-w-0"><p class="truncate font-semibold">' + U.esc(me.name) + '</p><p class="text-sm text-ink-500">' + (p ? U.esc(p.name) + ' package' : 'Free account') + '</p></div>';
     var cur = p ? st.packageMap[p.slug] : null;
     var nextP = st.site.packages.filter(function (x) { return !cur || x.price > cur.price; })[0];
-    U.$('#side-upsell').innerHTML = nextP ? '<p class="text-sm font-semibold">' + (cur ? 'Upgrade to ' + U.esc(nextP.name) : 'Unlock full courses') + '</p><p class="mt-1 text-sm text-ink-600">' + (cur ? '+' + (nextP.courses.length - cur.courses.length) + ' courses for ' + U.inr(nextP.price - cur.price) + '. Cashback rate goes to ' + nextP.cashback_percent + '%.' : 'Packages start at ' + U.inr(st.site.packages[0].price) + '.') + '</p><a class="btn btn-buy btn-sm btn-block mt-3" href="checkout.html?plan=' + nextP.slug + '">' + (cur ? 'Upgrade' : 'See packages') + '</a>'
+    U.$('#side-upsell').innerHTML = nextP ? '<p class="text-sm font-semibold">' + (cur ? 'Upgrade to ' + U.esc(nextP.name) : 'Unlock full courses') + '</p><p class="mt-1 text-sm text-ink-600">' + (cur ? '+' + (U.packageCourseCount(nextP) - U.packageCourseCount(cur)) + ' more courses for ' + U.inr(Math.max(1, (nextP.price - cur.price) - Math.round((nextP.price - cur.price) * (st.site.settings.upgrade_discount || 0) / 100))) + '. Cashback rate goes to ' + nextP.cashback_percent + '%.' : 'Packages start at ' + U.inr(st.site.packages[0].price) + '.') + '</p><a class="btn btn-buy btn-sm btn-block mt-3" href="checkout.html?plan=' + nextP.slug + '">' + (cur ? 'Upgrade' : 'See packages') + '</a>'
       : '<p class="text-sm font-semibold">You have the top package</p><p class="mt-1 text-sm text-ink-600">Thank you for learning with us.</p>';
   }
 
@@ -31,7 +31,7 @@
       var w = r[0].balances, notes = (r[1].results || r[1]).slice(0, 6); me = r[2] || me;
       var hr = new Date().getHours(), greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
       var last = me.last_lesson, c = last ? st.courseMap[last.course] : (me.owned_courses[0] ? st.courseMap[me.owned_courses[0]] : null);
-      view.innerHTML = '<div class="mb-6 flex flex-wrap items-center justify-between gap-4"><div><h1 class="text-display-md">' + greet + ', ' + U.esc(me.first_name) + '</h1><p class="mt-1 text-ink-600">' + (me.streak_days ? 'You are on a ' + me.streak_days + '-day streak. One lesson today keeps it going.' : 'Finish one lesson today to start a streak.') + '</p></div>' +
+      view.innerHTML = chooseBanner() + '<div class="mb-6 flex flex-wrap items-center justify-between gap-4"><div><h1 class="text-display-md">' + greet + ', ' + U.esc(me.first_name) + '</h1><p class="mt-1 text-ink-600">' + (me.streak_days ? 'You are on a ' + me.streak_days + '-day streak. One lesson today keeps it going.' : 'Finish one lesson today to start a streak.') + '</p></div>' +
         (me.package ? '<span class="tag tag-ink !px-3 !py-1.5 !text-sm">' + U.esc(me.package.name) + ' package</span>' : '<a class="btn btn-buy btn-sm" href="packages.html">Choose a package</a>') + '</div>' +
         '<div class="grid gap-6 xl:grid-cols-[1.5fr_1fr]">' +
         (last && c ? '<a href="lesson.html?l=' + last.id + '" class="group flex flex-col overflow-hidden rounded-3xl border border-line bg-white transition hover:shadow-lift sm:flex-row">' +
@@ -54,17 +54,99 @@
     }, fail);
   }
 
+  function chooseBanner() {
+    var p = me.package;
+    if (!p || !p.courses_to_choose) return '';
+    return '<a href="#choose" class="mb-6 flex items-start gap-3 rounded-2xl border border-orange-300 bg-orange-50 p-4 transition hover:border-orange-400">' +
+      U.icon('gift', 'text-orange-600 mt-0.5') + '<span><b class="block">Pick your ' + p.courses_to_choose + ' course' + (p.courses_to_choose === 1 ? '' : 's') +
+      '</b><span class="text-sm text-ink-600">Your ' + U.esc(p.name) + ' package is paid. Choose which courses you want.</span></span>' +
+      U.icon('chevron-right', 'ml-auto mt-0.5 text-orange-500') + '</a>';
+  }
+
   /* ---------- courses ---------- */
   function courses() {
     loading();
     A.myCourses().then(function (list) {
       var rest = st.site.courses.filter(function (c) { return !list.some(function (x) { return x.slug === c.slug; }); });
-      view.innerHTML = head('My courses', list.length ? list.length + ' courses in your library' : 'You have not bought a course yet', '<a class="btn btn-ghost btn-sm" href="courses.html">Browse all</a>') +
+      view.innerHTML = chooseBanner() + head('My courses', list.length ? list.length + ' courses in your library' : 'You have not bought a course yet', '<a class="btn btn-ghost btn-sm" href="courses.html">Browse all</a>') +
         (list.length ? '<div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">' + list.map(function (c) {
           return '<div class="flex flex-col">' + U.courseCard(c, { progress: c.progress, price: false }) + (c.next_lesson ? '<a class="btn btn-primary btn-sm mt-2" href="lesson.html?l=' + c.next_lesson.id + '">' + U.icon('play', 'i-sm') + (c.progress.done ? 'Continue' : 'Start') + '</a>' : '') + '</div>';
         }).join('') + '</div>' :
           card('<p class="font-display text-xl font-semibold">Your library is empty</p><p class="mt-1 text-ink-600">Watch the free lessons in any course, or pick a package to unlock full courses.</p><div class="mt-5 flex gap-2"><a class="btn btn-buy" href="packages.html">See packages</a><a class="btn btn-ghost" href="courses.html">Free lessons</a></div>')) +
-        (rest.length ? '<h2 class="mt-12 text-2xl">Not in your package yet</h2><p class="mt-1 text-ink-600">Free lessons are open. Upgrade or buy a single course to unlock the rest.</p><div class="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">' + rest.map(function (c) { return U.courseCard(c, {}); }).join('') + '</div>' : '');
+        (rest.length ? '<h2 class="mt-12 text-2xl">Not in your library yet</h2><p class="mt-1 text-ink-600">Free lessons are open. Upgrade your package or buy a single course to unlock these.</p><div class="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">' + rest.map(function (c) { return U.courseCard(c, {}); }).join('') + '</div>' : '');
+    }, fail);
+  }
+
+  /* ---------- choose the courses that came with the package ---------- */
+  function choose() {
+    loading();
+    A.courseChoices().then(function (d) {
+      if (!d.remaining) {
+        view.innerHTML = head('Choose your courses') +
+          card('<p class="font-display text-xl font-semibold">Nothing left to choose</p><p class="mt-1 text-ink-600">' +
+            (d.all_courses ? 'Your ' + U.esc(d.package) + ' package already includes every course.'
+              : 'All your package courses are picked. Ask support if you need one changed.') +
+            '</p><a class="btn btn-primary mt-5" href="#courses">Go to my courses</a>');
+        return;
+      }
+      var picked = [];
+      var open = d.choices.filter(function (c) { return !c.owned; });
+      function card1(c) {
+        var on = picked.indexOf(c.slug) >= 0;
+        return '<button type="button" data-pick="' + c.slug + '" aria-pressed="' + on + '" class="group flex flex-col overflow-hidden rounded-2xl border-2 text-left transition ' +
+          (on ? 'border-sky-600 bg-sky-50/60 shadow-card' : 'border-line bg-white hover:border-sky-300') + '">' +
+          '<span class="relative block aspect-[16/9] overflow-hidden" style="background:' + c.color + '">' + U.cover(c, 'h-full w-full object-cover') +
+          (on ? '<span class="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-sky-600 text-white">' + U.icon('check', 'i-sm') + '</span>' : '') + '</span>' +
+          '<span class="flex flex-1 flex-col p-4"><span class="font-semibold leading-snug">' + U.esc(c.title) + '</span>' +
+          '<span class="mt-1 text-sm text-ink-500">' + c.lesson_count + ' lessons · ' + U.esc(c.level) + '</span></span></button>';
+      }
+      function paint() {
+        U.$$('[data-pick]').forEach(function (b) {
+          var on = picked.indexOf(b.dataset.pick) >= 0;
+          b.setAttribute('aria-pressed', on);
+          b.className = b.className.replace(/border-sky-600 bg-sky-50\/60 shadow-card|border-line bg-white hover:border-sky-300/,
+            on ? 'border-sky-600 bg-sky-50/60 shadow-card' : 'border-line bg-white hover:border-sky-300');
+          var tick = b.querySelector('.absolute');
+          if (on && !tick) b.querySelector('span').insertAdjacentHTML('beforeend', '<span class="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-sky-600 text-white">' + U.icon('check', 'i-sm') + '</span>');
+          if (!on && tick) tick.remove();
+        });
+        U.$('#pick-count').textContent = picked.length + ' of ' + d.remaining + ' chosen';
+        U.$('#pick-save').disabled = picked.length === 0;
+        U.$('#pick-save').textContent = picked.length ? 'Add ' + picked.length + ' course' + (picked.length === 1 ? '' : 's') + ' to my library' : 'Choose your courses';
+      }
+      var CR = st.site.settings.course_reward || { amount: 0, enabled: false };
+      view.innerHTML = head('Choose your courses',
+          'Your ' + U.esc(d.package) + ' package lets you pick ' + d.slots + ' course' + (d.slots === 1 ? '' : 's') + '. ' +
+          d.remaining + ' left to choose.') +
+        (CR.enabled && CR.amount ? '<div class="mb-5 flex items-start gap-3 rounded-2xl border border-orange-200 bg-orange-50 p-4 text-[15px]">' + U.icon('wallet', 'text-orange-600 mt-0.5') +
+          '<p>Finish a course and <b>' + U.inr(CR.amount) + '</b> goes to your wallet. All ' + d.slots + ' courses = <b>' + U.inr(CR.amount * d.slots) + '</b>.</p></div>' : '') +
+        '<div class="sticky top-[76px] z-10 mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white/95 p-4 shadow-card backdrop-blur">' +
+          '<p class="font-semibold" id="pick-count">0 of ' + d.remaining + ' chosen</p>' +
+          '<button class="btn btn-buy" id="pick-save" disabled>Choose your courses</button></div>' +
+        '<div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">' + open.map(card1).join('') + '</div>' +
+        '<p class="mt-5 text-sm text-ink-500">Choices are final. If you need a change later, contact support.</p>';
+
+      view.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-pick]'); if (!b) return;
+        var slug = b.dataset.pick, i = picked.indexOf(slug);
+        if (i >= 0) picked.splice(i, 1);
+        else if (picked.length < d.remaining) picked.push(slug);
+        else { U.toast('You can choose ' + d.remaining + ' course' + (d.remaining === 1 ? '' : 's') + '. Remove one first.', null, true); return; }
+        paint();
+      });
+      U.$('#pick-save').addEventListener('click', function () {
+        var btn = this;
+        if (!picked.length) return;
+        U.busy(btn, true, 'Adding');
+        A.chooseCourses(picked).then(function (r) {
+          U.setMe(r.user); me = r.user; side();
+          U.toast(picked.length + ' course' + (picked.length === 1 ? '' : 's') + ' added. Start learning now.');
+          location.hash = r.remaining ? '#choose' : '#courses';
+          if (!r.remaining) U.$('#nav-choose').classList.add('hidden');
+          route();
+        }, function (err) { U.busy(btn, false); U.toast(err.message, null, true); });
+      });
+      paint();
     }, fail);
   }
 
@@ -212,7 +294,7 @@
 
   function fail(err) { view.innerHTML = card('<p class="font-semibold">This section did not load</p><p class="mt-1 text-ink-600">' + U.esc(err.message) + '</p><button class="btn btn-ghost mt-4" onclick="location.reload()">Try again</button>'); }
 
-  var views = { overview: overview, courses: courses, certificates: certificates, wallet: wallet, refer: refer, orders: orders, profile: profile };
+  var views = { overview: overview, choose: choose, courses: courses, certificates: certificates, wallet: wallet, refer: refer, orders: orders, profile: profile };
   function route() {
     var t = (location.hash || '#overview').slice(1); if (!views[t]) t = 'overview';
     U.$$('[data-tab]').forEach(function (a) { if (a.dataset.tab === t) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
@@ -223,6 +305,7 @@
 
   U.boot().then(function (state) {
     st = state; me = U.requireAuth(); if (!me) return;
+    if (me.package && me.package.courses_to_choose) U.$('#nav-choose').classList.remove('hidden');
     window.addEventListener('hashchange', function () { route(); window.scrollTo({ top: 0 }); });
     side(); route();
   });

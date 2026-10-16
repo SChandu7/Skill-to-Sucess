@@ -116,12 +116,17 @@
   function success(res) {
     try { localStorage.removeItem('sts:ref'); sessionStorage.removeItem('sts:co'); sessionStorage.removeItem('sts:site'); } catch (e) { /* */ }
     var o = res.order, u = res.user;
+    var pick = (u.package && u.package.courses_to_choose) || 0;
     U.setMe(u); U.header(); U.confetti();
     root.innerHTML = '<div class="mx-auto max-w-2xl">' + steps(3) + '<div class="rounded-3xl border border-line bg-white p-6 text-center sm:p-10">' +
       '<span class="mx-auto grid h-16 w-16 place-items-center rounded-full bg-good-500 text-white" style="animation:pop .45s both">' + U.icon('check', 'i-lg') + '</span>' +
       '<h1 class="mt-5 text-display-md">You are in, ' + U.esc(u.first_name) + '.</h1><p class="mt-2 text-ink-600">' + U.esc(o.title) + ' is unlocked.</p>' +
+      (pick ? '<p class="mx-auto mt-4 max-w-md rounded-2xl border border-orange-200 bg-orange-50 p-4 text-[15px] text-orange-900">Next step: choose the <b>' + pick + ' course' + (pick === 1 ? '' : 's') + '</b> you want in your library.</p>' : '') +
       '<dl class="mx-auto mt-6 grid max-w-md grid-cols-2 gap-3 text-left text-sm"><div class="rounded-2xl bg-cloud p-3"><dt class="text-ink-500">Order ID</dt><dd class="font-semibold tabular">' + U.esc(o.number) + '</dd></div><div class="rounded-2xl bg-cloud p-3"><dt class="text-ink-500">Paid</dt><dd class="font-semibold tabular">' + U.inr(o.amount) + (o.method ? ' by ' + U.esc(o.method) : '') + '</dd></div></dl>' +
-      '<div class="mt-8 flex flex-col justify-center gap-2 sm:flex-row">' + (o.first_lesson ? '<a class="btn btn-buy btn-lg" href="lesson.html?l=' + o.first_lesson + '">' + U.icon('play') + 'Start learning</a>' : '') + '<a class="btn btn-ghost btn-lg" href="dashboard.html">Go to dashboard</a></div></div>' +
+      '<div class="mt-8 flex flex-col justify-center gap-2 sm:flex-row">' +
+        (pick ? '<a class="btn btn-buy btn-lg" href="dashboard.html#choose">' + U.icon('gift') + 'Choose my ' + pick + ' course' + (pick === 1 ? '' : 's') + '</a>'
+              : (o.first_lesson ? '<a class="btn btn-buy btn-lg" href="lesson.html?l=' + o.first_lesson + '">' + U.icon('play') + 'Start learning</a>' : '')) +
+        '<a class="btn btn-ghost btn-lg" href="dashboard.html">Go to dashboard</a></div></div>' +
       (u.referral_code ? '<div class="mt-6 rounded-3xl bg-gradient-to-br from-sky-800 to-sky-600 p-6 text-white sm:p-8"><p class="text-sm text-sky-100">Your referral code</p><div class="mt-2 flex flex-wrap items-center gap-3"><span class="rounded-2xl bg-white/15 px-4 py-2 font-display text-2xl font-semibold tracking-wide">' + U.esc(u.referral_code) + '</span><button class="btn btn-buy btn-sm" data-copy>' + U.icon('copy', 'i-sm') + 'Copy invite link</button></div>' +
         '<p class="mt-4 text-[15px] text-sky-50">Friends save ' + U.inr(U.state.site.settings.referral.friend_discount) + '. You get ' + u.cashback_percent + '% cashback on what they pay.' + (U.state.site.settings.referral.learn_first ? ' Cashback unlocks after you finish your first course.' : '') + '</p></div>' : '') + '</div>';
     var cp = root.querySelector('[data-copy]');
