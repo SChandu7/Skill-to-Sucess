@@ -3,15 +3,16 @@
 <head>
 <title>About us | SkillToSuccess</title>
 <meta name="description" content="SkillToSuccess teaches practical digital skills in short lessons, with a quiz after each one and a certificate anyone can verify.">
-<meta property="og:image" content="assets/img/og-image.jpg">
+<meta property="og:image" content="logo.jpeg">
 <!--HEAD-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0A7BC2">
-<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="logo.jpeg">
+<link rel="apple-touch-icon" href="logo.jpeg">
 <link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/app.css?v=6">
+<link rel="stylesheet" href="assets/css/app.css?v=8">
 <!--/HEAD-->
 </head>
 <body class="flex min-h-screen flex-col">
@@ -43,7 +44,7 @@
   <!-- Founder -->
   <section class="container py-16" id="founder-wrap" hidden>
     <div class="grid gap-8 rounded-[32px] border border-line bg-white p-6 sm:p-10 lg:grid-cols-[220px_1fr] lg:items-center">
-      <div id="founder-photo" class="mx-auto lg:mx-0"></div>
+      <div id="founder-photo" class="mx-auto h-52 w-52 overflow-hidden rounded-3xl bg-sky-50 shadow-lift lg:mx-0"></div>
       <div>
         <p class="eyebrow">Who started this</p>
         <h2 class="mt-2 text-display-md" id="founder-name">Founder</h2>
@@ -69,12 +70,12 @@
 </main>
 <div id="site-footer"></div>
 <!--CORE-->
-<script src="assets/js/core/icons.js?v=6"></script>
-<script src="assets/js/core/config.js?v=6"></script>
-<script src="assets/js/core/api.js?v=6"></script>
-<script src="assets/js/core/app.js?v=6"></script>
+<script src="assets/js/core/icons.js?v=8"></script>
+<script src="assets/js/core/config.js?v=8"></script>
+<script src="assets/js/core/api.js?v=8"></script>
+<script src="assets/js/core/app.js?v=8"></script>
 <!--/CORE-->
-<script src="assets/js/chatbot.js?v=6"></script>
+<script src="assets/js/chatbot.js?v=8"></script>
 <script>
 (function () {
   var U = STS.ui;
@@ -89,9 +90,13 @@
       U.$('#founder-name').textContent = f.name;
       U.$('#founder-title').textContent = f.title || '';
       U.$('#founder-bio').textContent = f.bio || '';
-      U.$('#founder-photo').innerHTML = f.photo
-        ? '<img src="' + U.esc(f.photo) + '" alt="' + U.esc(f.name) + '" class="h-[200px] w-[200px] rounded-3xl object-cover shadow-lift">'
-        : '<div class="grid h-[200px] w-[200px] place-items-center rounded-3xl bg-sky-50 text-sky-700">' + U.avatar(f.name, 96) + '</div>';
+      // Use the photo uploaded in the admin panel; otherwise the founder.jpeg next to index.html.
+      var fbox = U.$('#founder-photo'), fimg = new Image();
+      fimg.className = 'h-full w-full object-cover';
+      fimg.alt = f.name;
+      fimg.onerror = function () { fbox.innerHTML = '<div class="grid h-full w-full place-items-center text-sky-700">' + U.avatar(f.name, 96) + '</div>'; };
+      fimg.src = f.photo || 'founder.jpeg';
+      fbox.appendChild(fimg);
     }
     U.$('#team').innerHTML = st.site.instructors.map(function (p) {
       var courses = st.site.courses.filter(function (c) { return c.instructor && c.instructor.name === p.name; });

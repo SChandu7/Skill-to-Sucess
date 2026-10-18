@@ -4,7 +4,7 @@ Plain HTML, Tailwind CSS and JavaScript. No build step is needed to run it: `ass
 
 | Folder / file | What it is |
 |---|---|
-| `*.html` | Website pages (home, courses, course, lesson, pricing, checkout, login, dashboard, play, **jobs**, verify, certificate, about, contact, help, legal, 404) |
+| `*.html` | Website pages (home, courses, course, lesson, pricing, checkout, login, dashboard, play, verify, certificate, about, contact, help, legal, 404) |
 | `admin/` | Admin panel, opens at **/admin** |
 | `assets/js/core/config.js` | The only setting you may change: `API_BASE` |
 | `assets/js/pages/` | One script per page |
@@ -53,19 +53,3 @@ python3 scripts/head.py   # only if you edit the shared <head> or script list
 ```
 
 After changing CSS or JS on the live site, raise `?v=1` to `?v=2` in the HTML files so browsers load the new files.
-
-
-## Version 1.2
-
-| Added | Where |
-|---|---|
-| Cashback calculator | `packages.html` |
-| Job connect page | `jobs.html` |
-| Welcome poster | `assets/js/core/app.js` (`poster()`), styles in `src/input.css` |
-| Founder block | `about.html` |
-| Per-package cashback and the GST line | `assets/js/core/app.js` (`courseReward()`, `gstLine()`) |
-
-Everything above reads its numbers from the server, so changing a setting in the admin panel
-is enough — no code change and no rebuild.
-
-After editing CSS or JS, raise `?v=6` to `?v=7` in the HTML files so browsers load the new files.

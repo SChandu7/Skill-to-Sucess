@@ -136,5 +136,22 @@
       }).join('');
       U.accordions(U.$('#faq'));
     });
+
+    /* ---------- founder ---------- */
+    (function () {
+      var f = s.founder || {};
+      if (!f.name) return;
+      U.$('#founder').hidden = false;
+      U.$('#h-founder-name').textContent = f.name;
+      U.$('#h-founder-title').textContent = f.title || '';
+      U.$('#h-founder-bio').textContent = f.bio || '';
+      // Use the photo uploaded in the admin panel; otherwise the founder.jpeg next to index.html.
+      var box = U.$('#h-founder-photo'), img = new Image();
+      img.className = 'h-full w-full object-cover';
+      img.alt = f.name;
+      img.onerror = function () { box.innerHTML = '<div class="grid h-full w-full place-items-center">' + U.avatar(f.name, 104) + '</div>'; };
+      img.src = f.photo || 'founder.jpeg';
+      box.appendChild(img);
+    })();
   });
 })();

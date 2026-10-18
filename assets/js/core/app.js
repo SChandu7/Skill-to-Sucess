@@ -28,7 +28,18 @@ STS.ui = (function () {
     size = size || 40;
     return '<span class="inline-grid flex-none place-items-center rounded-full font-display font-semibold text-white" style="width:' + size + 'px;height:' + size + 'px;background:' + t + ';font-size:' + Math.round(size * 0.38) + 'px">' + esc(ini) + '</span>';
   }
-  var LOGO_SVG = '<svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="10" fill="#0A7BC2"/><path d="M8 22.5 13.5 17l4 3 6.5-8.5" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="11.5" r="3.3" fill="#FF9A3D"/></svg>';
+  // The drawn mark we fall back to if the logo file is missing, so a page never shows a broken image.
+  var LOGO_FALLBACK = '<svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="10" fill="#0A7BC2"/><path d="M8 22.5 13.5 17l4 3 6.5-8.5" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="11.5" r="3.3" fill="#FF9A3D"/></svg>';
+
+  // Where the site lives, worked out from this script's own URL, so /admin/ finds the
+  // logo too. Change LOGO_FILE if you name your picture something else.
+  var LOGO_FILE = 'logo.jpeg';
+  var SITE_ROOT = (function () {
+    var el = document.querySelector('script[src*="core/app.js"]');
+    return el ? el.src.replace(/assets\/js\/core\/app\.js.*$/, '') : '';
+  })();
+  STS.logoFail = function (img) { img.outerHTML = LOGO_FALLBACK; };
+  var LOGO_SVG = '<img src="' + SITE_ROOT + LOGO_FILE + '" alt="" class="sts-logo" onerror="STS.logoFail(this)">';
   function logo(light) {
     return '<a href="index.html" class="flex items-center gap-2.5 rounded-lg" aria-label="SkillToSuccess home"><span class="h-9 w-9 flex-none">' + LOGO_SVG + '</span>' +
       '<span class="font-display text-[19px] font-semibold tracking-tight ' + (light ? 'text-white' : 'text-ink-900') + '">Skill<span class="text-orange-500">To</span>Success</span></a>';
@@ -373,7 +384,7 @@ STS.ui = (function () {
   }
 
   return {
-    page: page, state: state, esc: esc, icon: icon, inr: inr, num: num, $: $, $$: $$, h: h, date: date, ago: ago, avatar: avatar, logo: logo, LOGO_SVG: LOGO_SVG,
+    page: page, state: state, esc: esc, icon: icon, inr: inr, num: num, $: $, $$: $$, h: h, date: date, ago: ago, avatar: avatar, logo: logo, LOGO_SVG: LOGO_SVG, LOGO_FALLBACK: LOGO_FALLBACK,
     shuffle: shuffle, param: param, savedRef: savedRef, owned: owned, progress: progress, cheapestPackageFor: cheapestPackageFor,
     packageCovers: packageCovers, packageCourseCount: packageCourseCount, packageCourseLine: packageCourseLine,
     courseReward: courseReward, gstLine: gstLine, setMe: setMe, refreshMe: refreshMe,
