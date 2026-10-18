@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<title>Job connect | SkillToSuccess</title>
+<meta name="description" content="Finish a course, build real work, and get connected to hiring partners. Job connect is coming soon.">
+<!--HEAD-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A7BC2">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/app.css?v=6">
+<!--/HEAD-->
+</head>
+<body class="flex min-h-screen flex-col">
+<div id="site-header" class="h-[72px]"></div>
+<main id="main" class="flex-1 pb-20" tabindex="-1">
+  <section class="wash border-b border-line">
+    <div class="container max-w-3xl py-12 text-center sm:py-16">
+      <span class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-sky-600 text-white shadow-lift"><svg class="i i-lg" aria-hidden="true"><use href="#i-briefcase"></use></svg></span>
+      <h1 class="mt-5 text-display-lg">Job connect</h1>
+      <p class="lead mx-auto mt-3" id="jc-text">Finish a course, build real work you can show, and we put you in front of people who are hiring.</p>
+      <p class="mt-5"><span class="tag tag-orange" id="jc-tag">Available soon</span></p>
+    </div>
+  </section>
+
+  <section class="container max-w-3xl py-12">
+    <div id="jc-live" hidden></div>
+
+    <div id="jc-soon">
+      <h2 class="text-2xl">How it will work</h2>
+      <ol class="mt-6 space-y-5">
+        <li class="flex gap-4"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-sky-600 font-bold text-white">1</span><div><p class="font-semibold">Finish a course</p><p class="text-[15px] text-ink-600">Pass every lesson quiz and your certificate is issued with an ID anyone can check.</p></div></li>
+        <li class="flex gap-4"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-sky-600 font-bold text-white">2</span><div><p class="font-semibold">Build one piece of real work</p><p class="text-[15px] text-ink-600">Every course ends with something you can show: Reels, a design set, a campaign report or a client proposal.</p></div></li>
+        <li class="flex gap-4"><span class="grid h-9 w-9 flex-none place-items-center rounded-full bg-sky-600 font-bold text-white">3</span><div><p class="font-semibold">We share your profile</p><p class="text-[15px] text-ink-600">Your certificate and your work go to small businesses and agencies looking for exactly those skills.</p></div></li>
+      </ol>
+
+      <div class="mt-10 rounded-3xl border border-line bg-white p-6">
+        <h3 class="text-xl">Be first in line</h3>
+        <p class="mt-1 text-[15px] text-ink-600">Tell us what work you want. We will message you the day it opens.</p>
+        <form class="mt-5 grid gap-3 sm:grid-cols-2" id="jc-form" novalidate>
+          <div><label class="label" for="jc-name">Your name</label><input class="input" id="jc-name" name="name" autocomplete="name" required></div>
+          <div><label class="label" for="jc-email">Email</label><input class="input" id="jc-email" name="email" type="email" autocomplete="email" required></div>
+          <div><label class="label" for="jc-phone">Mobile</label><input class="input" id="jc-phone" name="phone" inputmode="numeric" maxlength="10" autocomplete="tel-national"></div>
+          <div><label class="label" for="jc-role">Work you want</label>
+            <select class="input" id="jc-role" name="role">
+              <option>Social media manager</option><option>Graphic designer</option><option>Video editor</option>
+              <option>Digital marketing executive</option><option>Freelance / own clients</option><option>Not sure yet</option>
+            </select></div>
+          <div class="sm:col-span-2"><button class="btn btn-buy btn-block">Tell me when it opens</button></div>
+        </form>
+        <p class="mt-3 text-sm text-ink-500">We only use this to tell you about Job connect. No spam.</p>
+      </div>
+
+      <div class="mt-8 rounded-2xl bg-cloud p-5 text-[15px] text-ink-700">
+        <b>Honest note:</b> a course and a certificate help you get interviews. They are not a job guarantee, and
+        we never promise an income. What you build and how you present it does the real work.
+      </div>
+    </div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<!--CORE-->
+<script src="assets/js/core/icons.js?v=6"></script>
+<script src="assets/js/core/config.js?v=6"></script>
+<script src="assets/js/core/api.js?v=6"></script>
+<script src="assets/js/core/app.js?v=6"></script>
+<!--/CORE-->
+<script src="assets/js/chatbot.js?v=6"></script>
+<script>
+(function () {
+  var U = STS.ui, A = STS.api;
+  U.boot({ page: 'jobs' }).then(function (st) {
+    var j = st.site.settings.jobs || {};
+    if (j.text) U.$('#jc-text').textContent = j.text;
+    if (j.live) {
+      U.$('#jc-tag').outerHTML = '<span class="tag tag-good">Open now</span>';
+      U.$('#jc-soon').hidden = true;
+      U.$('#jc-live').hidden = false;
+      U.$('#jc-live').innerHTML = '<div class="rounded-3xl border border-line bg-white p-6"><p class="font-display text-xl font-semibold">Openings are live</p>' +
+        '<p class="mt-1 text-[15px] text-ink-600">Your learning team will share the list with you. Write to us and we will send it now.</p>' +
+        '<a class="btn btn-primary mt-5" href="contact.html">Ask for the list</a></div>';
+      return;
+    }
+
+    // Pre-fill for a logged-in learner, so it is one tap.
+    var me = st.me;
+    if (me) { U.$('#jc-name').value = me.name || ''; U.$('#jc-email').value = me.email || ''; U.$('#jc-phone').value = me.phone || ''; }
+
+    U.$('#jc-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var f = e.target, btn = f.querySelector('button');
+      var name = U.$('#jc-name').value.trim(), email = U.$('#jc-email').value.trim();
+      if (!name || !email) { U.toast('Add your name and email so we can reach you.', null, true); return; }
+      U.busy(btn, true, 'Sending');
+      // Job connect has no table of its own yet, so this arrives as a normal support message.
+      A.contact({
+        name: name, email: email, phone: U.$('#jc-phone').value.trim(),
+        topic: 'Something else',
+        message: 'JOB CONNECT waiting list — wants: ' + U.$('#jc-role').value
+      }).then(function () {
+        U.$('#jc-form').outerHTML = '<div class="mt-5 flex items-start gap-3 rounded-2xl border border-good-200 bg-good-50 p-5">' +
+          U.icon('check-circle', 'text-good-600 mt-0.5') +
+          '<p class="text-[15px]"><b>You are on the list.</b> We will message you the day Job connect opens.</p></div>';
+      }, function (err) { U.busy(btn, false); U.toast(err.message, null, true); });
+    });
+  });
+})();
+</script>
+</body>
+</html>

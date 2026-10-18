@@ -111,6 +111,9 @@ STS.admin = (function () {
         h = (cur ? '<div class="mb-2 flex flex-wrap items-center gap-3 rounded-xl border border-line bg-cloud px-3 py-2 text-sm">' + (f.image && /\.(png|jpe?g|webp|gif|svg)(\?|$)/i.test(cur) ? '<img src="' + esc(cur) + '" alt="" class="h-10 w-16 rounded-md object-cover">' : icon('file-text', 'i-sm text-ink-500')) +
           '<a class="link truncate" target="_blank" rel="noopener" href="' + esc(cur) + '">' + esc((v && v.name) || 'Current file') + '</a><label class="ml-auto flex items-center gap-1.5 text-ink-600"><input type="checkbox" class="check !mt-0" name="clear_' + f.name + '">Remove</label></div>' : '') +
           '<input type="file" class="block w-full text-sm text-ink-600 file:mr-3 file:rounded-lg file:border-0 file:bg-sky-50 file:px-3 file:py-2 file:font-semibold file:text-sky-700 hover:file:bg-sky-100" id="' + id + '" name="' + f.name + '"' + (f.accept ? ' accept="' + f.accept + '"' : '') + '>'; break;
+      case 'json':
+        h = '<textarea class="input font-mono !text-[13px]" id="' + id + '" name="' + f.name + '" rows="' + (f.rows || 4) +
+            '" spellcheck="false">' + esc(v == null || v === '' ? '[]' : (typeof v === 'string' ? v : JSON.stringify(v, null, 2))) + '</textarea>'; break;
       case 'color':
         h = '<div class="flex gap-2"><input type="color" class="h-[46px] w-14 flex-none cursor-pointer rounded-xl border border-line bg-white p-1" value="' + esc(v || '#0A7BC2') + '" data-color-for="' + id + '"><input class="input font-mono" id="' + id + '" name="' + f.name + '" value="' + esc(v || '#0A7BC2') + '" maxlength="7"></div>'; break;
       default:
@@ -144,6 +147,11 @@ STS.admin = (function () {
       if (f.type === 'checkbox') data[f.name] = inp.checked;
       else if (f.type === 'file') { if (inp.files && inp.files[0]) files[f.name] = inp.files[0]; var c = el.querySelector('[name="clear_' + f.name + '"]'); if (c && c.checked) clears['clear_' + f.name] = 'true'; }
       else if (f.type === 'lines') data[f.name] = inp.value.split('\n').map(function (s) { return s.trim(); }).filter(Boolean);
+      else if (f.type === 'json') {
+        var raw = inp.value.trim() || '[]';
+        try { data[f.name] = JSON.parse(raw); }
+        catch (e) { throw { message: 'Check "' + (f.label || f.name) + '": that is not valid JSON.', field: f.name }; }
+      }
       else if (f.type === 'number') data[f.name] = inp.value === '' ? (f.nullable ? null : 0) : Number(inp.value);
       else if (f.type === 'select' && f.numeric) data[f.name] = inp.value === '' ? null : Number(inp.value);
       else if (f.type === 'select' && f.nullable && inp.value === '') data[f.name] = null;

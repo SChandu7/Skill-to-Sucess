@@ -11,7 +11,7 @@
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/app.css?v=5">
+<link rel="stylesheet" href="assets/css/app.css?v=6">
 <!--/HEAD-->
 </head>
 <body class="flex min-h-screen flex-col">
@@ -40,6 +40,19 @@
     </div>
   </section>
 
+  <!-- Founder -->
+  <section class="container py-16" id="founder-wrap" hidden>
+    <div class="grid gap-8 rounded-[32px] border border-line bg-white p-6 sm:p-10 lg:grid-cols-[220px_1fr] lg:items-center">
+      <div id="founder-photo" class="mx-auto lg:mx-0"></div>
+      <div>
+        <p class="eyebrow">Who started this</p>
+        <h2 class="mt-2 text-display-md" id="founder-name">Founder</h2>
+        <p class="mt-1 text-lg font-semibold text-sky-700" id="founder-title"></p>
+        <p class="mt-4 max-w-[62ch] text-ink-600" id="founder-bio"></p>
+      </div>
+    </div>
+  </section>
+
   <section class="bleed-cloud py-16">
     <div class="container">
       <h2 class="text-display-md">Who teaches</h2><p class="mt-2 text-ink-600">Working professionals who do this every day for real clients.</p>
@@ -56,12 +69,12 @@
 </main>
 <div id="site-footer"></div>
 <!--CORE-->
-<script src="assets/js/core/icons.js?v=5"></script>
-<script src="assets/js/core/config.js?v=5"></script>
-<script src="assets/js/core/api.js?v=5"></script>
-<script src="assets/js/core/app.js?v=5"></script>
+<script src="assets/js/core/icons.js?v=6"></script>
+<script src="assets/js/core/config.js?v=6"></script>
+<script src="assets/js/core/api.js?v=6"></script>
+<script src="assets/js/core/app.js?v=6"></script>
 <!--/CORE-->
-<script src="assets/js/chatbot.js?v=5"></script>
+<script src="assets/js/chatbot.js?v=6"></script>
 <script>
 (function () {
   var U = STS.ui;
@@ -70,6 +83,16 @@
     U.$('#stats').innerHTML = U.proof(x, 4).map(function (s, i) { s = s.concat([{ learners: 'users', lessons: 'list-checks', 'practical courses': 'book-open', 'average rating': 'star', 'free preview lessons': 'lock-open', 'certificates issued': 'award' }[s[1]] || 'sparkles']);
       return '<div class="stat ' + (i === 1 ? 'bg-sky-600 !border-sky-600 text-white' : '') + '">' + U.icon(s[2], i === 1 ? 'text-sky-100' : 'text-sky-600') + '<p class="v mt-3 ' + (i === 1 ? '!text-white' : '') + '">' + s[0] + '</p><p class="k ' + (i === 1 ? '!text-sky-100' : '') + '">' + s[1] + '</p></div>';
     }).join('');
+    var f = st.site.settings.founder;
+    if (f && f.name) {
+      U.$('#founder-wrap').hidden = false;
+      U.$('#founder-name').textContent = f.name;
+      U.$('#founder-title').textContent = f.title || '';
+      U.$('#founder-bio').textContent = f.bio || '';
+      U.$('#founder-photo').innerHTML = f.photo
+        ? '<img src="' + U.esc(f.photo) + '" alt="' + U.esc(f.name) + '" class="h-[200px] w-[200px] rounded-3xl object-cover shadow-lift">'
+        : '<div class="grid h-[200px] w-[200px] place-items-center rounded-3xl bg-sky-50 text-sky-700">' + U.avatar(f.name, 96) + '</div>';
+    }
     U.$('#team').innerHTML = st.site.instructors.map(function (p) {
       var courses = st.site.courses.filter(function (c) { return c.instructor && c.instructor.name === p.name; });
       return '<div class="card flex gap-4 p-5">' + (p.photo ? '<img src="' + U.esc(p.photo) + '" alt="" class="h-14 w-14 flex-none rounded-full object-cover">' : U.avatar(p.name, 56)) +

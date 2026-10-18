@@ -120,6 +120,7 @@ STS.api = (function () {
     changePassword: function (o, n) { return post('/me/password/', { old_password: o, new_password: n }).then(authDone); },
     notifications: function () { return get('/me/notifications/'); },
     readNotifications: function () { return post('/me/notifications/read/'); },
+    earnings: function (qs) { return get('/earnings/?' + qs); },
     myCourses: function () { return get('/me/courses/'); },
     courseChoices: function () { return get('/me/courses/choose/'); },
     chooseCourses: function (slugs) { return post('/me/courses/choose/', { courses: slugs }); },

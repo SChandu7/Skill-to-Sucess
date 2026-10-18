@@ -11,7 +11,7 @@
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/app.css?v=5">
+<link rel="stylesheet" href="assets/css/app.css?v=6">
 <!--/HEAD-->
 </head>
 <body class="flex min-h-screen flex-col">
@@ -30,6 +30,39 @@
     <div class="mb-6 flex flex-wrap items-end justify-between gap-4"><h2 id="cmp-h" class="text-display-md">Compare everything</h2><p class="text-sm text-ink-500 md:hidden">Scroll sideways to see all packages</p></div>
     <div class="table-wrap"><table class="tbl min-w-[880px]" id="cmp"></table></div>
   </section>
+  <!-- Cashback calculator: how much a package can pay back -->
+  <section class="container mt-20" aria-labelledby="calc-h">
+    <div class="mx-auto max-w-3xl text-center">
+      <span class="tag tag-sky">Cashback calculator</span>
+      <h2 class="mt-3 text-display-md" id="calc-h">See what comes back to you</h2>
+      <p class="lead mx-auto mt-3">Move the sliders. Every number is worked out by our server using the live rules, not a guess.</p>
+    </div>
+    <div class="mx-auto mt-8 grid max-w-5xl items-start gap-6 lg:grid-cols-[1fr_1fr]">
+      <div class="card p-6 sm:p-8">
+        <label class="label" for="cc-pkg">Package</label>
+        <select class="input" id="cc-pkg"></select>
+
+        <div class="mt-6 flex items-end justify-between"><label class="label !mb-0" for="cc-courses">Courses you finish</label><b class="font-display text-xl tabular" id="cc-courses-v">0</b></div>
+        <input class="range mt-2" type="range" id="cc-courses" min="0" max="10" value="0">
+
+        <div class="mt-6 flex items-end justify-between"><label class="label !mb-0" for="cc-friends">Friends who join with your code</label><b class="font-display text-xl tabular" id="cc-friends-v">0</b></div>
+        <input class="range mt-2" type="range" id="cc-friends" min="0" max="25" value="0">
+
+        <p class="mt-6 text-sm text-ink-500" id="cc-gst"></p>
+      </div>
+
+      <div class="card overflow-hidden p-0">
+        <div class="bg-ink-900 p-6 text-white sm:p-8">
+          <p class="text-sm text-ink-300">You can earn back</p>
+          <p class="font-display text-[44px] font-bold leading-none tabular" id="cc-total">₹0</p>
+          <p class="mt-2 text-[15px] text-sky-100" id="cc-net"></p>
+        </div>
+        <ul class="divide-y divide-line" id="cc-rows"></ul>
+        <div class="bg-cloud p-5 text-[13px] leading-relaxed text-ink-600" id="cc-note"></div>
+      </div>
+    </div>
+  </section>
+
   <section class="container mt-20 grid gap-6 lg:grid-cols-2">
     <div class="card p-6 sm:p-8">
       <h2 class="text-2xl">Upgrade cost</h2><p class="mt-2 text-ink-600">Already have a package? You only pay the gap. Progress, certificates and your referral code stay.</p>
@@ -45,12 +78,12 @@
 </main>
 <div id="site-footer"></div>
 <!--CORE-->
-<script src="assets/js/core/icons.js?v=5"></script>
-<script src="assets/js/core/config.js?v=5"></script>
-<script src="assets/js/core/api.js?v=5"></script>
-<script src="assets/js/core/app.js?v=5"></script>
+<script src="assets/js/core/icons.js?v=6"></script>
+<script src="assets/js/core/config.js?v=6"></script>
+<script src="assets/js/core/api.js?v=6"></script>
+<script src="assets/js/core/app.js?v=6"></script>
 <!--/CORE-->
-<script src="assets/js/chatbot.js?v=5"></script>
+<script src="assets/js/chatbot.js?v=6"></script>
 <script>
 (function () {
   var U = STS.ui, A = STS.api;
@@ -61,6 +94,8 @@
     U.$('#plans').innerHTML = P.map(function (p) {
       var owned = cur && cur.slug === p.slug, below = cur && cur.price > p.price, pop = p.is_popular;
       var cta = owned ? '<span class="btn btn-soft btn-block">' + U.icon('check', 'i-sm') + 'Your package</span>' : below ? '<span class="btn btn-block border border-line text-ink-400">Included in yours</span>' :
+        (p.max_course_cashback ? '<p class="mt-4 flex items-center gap-2 rounded-xl bg-good-50 px-3 py-2 text-[13px] font-semibold text-good-700">' + U.icon('wallet', 'i-sm') + 'Earn back up to ' + U.inr(p.max_course_cashback) + ' by finishing them</p>' : '') +
+        '<p class="mt-2 text-center text-[11px] text-ink-500">' + U.gstLine(p.price) + '</p>' +
         '<a class="btn btn-block ' + (pop ? 'btn-buy' : 'btn-primary') + '" href="checkout.html?plan=' + p.slug + '">' + (cur ? 'Upgrade for ' + U.inr(Math.max(1, (p.price - cur.price) - Math.round((p.price - cur.price) * UPD / 100))) : 'Enroll in ' + U.esc(p.name)) + '</a>';
       return '<article class="relative flex flex-col rounded-3xl border ' + (pop ? 'border-sky-600 bg-gradient-to-b from-sky-50 to-white shadow-lift ring-1 ring-sky-600' : 'border-line bg-white') + ' p-6">' +
         (pop ? '<span class="absolute -top-3 left-6 tag bg-orange-400 !px-2.5 !py-1 text-ink-900">' + U.esc(p.tagline || 'Most chosen') + '</span>' : '<p class="text-sm font-semibold text-sky-700">' + U.esc(p.tagline) + '</p>') +
@@ -87,7 +122,8 @@
       row('You choose them yourself', function (p) { return p.course_slots ? yes : p.includes_future_courses ? '<span class="text-xs text-ink-600">all included</span>' : no; }) +
       row('Any course in the library', function () { return yes; }) +
       row('<b>Lessons (about)</b>', function (p) { return '<b class="tabular">' + p.lesson_count + '</b>'; }) +
-      row('<b>Cashback for finishing them</b>', function (p) { return '<b class="tabular text-good-600">' + U.inr(CR.amount * U.packageCourseCount(p)) + '</b>'; }) +
+      row('<b>Per course you finish</b>', function (p) { return '<b class="tabular text-good-600">' + U.inr(U.courseReward(p)) + '</b>'; }) +
+      row('<b>Most you can earn back</b>', function (p) { return '<b class="tabular text-good-600">' + U.inr(p.max_course_cashback) + '</b>'; }) +
       group('Learning') + row('Lesson quizzes and certificates', function () { return yes; }) + row('Free resources and cheat sheets', function () { return yes; }) + row('New courses added later', function (p) { return p.includes_future_courses ? yes : no; }) +
       group('Support') + row('Support', function (p) { return '<span class="text-xs text-ink-600">' + U.esc(p.support_text || 'Email') + '</span>'; }) +
       group('Refer &amp; earn (one level)') + row('Your cashback per friend\'s purchase', function (p) { return '<b class="tabular text-orange-600">' + p.cashback_percent + '%</b>'; }) + row('Discount your friend gets', function () { return U.inr(R.friend_discount) + ' off'; }) +
@@ -97,6 +133,58 @@
     from.innerHTML = P.slice(0, -1).map(function (p) { return '<option value="' + p.slug + '">' + U.esc(p.name) + ' (' + U.inr(p.price) + ')</option>'; }).join('');
     if (cur && P.indexOf(cur) < P.length - 1) from.value = cur.slug;
     function fillTo() { var f = st.packageMap[from.value]; to.innerHTML = P.filter(function (p) { return p.price > f.price; }).map(function (p) { return '<option value="' + p.slug + '">' + U.esc(p.name) + ' (' + U.inr(p.price) + ')</option>'; }).join(''); up(); }
+
+    /* ---------- cashback calculator ---------- */
+    (function () {
+      var pkgSel = U.$('#cc-pkg'), cS = U.$('#cc-courses'), fS = U.$('#cc-friends'), timer = null, last = '';
+      pkgSel.innerHTML = P.map(function (p) { return '<option value="' + p.slug + '">' + U.esc(p.name) + ' · ' + U.inr(p.price) + '</option>'; }).join('');
+      pkgSel.value = (P.filter(function (p) { return p.is_popular; })[0] || P[0]).slug;
+
+      function setCourseMax() {
+        var p = st.packageMap[pkgSel.value], n = U.packageCourseCount(p);
+        cS.max = n;
+        if (+cS.value > n || !cS.dataset.touched) cS.value = n;
+      }
+      function ask() {
+        var qs = 'package=' + encodeURIComponent(pkgSel.value) + '&courses=' + cS.value + '&friends=' + fS.value;
+        U.$('#cc-courses-v').textContent = cS.value;
+        U.$('#cc-friends-v').textContent = fS.value;
+        if (qs === last) return;
+        last = qs;
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+          A.earnings(qs).then(paint, function (err) { U.$('#cc-note').textContent = err.message; });
+        }, 120);
+      }
+      function row(label, sub, amount) {
+        return '<li class="flex items-start justify-between gap-4 px-5 py-4"><div><p class="font-semibold">' + label + '</p>' +
+          '<p class="text-[13px] text-ink-500">' + sub + '</p></div>' +
+          '<b class="font-display text-lg tabular ' + (amount ? 'text-good-700' : 'text-ink-300') + '">' + U.inr(amount) + '</b></li>';
+      }
+      function paint(d) {
+        U.$('#cc-total').textContent = U.inr(d.total);
+        U.$('#cc-net').textContent = d.net_cost
+          ? 'That brings the ' + U.inr(d.package.price) + ' package down to ' + U.inr(d.net_cost) + '.'
+          : 'That is more than the ' + U.inr(d.package.price) + ' you paid.';
+        var mb = d.monthly_bonus;
+        U.$('#cc-rows').innerHTML =
+          row('Finishing courses', d.course_reward.courses + ' × ' + U.inr(d.course_reward.per_course) + ' a course', d.course_reward.total) +
+          row('Referral cashback', d.referral.friends + ' friends × ' + U.inr(d.referral.per_friend) + ' (' + d.package.cashback_percent + '% of ' + U.inr(d.package.price) + ')', d.referral.total) +
+          row('Daily referral bonus', U.inr(d.daily_bonus.per_day) + ' on each day a friend joins', d.daily_bonus.total) +
+          row('Monthly milestone', mb.reached ? mb.reached + ' friends in one month' : (mb.tiers[0] ? 'Reach ' + mb.tiers[0].friends + ' friends in a month' : 'Not running'), mb.total);
+        var g = d.package.gst;
+        U.$('#cc-gst').textContent = 'The ' + U.inr(d.package.price) + ' price already includes ' + U.inr(g.tax) + ' GST at ' + g.percent + '%. Nothing is added at checkout.';
+        U.$('#cc-note').innerHTML = 'Cashback waits ' + d.rules.hold_days + ' days (the refund window)' +
+          (d.rules.learn_first ? ' and unlocks after you finish one course' : '') +
+          '. Withdraw from ' + U.inr(d.rules.min_withdraw) + ' to UPI, paid within ' + d.rules.payout_hours + ' hours. ' +
+          '<b>This is a calculator, not a promise</b> — you only earn if friends actually buy.';
+      }
+      pkgSel.addEventListener('change', function () { setCourseMax(); ask(); });
+      cS.addEventListener('input', function () { cS.dataset.touched = '1'; ask(); });
+      fS.addEventListener('input', ask);
+      setCourseMax(); ask();
+    })();
+
     function up() {
       var f = st.packageMap[from.value], t = st.packageMap[to.value]; if (!f || !t) return;
       var gap = t.price - f.price, pay = Math.max(1, gap - Math.round(gap * UPD / 100));

@@ -19,7 +19,7 @@ STS.chat = (function () {
 
   function pkgList() {
     return 'Here are the packages. Each is a one-time payment with lifetime access:<br>' +
-      S().packages.map(function (p) { return '• <b>' + U.esc(p.name) + '</b>: ' + U.inr(p.price) + ' — ' + U.packageCourseLine(p).toLowerCase() + ', refer & earn at ' + p.cashback_percent + '%'; }).join('<br>') +
+      S().packages.map(function (p) { return '• <b>' + U.esc(p.name) + '</b>: ' + U.inr(p.price) + ' — ' + U.packageCourseLine(p).toLowerCase() + ', ' + U.inr(U.courseReward(p)) + ' back per course you finish, refer & earn at ' + p.cashback_percent + '%'; }).join('<br>') +
       '<br>You choose your own courses from the dashboard right after paying.' +
       '<br><a href="packages.html">Compare packages side by side</a>';
   }
@@ -41,7 +41,9 @@ STS.chat = (function () {
   var intents = [
     { id: 'human', re: /human|person|agent|call|phone|whatsapp|contact|support|talk to/, a: function () { var s = S().settings; return 'Our team is available ' + U.esc(s.hours) + ':<br>• Phone / WhatsApp: <b>' + U.esc(s.phone) + '</b><br>• Email: <b>' + U.esc(s.email) + '</b><br><a href="https://wa.me/' + s.whatsapp + '" target="_blank" rel="noopener">Open WhatsApp chat</a> or use the <a href="contact.html">contact form</a>.'; } },
     { id: 'guarantee', re: /guarantee|job guarantee|income|salary|how much can i earn|per month|mlm|scam|chain|level/, a: function () { return 'Straight answer: we sell courses, not income. There is no guaranteed job or earning.<br>Refer & earn is <b>one level only</b>. You get cashback when a friend buys with your code, and that is where it stops. No teams, no levels, no targets.'; } },
-    { id: 'withdraw', re: /withdraw|payout|upi id|bank|transfer|redeem|cash out/, a: function () { var r = R(); return 'Withdrawals go to your UPI ID:<br>• Minimum ' + U.inr(r.min_withdraw) + '<br>• Cashback is held ' + r.hold_days + ' days (refund window)' + (r.learn_first ? '<br>• Complete at least one course to unlock withdrawals' : '') + '<br>• Paid within ' + r.payout_days + ' working days<br><a href="dashboard.html#wallet">Open your wallet</a>'; } },
+    { id: 'withdraw', re: /withdraw|payout|upi id|bank|transfer|redeem|cash out/, a: function () { var r = R(); return 'Withdrawals go to your UPI ID:<br>• Minimum ' + U.inr(r.min_withdraw) + '<br>• Cashback is held ' + r.hold_days + ' days (refund window)' + (r.learn_first ? '<br>• Complete at least one course to unlock withdrawals' : '') + '<br>• Paid within ' + r.payout_hours + ' hours of your request' +
+      (r.withdraw_play_cap ? '<br>• Only ' + U.inr(r.withdraw_play_cap) + ' of a withdrawal can be Play &amp; earn money — the rest comes from finished courses and referrals' : '') +
+      '<br><a href="dashboard.html#wallet">Open your wallet</a>'; } },
     { id: 'refer', re: /refer|referral|cashback|commission|invite|share code|my code/, a: function () {
       var u = U.state.me, r = R(), rates = S().packages.map(function (p) { return p.cashback_percent; });
       var you = u && u.referral_code ? '<br><br>Your code is <b>' + U.esc(u.referral_code) + '</b> and your rate is <b>' + u.cashback_percent + '%</b>. <a href="dashboard.html#refer">Share it</a>' : '<br><br>You get your code after your first purchase.';
@@ -56,10 +58,24 @@ STS.chat = (function () {
     { id: 'pay', re: /pay|upi|card|emi|razorpay|gpay|phonepe|paytm|netbank/, a: function () { return 'We accept UPI (GPay, PhonePe, Paytm), debit and credit cards, and netbanking through Razorpay. Prices include GST. Access starts as soon as the payment is confirmed.'; } },
     { id: 'play', re: /play|game|quiz|reward|coin|free money/, a: function () { var p = P(); return 'Play & earn: learn and win small rewards.<br>• Free quizzes: ' + U.inr(p.per_correct) + ' per correct answer, up to ' + U.inr(p.per_quiz_cap) + ' a quiz<br>• Mini games: memory match, word scramble, rapid fire<br>• Up to ' + U.inr(p.daily_cap) + ' a day, and up to ' + U.inr(p.checkout_max) + ' can be used on your first package<br><a href="play.html">Start playing</a>'; } },
     { id: 'free', re: /free|preview|trial|demo|sample|before buy/, a: function () { return 'Every course has free preview lessons, an intro video and a PDF cheat sheet. Open any course from the <a href="courses.html">course list</a> and look for the "Free" tags.'; } },
-    { id: 'coursereward', re: /finish|complete|reward for course|50|cashback for course|course reward/, a: function () {
+    { id: 'coursereward', re: /finish|complete|reward for course|cashback for course|course reward|how much back|calculator/, a: function () {
       var cr = S().settings.course_reward || {};
-      if (!cr.enabled || !cr.amount) return 'Finish your lessons and you earn a certificate for each course.';
-      return 'Finish a course and <b>' + U.inr(cr.amount) + '</b> goes to your wallet.<br>• It counts when you pass every lesson quiz in that course<br>• Example: a 5-course package pays up to ' + U.inr(cr.amount * 5) + '<br>• It waits ' + cr.hold_days + ' days (the refund window), then you can withdraw it<br><a href="dashboard.html#wallet">Open your wallet</a>';
+      if (!cr.enabled) return 'Finish your lessons and you earn a certificate for each course.';
+      return 'Finish a course and money goes to your wallet. Bigger packages pay more per course:<br>' +
+        S().packages.map(function (p) { return '• ' + U.esc(p.name) + ' (' + U.inr(p.price) + '): <b>' + U.inr(U.courseReward(p)) + '</b> a course, up to ' + U.inr(p.max_course_cashback); }).join('<br>') +
+        '<br>It counts when you pass every lesson quiz, waits ' + cr.hold_days + ' days, then you can withdraw it.<br><a href="packages.html#calc-h">Try the cashback calculator</a>';
+    } },
+    { id: 'gst', re: /gst|tax|invoice|bill|extra charge/, a: function () {
+      var g = S().settings.gst || {};
+      if (!g.percent) return 'The price you see is the price you pay. Nothing extra at checkout.';
+      return 'The price already includes GST at ' + g.percent + '%. <b>Nothing is added at checkout.</b><br>' +
+        S().packages.slice(0, 2).map(function (p) { var b = Math.round(p.price / (1 + g.percent / 100)); return '• ' + U.esc(p.name) + ' ' + U.inr(p.price) + ' = ' + U.inr(b) + ' course value + ' + U.inr(p.price - b) + ' GST'; }).join('<br>') +
+        '<br>Your receipt email shows the split.';
+    } },
+    { id: 'jobs', re: /job|hiring|placement|work|career|interview/, a: function () {
+      var j = S().settings.jobs || {};
+      return j.live ? 'Job connect is open. <a href="jobs.html">See it here</a>.'
+        : 'Job connect is coming soon. ' + U.esc(j.text || '') + '<br>Join the waiting list on the <a href="jobs.html">Job connect page</a>.';
     } },
     { id: 'choose', re: /choose|pick|select course|which course|my courses/, a: function () {
       return 'You pick your own courses.<br>1. Buy a package<br>2. Open <a href="dashboard.html#choose">Choose your courses</a> in your dashboard<br>3. Pick any courses from the library, up to the number your package allows<br>Choices are final, so pick carefully. Contact support if you need a change.';

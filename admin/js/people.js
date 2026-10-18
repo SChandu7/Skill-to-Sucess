@@ -42,7 +42,7 @@
     return Promise.all([AD.api.get('/users/' + id + '/'), AD.options()]).then(function (res) {
       var u = res[0], o = res[1], w = u.wallet, write = AD.can('users', 'write');
       var ownedIds = u.courses.map(function (c) { return c.id; });
-      var tabsDef = [['courses', 'Courses', u.courses.length], ['orders', 'Orders', u.orders.length], ['wallet', 'Wallet', null], ['referrals', 'Referrals', u.referrals_made.length], ['certificates', 'Certificates', u.certificates.length], ['activity', 'Activity', null]]
+      var tabsDef = [['courses', 'Courses', u.courses.length], ['orders', 'Orders', u.orders.length], ['wallet', 'Wallet', null], ['referrals', 'Referrals', u.referrals_made.length], ['certificates', 'Certificates', u.certificates.length], ['mails', 'Emails', (u.mails || []).length], ['activity', 'Activity', null]]
         .filter(function (t) { return (t[0] !== 'orders' || AD.can('orders')) && (t[0] !== 'wallet' || AD.can('wallet')); });
       var actions = write ? '<button class="btn btn-ghost" data-do="edit">' + icon('pencil', 'i-sm') + 'Edit</button>' +
         '<div class="relative"><button class="btn btn-ghost" data-menu-btn>More' + icon('chevron-down', 'i-sm') + '</button><div data-menu class="absolute right-0 top-12 z-40 w-60 rounded-2xl border border-line bg-white p-2 shadow-pop" hidden>' +
@@ -128,7 +128,11 @@
         { label: 'Order', render: function (x) { return esc(x.order_number) + ' · ' + U.inr(x.amount_paid); } },
         { label: 'Cashback', right: true, render: function (x) { return '<b>' + U.inr(x.cashback_amount) + '</b><br><span class="text-xs text-ink-500">' + x.cashback_percent + '%</span>'; } },
         { label: 'Status', render: function (x) { return AD.tag(x.status) + (x.flag_reason ? '<br><span class="text-xs text-ink-500">' + esc(x.flag_reason) + '</span>' : ''); } }
-      ], u.referrals_made, { empty: 'No referrals yet', emptyIcon: 'gift' }) + '</div>';
+      ], u.referrals_made, { empty: 'No referrals yet', emptyIcon: 'gift' }) + '</div>' +
+        (u.bonuses ? '<div class="card mt-4 p-5"><p class="font-semibold">Bonuses this month</p>' +
+          '<p class="mt-1 text-sm text-ink-600">' + u.bonuses.friends_this_month + ' friends in ' + esc(u.bonuses.month) +
+          ' · earned ' + U.inr(u.bonuses.earned_this_month) +
+          (u.bonuses.next_tier ? ' · ' + u.bonuses.next_tier.to_go + ' more unlocks ' + U.inr(u.bonuses.next_tier.bonus) : '') + '</p></div>' : '');
     } else if (tab === 'certificates') {
       host.innerHTML = '<div class="card overflow-hidden">' + AD.table([
         { label: 'Certificate', render: function (c) { return '<a class="font-mono font-semibold hover:text-sky-700" target="_blank" rel="noopener" href="../certificate.html?id=' + encodeURIComponent(c.code) + '">' + esc(c.code) + '</a>' + (c.issued_by_admin ? ' <span class="tag tag-orange">by admin</span>' : ''); } },
@@ -137,6 +141,15 @@
         { label: 'Issued', render: function (c) { return AD.day(c.issued_at); } },
         { label: 'Status', render: function (c) { return c.is_revoked ? AD.tag('revoked') : AD.tag('valid'); } }
       ], u.certificates, { empty: 'No certificates yet', emptyIcon: 'award' }) + '</div>';
+    } else if (tab === 'mails') {
+      host.innerHTML = '<div class="card overflow-hidden">' + AD.table([
+        { label: 'Sent', render: function (m) { return AD.day(m.created_at); } },
+        { label: 'Type', render: function (m) { return esc(m.kind); } },
+        { label: 'Subject', render: function (m) { return '<details><summary class="cursor-pointer font-medium hover:text-sky-700">' + esc(m.subject) + '</summary>' +
+            '<pre class="mt-2 max-w-[60ch] whitespace-pre-wrap break-words rounded-xl bg-cloud p-3 font-sans text-[13px] leading-relaxed text-ink-700">' + esc(m.body) + '</pre></details>'; } },
+        { label: 'To', render: function (m) { return esc(m.to); } },
+        { label: 'Status', render: function (m) { return m.sent ? AD.tag('sent') : AD.tag('failed') + (m.error ? '<br><span class="text-xs text-ink-500">' + esc(m.error) + '</span>' : ''); } }
+      ], u.mails || [], { empty: 'No emails sent yet', emptyHint: 'Receipts and withdrawal updates appear here.', emptyIcon: 'mail' }) + '</div>';
     } else {
       host.innerHTML = '<div class="card px-4">' + (u.activity.length ? '<ul class="divide-y divide-line">' + u.activity.map(function (a) { return AD.activityRow(a); }).join('') + '</ul>' : '<p class="py-10 text-center text-sm text-ink-500">No activity recorded</p>') + '</div>';
     }

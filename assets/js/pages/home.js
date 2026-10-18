@@ -78,7 +78,7 @@
         '<p class="mt-3 flex items-baseline gap-2"><span class="font-display text-[34px] font-semibold leading-none tabular">' + U.inr(p.price) + '</span>' + (p.mrp ? '<s class="text-sm text-ink-400 tabular">' + U.inr(p.mrp) + '</s>' : '') + '</p>' +
         '<ul class="mt-5 space-y-2.5 text-[15px] text-ink-700">' +
         '<li class="flex gap-2">' + U.icon('book-open', 'i-sm mt-1 text-sky-600') + U.packageCourseLine(p) + '</li>' +
-        (CR.enabled && CR.amount ? '<li class="flex gap-2">' + U.icon('wallet', 'i-sm mt-1 text-good-600') + 'Up to ' + U.inr(CR.amount * U.packageCourseCount(p)) + ' back when you finish them</li>' : '') +
+        (p.max_course_cashback ? '<li class="flex gap-2">' + U.icon('wallet', 'i-sm mt-1 text-good-600') + U.inr(U.courseReward(p)) + ' back per course, up to ' + U.inr(p.max_course_cashback) + '</li>' : '') +
         '<li class="flex gap-2">' + U.icon('gift', 'i-sm mt-1 text-orange-500') + p.cashback_percent + '% referral cashback</li>' +
         (p.support_text ? '<li class="flex gap-2">' + U.icon('headphones', 'i-sm mt-1 text-sky-600') + U.esc(p.support_text) + '</li>' : '') + '</ul>' +
         '<div class="mt-auto pt-6">' + cta + '</div></article>';

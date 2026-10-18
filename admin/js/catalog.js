@@ -293,6 +293,7 @@
           { name: 'price', label: 'Price', type: 'number', prefix: '₹', min: 0, required: true }, { name: 'mrp', label: 'Crossed-out price', type: 'number', prefix: '₹', nullable: true, optional: true },
           { name: 'cashback_percent', label: 'Referral cashback for owners', type: 'number', min: 0, max: 60, help: '% of what a referred friend pays. One level only. Max 60%.' },
           { name: 'course_slots', label: 'Courses the buyer picks', type: 'number', min: 0, max: 60, help: 'The buyer chooses this many courses from the whole library. Use 0 for a fixed list below.' },
+          { name: 'course_cashback', label: 'Cashback per finished course', type: 'number', prefix: '₹', min: 0, help: 'Paid to this package\'s owner for every course they complete. 0 = use the default in Site settings.' },
           { name: 'sort_order', label: 'Position', type: 'number', min: 0 },
           { name: 'courses', label: 'Fixed course list (only when "courses the buyer picks" is 0)', type: 'multi', span: 2, options: o.courses.map(function (c) { return { value: c.id, label: c.title }; }) },
           { name: 'perks', label: 'Perks shown on the pricing card', type: 'lines', span: 2, rows: 4 },
@@ -303,7 +304,7 @@
         }
         view.addEventListener('click', function (e) {
           var ed = e.target.closest('[data-edit]'), nw = e.target.closest('[data-new]');
-          if (nw) AD.editor({ title: 'New package', icon: 'package', fields: fields, values: { is_active: true, cashback_percent: 10, course_slots: 2, courses: [] }, ok: 'Create package', saved: 'Package created', save: save(null), done: function () { AD.options(true); AD.refresh(); } });
+          if (nw) AD.editor({ title: 'New package', icon: 'package', fields: fields, values: { is_active: true, cashback_percent: 10, course_slots: 2, course_cashback: 50, courses: [] }, ok: 'Create package', saved: 'Package created', save: save(null), done: function () { AD.options(true); AD.refresh(); } });
           if (ed) {
             var p = list.filter(function (x) { return x.id === Number(ed.dataset.edit); })[0];
             AD.editor({ title: 'Edit ' + p.name, icon: 'package', fields: fields, values: p, save: save(p), done: function () { AD.options(true); AD.refresh(); },

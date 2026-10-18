@@ -79,6 +79,15 @@ STS.ui = (function () {
   // includes every course, or when the course is in its fixed list.
   function packageCovers(p, slug) { return p.course_slots > 0 || p.includes_future_courses || p.courses.indexOf(slug) >= 0; }
   function cheapestPackageFor(slug) { return state.site.packages.filter(function (p) { return packageCovers(p, slug); }).sort(function (a, b) { return a.price - b.price; })[0]; }
+  // What one finished course pays in this package.
+  function courseReward(p) { return (p && p.course_cashback) || (state.site.settings.course_reward || {}).amount || 0; }
+  // The tax already inside a price. We never add it on top.
+  function gstLine(amount) {
+    var g = state.site.settings.gst || {};
+    if (!g.percent) return '';
+    var base = Math.round(amount / (1 + g.percent / 100));
+    return 'Includes ' + inr(amount - base) + ' GST (' + g.percent + '%) · course value ' + inr(base);
+  }
   function packageCourseCount(p) { return p.course_count || (p.includes_future_courses ? state.site.courses.length : p.course_slots || p.courses.length); }
   function packageCourseLine(p) {
     if (p.includes_future_courses) return 'Every course (' + state.site.courses.length + '), plus new ones';
@@ -99,7 +108,8 @@ STS.ui = (function () {
   function savedRef() { try { return localStorage.getItem('sts:ref') || ''; } catch (e) { return ''; } }
 
   /* ------------------------------------------------------------------ header */
-  var NAV = [['courses', 'Courses'], ['packages', 'Pricing'], ['play', 'Play & earn'], ['refer', 'Refer & earn', 'index.html#refer'], ['verify', 'Verify']];
+  var NAV = [['courses', 'Courses'], ['packages', 'Pricing'], ['play', 'Play & earn'],
+             ['refer', 'Refer & earn', 'index.html#refer'], ['jobs', 'Job connect'], ['verify', 'Verify']];
   function header(opts) {
     opts = opts || {};
     var u = state.me, host = $('#site-header'); if (!host) return;
@@ -139,7 +149,7 @@ STS.ui = (function () {
   function openDrawer() {
     var u = state.me;
     var ov = h('<div class="fixed inset-0 z-[59] bg-ink-900/40" style="animation:fadeIn .15s both"></div>');
-    var items = [['index.html', 'home', 'Home'], ['courses.html', 'book-open', 'Courses'], ['packages.html', 'layers', 'Pricing'], ['play.html', 'gamepad-2', 'Play & earn'], ['index.html#refer', 'gift', 'Refer & earn'], ['verify.html', 'badge-check', 'Verify a certificate'], ['about.html', 'users', 'About us'], ['help.html', 'help-circle', 'Help & FAQ'], ['contact.html', 'message-circle', 'Contact']];
+    var items = [['index.html', 'home', 'Home'], ['courses.html', 'book-open', 'Courses'], ['packages.html', 'layers', 'Pricing'], ['play.html', 'gamepad-2', 'Play & earn'], ['index.html#refer', 'gift', 'Refer & earn'], ['jobs.html', 'briefcase', 'Job connect'], ['verify.html', 'badge-check', 'Verify a certificate'], ['about.html', 'users', 'About us'], ['help.html', 'help-circle', 'Help & FAQ'], ['contact.html', 'message-circle', 'Contact']];
     var dr = h('<aside class="drawer" role="dialog" aria-label="Menu"><div class="flex h-[72px] items-center justify-between border-b border-line px-5">' + logo() + '<button class="grid h-10 w-10 place-items-center rounded-lg hover:bg-sky-50" data-close aria-label="Close menu">' + icon('x') + '</button></div>' +
       '<nav class="flex flex-col gap-1 overflow-y-auto p-4">' + items.map(function (m) { return '<a class="side-link" href="' + m[0] + '">' + icon(m[1], 'text-ink-400') + m[2] + '</a>'; }).join('') + '</nav>' +
       '<div class="mt-auto border-t border-line p-4">' + (u ? '<a class="btn btn-primary btn-block" href="dashboard.html">' + icon('layout-dashboard') + 'Go to dashboard</a>' : '<div class="grid grid-cols-2 gap-2"><a class="btn btn-ghost" href="login.html">Log in</a><a class="btn btn-primary" href="login.html#register">Start free</a></div>') + '</div></aside>');
@@ -171,7 +181,7 @@ STS.ui = (function () {
       '<div class="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr]"><div class="max-w-sm">' + logo() + '<p class="mt-4 text-[15px] text-ink-600">' + esc(s.tagline) + ' Learn with short video, image and text lessons, prove it with quizzes, and get a certificate anyone can verify.</p>' +
       '<div class="mt-5 space-y-2 text-[15px] text-ink-700"><p class="flex items-center gap-2">' + icon('phone', 'text-sky-600') + '<span class="select-all">' + esc(s.phone) + '</span></p><p class="flex items-center gap-2">' + icon('mail', 'text-sky-600') + '<span class="select-all">' + esc(s.email) + '</span></p><p class="flex items-center gap-2">' + icon('clock', 'text-sky-600') + esc(s.hours) + '</p></div>' +
       (social ? '<div class="mt-5 flex flex-wrap gap-2">' + social + '</div>' : '') + '</div>' +
-      col('Learn', [['All courses', 'courses.html'], ['Pricing', 'packages.html'], ['Play & earn', 'play.html'], ['Verify a certificate', 'verify.html']]) +
+      col('Learn', [['All courses', 'courses.html'], ['Pricing', 'packages.html'], ['Play & earn', 'play.html'], ['Job connect', 'jobs.html'], ['Verify a certificate', 'verify.html']]) +
       col('Company', [['About us', 'about.html'], ['Refer & earn', 'index.html#refer'], ['Help & FAQ', 'help.html'], ['Contact', 'contact.html']]) +
       col('Policies', [['Terms of use', 'legal.html#terms'], ['Refund policy', 'legal.html#refund'], ['Referral terms', 'legal.html#referral'], ['Privacy policy', 'legal.html#privacy']]) +
       '</div><div class="mt-12 flex flex-col gap-4 border-t border-line pt-6 text-sm text-ink-500 sm:flex-row sm:items-center sm:justify-between">' +
@@ -298,6 +308,49 @@ STS.ui = (function () {
 
   /* ------------------------------------------------------------------ boot */
   var booted = null;
+  /* ---------- welcome poster: the referral offer, once per visit ---------- */
+  function poster() {
+    var p = state.site.settings.poster;
+    if (!p || sessionStorage.getItem('sts:poster')) return;
+    try { sessionStorage.setItem('sts:poster', '1'); } catch (e) { /* private window */ }
+
+    var box = document.createElement('div');
+    box.className = 'poster-wrap';
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-label', p.title);
+    box.innerHTML =
+      '<div class="poster-card">' +
+        '<button class="poster-x" type="button" aria-label="Close">' + icon('x') + '</button>' +
+        (p.image ? '<img class="poster-img" src="' + esc(p.image) + '" alt="">' : '') +
+        '<div class="poster-body">' +
+          '<span class="tag tag-orange">Offer</span>' +
+          '<h2 class="mt-3 font-display text-2xl font-bold leading-tight">' + esc(p.title) + '</h2>' +
+          '<p class="mt-2 text-[15px] text-ink-600">' + esc(p.text) + '</p>' +
+          '<a class="btn btn-buy mt-5 w-full" href="' + esc(p.link) + '">' + esc(p.button) + '</a>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(box);
+    requestAnimationFrame(function () { box.classList.add('is-on'); });
+
+    var timer = null;
+    function close() {
+      clearTimeout(timer);
+      box.classList.remove('is-on');
+      setTimeout(function () { box.remove(); }, 220);
+      document.removeEventListener('keydown', onKey);
+    }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    box.querySelector('.poster-x').addEventListener('click', close);
+    box.addEventListener('click', function (e) { if (e.target === box) close(); });
+    box.querySelector('a').addEventListener('click', close);
+    document.addEventListener('keydown', onKey);
+    // Closes by itself, but stays open if the visitor moves onto the card to read it.
+    if (p.auto_close > 0) {
+      timer = setTimeout(close, p.auto_close * 1000);
+      box.querySelector('.poster-card').addEventListener('mouseenter', function () { clearTimeout(timer); });
+    }
+  }
+
   function boot(opts) {
     opts = opts || {};
     if (booted) return booted;
@@ -307,7 +360,7 @@ STS.ui = (function () {
         document.body.innerHTML = '<main class="grid min-h-screen place-items-center p-6 text-center"><div>' + logo() + '<h1 class="mt-8 text-display-md">We are improving the site.</h1><p class="mt-2 text-ink-600">Please check back in a little while. For help, write to ' + esc(state.site.settings.email) + '.</p></div></main>';
         throw new Error('maintenance');
       }
-      if (!opts.noShell) { header(opts); footer(); }
+      if (!opts.noShell) { header(opts); footer(); poster(); }
       captureRef();
       if (STS.chat && !opts.noChat) STS.chat.mount();
       return state;
@@ -322,7 +375,8 @@ STS.ui = (function () {
   return {
     page: page, state: state, esc: esc, icon: icon, inr: inr, num: num, $: $, $$: $$, h: h, date: date, ago: ago, avatar: avatar, logo: logo, LOGO_SVG: LOGO_SVG,
     shuffle: shuffle, param: param, savedRef: savedRef, owned: owned, progress: progress, cheapestPackageFor: cheapestPackageFor,
-    packageCovers: packageCovers, packageCourseCount: packageCourseCount, packageCourseLine: packageCourseLine, setMe: setMe, refreshMe: refreshMe,
+    packageCovers: packageCovers, packageCourseCount: packageCourseCount, packageCourseLine: packageCourseLine,
+    courseReward: courseReward, gstLine: gstLine, setMe: setMe, refreshMe: refreshMe,
     header: header, toast: toast, modal: modal, unlock: unlock, cover: cover, stars: stars, proof: proof, courseCard: courseCard, confetti: confetti,
     accordions: accordions, copy: copy, busy: busy, fieldError: fieldError, failure: failure, requireAuth: requireAuth, boot: boot
   };

@@ -114,12 +114,14 @@
         U.$('#pick-save').disabled = picked.length === 0;
         U.$('#pick-save').textContent = picked.length ? 'Add ' + picked.length + ' course' + (picked.length === 1 ? '' : 's') + ' to my library' : 'Choose your courses';
       }
-      var CR = st.site.settings.course_reward || { amount: 0, enabled: false };
+      // The reward follows the learner's own package, not the site default.
+      var myPkg = me.package ? st.packageMap[me.package.slug] : null;
+      var perCourse = U.courseReward(myPkg);
       view.innerHTML = head('Choose your courses',
           'Your ' + U.esc(d.package) + ' package lets you pick ' + d.slots + ' course' + (d.slots === 1 ? '' : 's') + '. ' +
           d.remaining + ' left to choose.') +
-        (CR.enabled && CR.amount ? '<div class="mb-5 flex items-start gap-3 rounded-2xl border border-orange-200 bg-orange-50 p-4 text-[15px]">' + U.icon('wallet', 'text-orange-600 mt-0.5') +
-          '<p>Finish a course and <b>' + U.inr(CR.amount) + '</b> goes to your wallet. All ' + d.slots + ' courses = <b>' + U.inr(CR.amount * d.slots) + '</b>.</p></div>' : '') +
+        (perCourse ? '<div class="mb-5 flex items-start gap-3 rounded-2xl border border-orange-200 bg-orange-50 p-4 text-[15px]">' + U.icon('wallet', 'text-orange-600 mt-0.5') +
+          '<p>Finish a course and <b>' + U.inr(perCourse) + '</b> goes to your wallet. All ' + d.slots + ' courses = <b>' + U.inr(perCourse * d.slots) + '</b>.</p></div>' : '') +
         '<div class="sticky top-[76px] z-10 mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white/95 p-4 shadow-card backdrop-blur">' +
           '<p class="font-semibold" id="pick-count">0 of ' + d.remaining + ' chosen</p>' +
           '<button class="btn btn-buy" id="pick-save" disabled>Choose your courses</button></div>' +
@@ -184,15 +186,18 @@
         '<div class="rounded-3xl border border-line bg-white p-6"><p class="text-ink-600">Earned so far</p><p class="mt-2 font-display text-4xl font-semibold tabular">' + U.inr(b.earned) + '</p><p class="mt-1 text-sm text-ink-500">' + U.inr(b.withdrawn) + ' withdrawn</p></div></div>' +
         (b.can_withdraw ? '' : '<div class="mt-4 flex gap-3 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-[15px]">' + U.icon('graduation-cap', 'mt-0.5 text-sky-700') + '<p><b>Learn first, then withdraw.</b> Complete any one course to unlock withdrawals. Your cashback is safe and keeps adding up until then.</p></div>') +
         '<div class="mt-6 grid gap-6 xl:grid-cols-[1fr_1.4fr]">' +
-        card('<h2 class="text-xl">Withdraw to UPI</h2><p class="mt-1 text-sm text-ink-600">Minimum ' + U.inr(b.min_withdrawal) + '. Paid within ' + b.payout_days + ' working days.</p>' +
-          '<form class="mt-5 grid gap-4" id="wd" novalidate><div><label class="label" for="wd-amt">Amount</label><div class="relative" data-field><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-500">₹</span><input class="input pl-8 tabular" id="wd-amt" name="amount" inputmode="numeric" value="' + (b.available >= b.min_withdrawal ? b.available : '') + '" placeholder="' + b.min_withdrawal + '"></div>' +
-          '<div class="mt-2 flex gap-2">' + [200, 500].filter(function (v) { return v <= b.available && v >= b.min_withdrawal; }).map(function (v) { return '<button type="button" class="chip !py-1 !text-xs" data-amt="' + v + '">' + U.inr(v) + '</button>'; }).join('') + (b.available >= b.min_withdrawal ? '<button type="button" class="chip !py-1 !text-xs" data-amt="' + b.available + '">All ' + U.inr(b.available) + '</button>' : '') + '</div></div>' +
+        card('<h2 class="text-xl">Withdraw to UPI</h2><p class="mt-1 text-sm text-ink-600">Minimum ' + U.inr(b.min_withdrawal) + '. We pay it within ' + b.payout_hours + ' hours.</p>' +
+          (b.blocked_by_play_cap ? '<div class="mt-4 flex gap-3 rounded-2xl border border-orange-200 bg-orange-50 p-4 text-[15px]">' + U.icon('gamepad-2', 'mt-0.5 text-orange-600') +
+            '<p><b>' + U.inr(b.play_cap_left) + ' of a withdrawal can be play money.</b> You can take out ' + U.inr(b.withdrawable_now) + ' now. Finish a course or refer a friend to unlock the other ' + U.inr(b.blocked_by_play_cap) + '.</p></div>' : '') +
+          '<form class="mt-5 grid gap-4" id="wd" novalidate><div><label class="label" for="wd-amt">Amount</label><div class="relative" data-field><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-500">₹</span><input class="input pl-8 tabular" id="wd-amt" name="amount" inputmode="numeric" value="' + (b.withdrawable_now >= b.min_withdrawal ? b.withdrawable_now : '') + '" placeholder="' + b.min_withdrawal + '"></div>' +
+          '<div class="mt-2 flex flex-wrap gap-2">' + [50, 100, 500].filter(function (v) { return v <= b.withdrawable_now && v >= b.min_withdrawal; }).map(function (v) { return '<button type="button" class="chip !py-1 !text-xs" data-amt="' + v + '">' + U.inr(v) + '</button>'; }).join('') + (b.withdrawable_now >= b.min_withdrawal ? '<button type="button" class="chip !py-1 !text-xs" data-amt="' + b.withdrawable_now + '">All ' + U.inr(b.withdrawable_now) + '</button>' : '') + '</div></div>' +
           '<div><label class="label" for="wd-upi">UPI ID</label><input class="input" id="wd-upi" name="upi" value="' + U.esc(r.upi_id || '') + '" placeholder="name@okhdfc" autocomplete="off"></div>' +
-          '<button class="btn btn-primary btn-block"' + (b.can_withdraw && b.available >= b.min_withdrawal ? '' : ' disabled') + '>' + U.icon('send', 'i-sm') + 'Request withdrawal</button>' +
-          (b.can_withdraw && b.available < b.min_withdrawal ? '<p class="text-center text-sm text-ink-500">You need ' + U.inr(b.min_withdrawal - b.available) + ' more to withdraw.</p>' : '') + '</form>') +
+          '<button class="btn btn-primary btn-block"' + (b.can_withdraw && b.withdrawable_now >= b.min_withdrawal ? '' : ' disabled') + '>' + U.icon('send', 'i-sm') + 'Request withdrawal</button>' +
+          (b.can_withdraw && b.withdrawable_now < b.min_withdrawal ? '<p class="text-center text-sm text-ink-500">You need ' + U.inr(b.min_withdrawal - b.withdrawable_now) + ' more to withdraw.</p>' : '') +
+          '<p class="text-center text-xs text-ink-500">We email the team the moment you ask, and reply with the status.</p></form>') +
         card('<div class="flex flex-wrap items-center justify-between gap-3"><h2 class="text-xl">Transactions</h2><div class="seg" role="group" aria-label="Filter">' + [['all', 'All'], ['cashback', 'Cashback'], ['play', 'Play'], ['withdrawal', 'Withdrawals']].map(function (f) { return '<button data-f="' + f[0] + '" aria-pressed="' + (txFilter === f[0]) + '">' + f[1] + '</button>'; }).join('') + '</div></div>' +
           (list.length ? '<ul class="mt-4 divide-y divide-line">' + list.map(function (t) {
-            var ic = { cashback: 'gift', play: 'gamepad-2', withdrawal: 'banknote', checkout: 'ticket', adjustment: 'sliders-horizontal' }[t.kind] || 'wallet';
+            var ic = { cashback: 'gift', daily: 'zap', monthly: 'trophy', course: 'graduation-cap', play: 'gamepad-2', withdrawal: 'banknote', checkout: 'ticket', adjustment: 'sliders-horizontal' }[t.kind] || 'wallet';
             return '<li class="flex items-center gap-3 py-3"><span class="grid h-10 w-10 flex-none place-items-center rounded-2xl ' + (t.amount > 0 ? 'bg-sky-50 text-sky-700' : 'bg-cloud text-ink-500') + '">' + U.icon(ic, 'i-sm') + '</span>' +
               '<div class="min-w-0 flex-1"><p class="truncate text-[15px] font-medium">' + U.esc(t.title) + '</p><p class="text-xs text-ink-500">' + U.esc(t.kind_label) + ', ' + U.date(t.created_at) + (t.status === 'pending' ? ', unlocks ' + U.ago(t.available_at) : '') + (t.utr ? ', ref ' + U.esc(t.utr) : '') + (t.note ? ', ' + U.esc(t.note) : '') + '</p></div>' +
               '<div class="text-right"><p class="font-semibold tabular ' + (t.amount > 0 ? 'text-good-600' : '') + '">' + (t.amount > 0 ? '+' : '−') + U.inr(Math.abs(t.amount)) + '</p>' + pill(t.status) + '</div></li>';
@@ -223,6 +228,7 @@
         '<p class="mt-6 text-sm text-sky-100">Invite link</p><div class="mt-2 flex gap-2"><input class="input !border-white/20 !bg-white/10 !text-white" value="' + U.esc(inviteLink()) + '" readonly aria-label="Invite link"><button class="btn border border-white/25 text-white hover:bg-white/10" data-c="link" aria-label="Copy link">' + U.icon('copy', 'i-sm') + '</button></div>' +
         '<div class="mt-6 flex flex-wrap gap-2"><a class="btn btn-buy" target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(waText()) + '">' + U.icon('message-circle', 'i-sm') + 'Share on WhatsApp</a><button class="btn border border-white/25 text-white hover:bg-white/10" data-c="msg">' + U.icon('copy', 'i-sm') + 'Copy message</button></div></div>' +
         '<div class="grid gap-4 sm:grid-cols-3 xl:grid-cols-1">' + [['users', 'Friends joined', r.friends], ['indian-rupee', 'Total cashback', U.inr(r.total_cashback)], ['clock', 'Pending', U.inr(r.pending)]].map(function (s) { return '<div class="stat flex items-center gap-4"><span class="grid h-11 w-11 place-items-center rounded-2xl bg-sky-50 text-sky-700">' + U.icon(s[0]) + '</span><div><p class="v !text-2xl">' + s[2] + '</p><p class="k">' + s[1] + '</p></div></div>'; }).join('') + '</div></div>' +
+        bonusPanel(r.bonuses) +
         '<div class="mt-6 grid gap-6 xl:grid-cols-[1.3fr_1fr]">' +
         card('<h2 class="text-xl">Your friends</h2>' + (r.referrals.length ? '<div class="mt-4 overflow-x-auto"><table class="tbl min-w-[520px]"><thead><tr><th>Friend</th><th>Bought</th><th class="text-right">Paid</th><th class="text-right">Your cashback</th><th>Status</th></tr></thead><tbody>' +
           r.referrals.map(function (x) { return '<tr><td><div class="flex items-center gap-2.5">' + U.avatar(x.name, 30) + '<div><p class="font-medium">' + U.esc(x.name) + '</p><p class="text-xs text-ink-500">' + U.date(x.created_at) + '</p></div></div></td><td>' + U.esc(x.bought) + '</td><td class="text-right tabular">' + U.inr(x.paid) + '</td><td class="text-right font-semibold tabular text-good-600">' + U.inr(x.cashback) + '</td><td>' + pill(x.status) + '</td></tr>'; }).join('') + '</tbody></table></div>' :
@@ -234,6 +240,33 @@
       view.querySelector('[data-c="link"]').addEventListener('click', function () { U.copy(inviteLink(), 'Invite link'); });
       view.querySelector('[data-c="msg"]').addEventListener('click', function () { U.copy(waText(), 'Message'); });
     }, fail);
+  }
+
+  function bonusPanel(bn) {
+    if (!bn || (!bn.daily_bonus && !bn.tiers.length)) return '';
+    var daily = bn.daily_bonus
+      ? '<div class="flex items-start gap-4 rounded-2xl ' + (bn.daily_done_today ? 'border border-good-200 bg-good-50' : 'bg-cloud') + ' p-5">' +
+          '<span class="grid h-11 w-11 flex-none place-items-center rounded-2xl ' + (bn.daily_done_today ? 'bg-good-500 text-white' : 'bg-white text-orange-600') + '">' + U.icon('zap') + '</span>' +
+          '<div><p class="font-semibold">Daily bonus · ' + U.inr(bn.daily_bonus) + '</p>' +
+          '<p class="text-[15px] text-ink-600">' + (bn.daily_done_today
+              ? 'Earned today. The next one is available tomorrow.'
+              : 'Get one friend to buy today, on any package, and ' + U.inr(bn.daily_bonus) + ' is added on top of your cashback.') + '</p></div></div>'
+      : '';
+    var tiers = bn.tiers.length
+      ? '<div class="mt-4"><div class="flex items-end justify-between"><p class="font-semibold">' + bn.month + ' milestones</p>' +
+          '<p class="text-sm text-ink-600"><b class="tabular">' + bn.friends_this_month + '</b> friends so far</p></div>' +
+          '<ul class="mt-3 space-y-2">' + bn.tiers.map(function (t) {
+            return '<li class="flex items-center gap-3 rounded-xl border ' + (t.reached ? 'border-good-200 bg-good-50' : 'border-line') + ' px-4 py-2.5 text-[15px]">' +
+              U.icon(t.reached ? 'check-circle-2' : 'circle', 'i-sm ' + (t.reached ? 'text-good-600' : 'text-ink-300')) +
+              '<span class="flex-1">' + t.friends + ' friends in one month</span>' +
+              '<b class="tabular ' + (t.reached ? 'text-good-700' : 'text-ink-500') + '">' + U.inr(t.bonus) + '</b></li>';
+          }).join('') + '</ul>' +
+          (bn.next_tier ? '<p class="mt-3 text-sm text-ink-600">' + bn.next_tier.to_go + ' more friend' + (bn.next_tier.to_go === 1 ? '' : 's') + ' this month unlocks ' + U.inr(bn.next_tier.bonus) + '.</p>' : '') +
+        '</div>'
+      : '';
+    return '<div class="mt-6">' + card('<div class="flex flex-wrap items-center justify-between gap-3"><h2 class="text-xl">Bonuses on top of cashback</h2>' +
+      '<span class="tag tag-orange">' + U.inr(bn.earned_this_month) + ' this month</span></div>' +
+      '<div class="mt-4">' + daily + tiers + '</div>', 'p-6') + '</div>';
   }
 
   /* ---------- orders ---------- */

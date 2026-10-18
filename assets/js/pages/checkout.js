@@ -37,7 +37,7 @@
       '<div class="flex justify-between"><dt class="text-ink-600">' + (q.kind === 'upgrade' ? 'Upgrade price' : 'Price') + '</dt><dd class="tabular">' + (q.kind !== 'upgrade' && q.mrp > q.price ? '<s class="mr-2 text-ink-400">' + U.inr(q.mrp) + '</s>' : '') + U.inr(q.price) + '</dd></div>' +
       (q.discount ? '<div class="flex justify-between text-good-600"><dt>Referral discount (' + U.esc(q.ref_name) + ')</dt><dd class="tabular">−' + U.inr(q.discount) + '</dd></div>' : '') +
       (q.play_used ? '<div class="flex justify-between text-good-600"><dt>Play rewards</dt><dd class="tabular">−' + U.inr(q.play_used) + '</dd></div>' : '') +
-      '<div class="flex items-end justify-between border-t border-line pt-3"><dt class="font-semibold">Total</dt><dd class="font-display text-3xl font-semibold tabular">' + U.inr(q.total) + '</dd></div><p class="text-xs text-ink-500">Includes GST. One-time payment.</p></dl></div>' +
+      '<div class="flex items-end justify-between border-t border-line pt-3"><dt class="font-semibold">Total</dt><dd class="font-display text-3xl font-semibold tabular">' + U.inr(q.total) + '</dd></div><p class="text-xs text-ink-500">' + (U.gstLine(q.total) || 'Includes GST') + '. Nothing is added on top. One-time payment.</p></dl></div>' +
       '<ul class="mt-5 grid gap-3 px-1 text-sm text-ink-600"><li class="flex items-center gap-2">' + U.icon('shield-check', 'text-sky-600') + 'Payments by Razorpay. We never see your card or UPI PIN.</li><li class="flex items-center gap-2">' + U.icon('zap', 'text-sky-600') + 'Courses unlock the moment payment is confirmed.</li><li class="flex items-center gap-2">' + U.icon('headphones', 'text-sky-600') + 'Charged twice or no access? We fix it within 7 days.</li></ul></aside>';
   }
 

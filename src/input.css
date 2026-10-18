@@ -240,3 +240,46 @@
 .feed-new { animation: feedIn .6s ease both; }
 @keyframes feedIn { from { background: #FFF5EB; transform: translateY(-6px); opacity: 0; } to { background: transparent; } }
 .modal [data-actions] { position: sticky; bottom: 0; background: #fff; z-index: 2; }
+
+/* ---------- welcome poster (shown once a visit) ---------- */
+.poster-wrap {
+  position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 1rem;
+  background: rgb(10 22 34 / .55); backdrop-filter: blur(3px);
+  opacity: 0; transition: opacity .2s ease;
+}
+.poster-wrap.is-on { opacity: 1; }
+.poster-card {
+  position: relative; width: 100%; max-width: 380px; overflow: hidden;
+  border-radius: 1.5rem; background: #fff; box-shadow: 0 24px 60px rgb(10 22 34 / .3);
+  transform: translateY(12px) scale(.98); transition: transform .22s cubic-bezier(.2,.8,.3,1);
+}
+.poster-wrap.is-on .poster-card { transform: none; }
+.poster-x {
+  position: absolute; right: .6rem; top: .6rem; z-index: 1;
+  display: grid; place-items: center; height: 2rem; width: 2rem; border-radius: 9999px;
+  background: rgb(255 255 255 / .9); color: theme('colors.ink.700'); box-shadow: 0 2px 8px rgb(0 0 0 / .12);
+}
+.poster-x:hover { background: #fff; color: theme('colors.ink.900'); }
+.poster-img { display: block; width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+.poster-body { padding: 1.25rem 1.25rem 1.5rem; }
+.poster-card:not(:has(.poster-img)) .poster-body {
+  background: linear-gradient(145deg, theme('colors.sky.50'), theme('colors.orange.50'));
+}
+@media (prefers-reduced-motion: reduce) {
+  .poster-wrap, .poster-card { transition: none; }
+}
+
+/* ---------- slider used by the cashback calculator ---------- */
+.range {
+  -webkit-appearance: none; appearance: none; width: 100%; height: .5rem; border-radius: 9999px;
+  background: theme('colors.cloud'); outline-offset: 4px; cursor: pointer;
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; height: 1.5rem; width: 1.5rem; border-radius: 9999px;
+  background: theme('colors.sky.600'); border: 3px solid #fff; box-shadow: 0 2px 8px rgb(10 22 34 / .25);
+}
+.range::-moz-range-thumb {
+  height: 1.5rem; width: 1.5rem; border: 3px solid #fff; border-radius: 9999px;
+  background: theme('colors.sky.600'); box-shadow: 0 2px 8px rgb(10 22 34 / .25);
+}
+.range:focus-visible { outline: 2px solid theme('colors.sky.600'); }
