@@ -124,10 +124,10 @@
     { name: 'founder_photo', label: 'Founder photo', type: 'file', span: 2, accept: 'image/*' },
     { section: 'Play & earn' },
     { name: 'play_enabled', label: 'Play & earn on', type: 'checkbox', span: 2 },
-    { name: 'play_daily_cap', label: 'Daily limit per learner', type: 'number', prefix: '₹', min: 0 }, { name: 'play_ip_daily_cap', label: 'Daily limit per network (IP)', type: 'number', prefix: '₹', min: 0, help: 'Stops one person farming rewards with many accounts.' },
+    { name: 'play_total_cap', label: 'Total limit per learner (once, not daily)', type: 'number', prefix: '₹', min: 0, help: 'Most one account can ever earn from Play & earn. 0 = no limit.' }, { name: 'play_ip_daily_cap', label: 'Daily limit per network (IP)', type: 'number', prefix: '₹', min: 0, help: 'Stops one person farming rewards with many accounts.' },
     { name: 'play_per_correct', label: 'Reward per correct quiz answer', type: 'number', prefix: '₹', min: 0 }, { name: 'play_per_quiz_cap', label: 'Max reward per quiz', type: 'number', prefix: '₹', min: 0 },
-    { name: 'play_game_win', label: 'Reward for winning a mini game', type: 'number', prefix: '₹', min: 0, span: 2, help: 'A partly finished game pays less. The daily limit above still applies.' },
-    { name: 'play_checkout_max', label: 'Max play rewards usable at checkout', type: 'number', prefix: '₹', min: 0, span: 2 },
+    { name: 'play_game_win', label: 'Reward for winning a mini game', type: 'number', prefix: '₹', min: 0, span: 2, help: 'A partly finished game pays less. The total limit above still applies.' },
+    { name: 'play_checkout_max', label: 'Max play rewards usable on one package order', type: 'number', prefix: '₹', min: 0, span: 2 },
     { section: 'Lessons and quizzes' },
     { name: 'quiz_questions_per_lesson', label: 'Questions after each lesson', type: 'number', min: 1, max: 10 }, { name: 'quiz_pass_correct', label: 'Correct answers needed to pass', type: 'number', min: 1, max: 10 },
     { name: 'free_preview_lessons', label: 'Free preview lessons per course', type: 'number', min: 0, help: 'A guide for new courses. Mark each free lesson in the course editor.' }

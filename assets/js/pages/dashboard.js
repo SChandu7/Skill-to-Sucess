@@ -73,7 +73,7 @@
           return '<div class="flex flex-col">' + U.courseCard(c, { progress: c.progress, price: false }) + (c.next_lesson ? '<a class="btn btn-primary btn-sm mt-2" href="lesson.html?l=' + c.next_lesson.id + '">' + U.icon('play', 'i-sm') + (c.progress.done ? 'Continue' : 'Start') + '</a>' : '') + '</div>';
         }).join('') + '</div>' :
           card('<p class="font-display text-xl font-semibold">Your library is empty</p><p class="mt-1 text-ink-600">Watch the free lessons in any course, or pick a package to unlock full courses.</p><div class="mt-5 flex gap-2"><a class="btn btn-buy" href="packages.html">See packages</a><a class="btn btn-ghost" href="courses.html">Free lessons</a></div>')) +
-        (rest.length ? '<h2 class="mt-12 text-2xl">Not in your library yet</h2><p class="mt-1 text-ink-600">Free lessons are open. Upgrade your package or buy a single course to unlock these.</p><div class="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">' + rest.map(function (c) { return U.courseCard(c, {}); }).join('') + '</div>' : '');
+        (rest.length ? '<h2 class="mt-12 text-2xl">Not in your library yet</h2><p class="mt-1 text-ink-600">Free lessons are open. Upgrade your package to unlock these.</p><div class="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">' + rest.map(function (c) { return U.courseCard(c, {}); }).join('') + '</div>' : '');
     }, fail);
   }
 

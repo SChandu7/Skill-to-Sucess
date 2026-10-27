@@ -4,11 +4,15 @@
   var U = STS.ui, A = STS.api;
   var root = U.$('#co-root');
   var plan = U.param('plan'), courseSlug = U.param('course');
-  var item = courseSlug ? { kind: 'course', slug: courseSlug } : { kind: 'package', slug: plan };
+  var item = { kind: 'package', slug: plan };      // courses are sold only inside packages
   var opts = { ref_code: U.savedRef(), use_play: false };
 
   U.boot({ noChat: true }).then(function (st) {
-    if (!item.slug || (item.kind === 'course' ? !st.courseMap[item.slug] : !st.packageMap[item.slug])) {
+    if (!item.slug && courseSlug && st.courseMap[courseSlug]) {      // old ?course= links: the cheapest package with it
+      var cp = U.cheapestPackageFor(courseSlug);
+      if (cp) item.slug = cp.slug;
+    }
+    if (!item.slug || !st.packageMap[item.slug]) {
       var pop = st.site.packages.filter(function (p) { return p.is_popular; })[0] || st.site.packages[0];
       item = { kind: 'package', slug: pop.slug };
     }
@@ -48,7 +52,7 @@
         root.innerHTML = '<div class="mx-auto max-w-lg rounded-3xl border border-line bg-white p-8 text-center"><span class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-sky-50 text-sky-700">' + U.icon('check-circle-2', 'i-lg') + '</span><h1 class="mt-4 text-2xl">Nothing to pay here</h1><p class="mt-2 text-ink-600">' + U.esc(q.reason) + '</p><div class="mt-6 flex justify-center gap-2"><a class="btn btn-primary" href="dashboard.html#courses">Go to my courses</a><a class="btn btn-ghost" href="packages.html">See packages</a></div></div>';
         return;
       }
-      var next = encodeURIComponent('checkout.html?' + (item.kind === 'course' ? 'course=' : 'plan=') + item.slug);
+      var next = encodeURIComponent('checkout.html?plan=' + item.slug);
       root.innerHTML = '<div class="grid gap-8 lg:grid-cols-[1fr_420px]"><section class="rounded-3xl border border-line bg-white p-6 sm:p-8">' + steps(1) +
         '<h1 class="text-display-md">' + (me ? 'Confirm and pay' : 'Create your account') + '</h1>' +
         '<p class="mt-2 text-ink-600">' + (me ? 'You are buying as <b>' + U.esc(me.name) + '</b> (' + U.esc(me.email) + ').' : 'Then pay securely with UPI, card or netbanking. Already a member? <a class="link" href="login.html?next=' + next + '">Log in</a>') + '</p>' +

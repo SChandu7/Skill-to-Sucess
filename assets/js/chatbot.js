@@ -26,7 +26,7 @@ STS.chat = (function () {
   function courseInfo(c) {
     var p = U.cheapestPackageFor(c.slug);
     return '<b>' + U.esc(c.title) + '</b> (' + c.level + ', ' + c.lesson_count + ' lessons, about ' + c.hours + ' hours)' + (c.instructor ? ' with ' + U.esc(c.instructor.name) : '') + '.<br>' + U.esc(c.short_description) +
-      '<br>Free preview lessons are open. Get it alone for ' + U.inr(c.price) + (p ? ' or pick it inside the ' + U.esc(p.name) + ' package (' + U.inr(p.price) + ') or any bigger one' : '') + '.<br><a href="course.html?c=' + c.slug + '">Open the course page</a>';
+      '<br>Free preview lessons are open. Courses are sold only inside packages' + (p ? ': pick it with the ' + U.esc(p.name) + ' package (' + U.inr(p.price) + ') or any bigger one' : '') + '.<br><a href="course.html?c=' + c.slug + '">Open the course page</a>';
   }
   function findCourse(t) {
     var best = null;
@@ -56,7 +56,7 @@ STS.chat = (function () {
         ' You then pick the extra courses, and your progress and certificates stay.<br><a href="packages.html">See packages</a>'; } },
     { id: 'cert', re: /certif|verify|verification/, a: function () { var q = S().settings.quiz; return 'Pass the quiz after each lesson (' + q.pass + ' of ' + q.questions + ' correct). Finish all lessons and your certificate is issued with a unique ID that anyone can check on our <a href="verify.html">verify page</a>.'; } },
     { id: 'pay', re: /pay|upi|card|emi|razorpay|gpay|phonepe|paytm|netbank/, a: function () { return 'We accept UPI (GPay, PhonePe, Paytm), debit and credit cards, and netbanking through Razorpay. Prices include GST. Access starts as soon as the payment is confirmed.'; } },
-    { id: 'play', re: /play|game|quiz|reward|coin|free money/, a: function () { var p = P(); return 'Play & earn: learn and win small rewards.<br>• Free quizzes: ' + U.inr(p.per_correct) + ' per correct answer, up to ' + U.inr(p.per_quiz_cap) + ' a quiz<br>• Mini games: memory match, word scramble, rapid fire<br>• Up to ' + U.inr(p.daily_cap) + ' a day, and up to ' + U.inr(p.checkout_max) + ' can be used on your first package<br><a href="play.html">Start playing</a>'; } },
+    { id: 'play', re: /play|game|quiz|reward|coin|free money/, a: function () { var p = P(); return 'Play & earn: learn and win small rewards.<br>• Free quizzes: ' + U.inr(p.per_correct) + ' per correct answer, up to ' + U.inr(p.per_quiz_cap) + ' a quiz<br>• Mini games: memory match, word scramble, rapid fire<br>• Up to ' + U.inr(p.total_cap) + ' in total per account (one time, not daily). Use it off a package price at checkout or withdraw it<br><a href="play.html">Start playing</a>'; } },
     { id: 'free', re: /free|preview|trial|demo|sample|before buy/, a: function () { return 'Every course has free preview lessons, an intro video and a PDF cheat sheet. Open any course from the <a href="courses.html">course list</a> and look for the "Free" tags.'; } },
     { id: 'coursereward', re: /finish|complete|reward for course|cashback for course|course reward|how much back|calculator/, a: function () {
       var cr = S().settings.course_reward || {};

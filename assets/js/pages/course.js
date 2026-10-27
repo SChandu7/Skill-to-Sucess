@@ -42,7 +42,7 @@
         '<p class="mt-1 text-sm text-ink-600">' + U.packageCourseLine(pkg) + ' — this one included</p>' +
         (U.courseReward(pkg) ? '<p class="mt-1 flex items-center gap-1.5 text-sm font-semibold text-good-700">' + U.icon('wallet', 'i-sm') + U.inr(U.courseReward(pkg)) + ' back when you finish this course</p>' : '') +
         '<a class="btn btn-buy btn-lg btn-block mt-5" href="checkout.html?plan=' + pkg.slug + '">' + (upg ? 'Upgrade to ' : 'Enroll with ') + U.esc(pkg.name) + '</a>' : '') +
-      '<a class="btn btn-ghost btn-block mt-2" href="checkout.html?course=' + c.slug + '">Buy only this course for ' + U.inr(c.price) + '</a>' +
+      '<p class="mt-3 text-center text-sm text-ink-500">Courses are sold only inside packages. <a class="link" href="packages.html">Compare packages</a></p>' +
       (ref && !(me && me.has_purchased) ? '<p class="mt-3 flex items-center gap-2 rounded-xl bg-orange-50 px-3 py-2 text-sm text-orange-800">' + U.icon('gift', 'i-sm') + U.inr(R.friend_discount) + ' referral discount is applied at checkout</p>' : '') +
       (firstFree ? '<a class="mt-4 flex items-center justify-center gap-2 text-sm font-semibold text-sky-700 hover:underline" href="lesson.html?l=' + firstFree.id + '">' + U.icon('play-circle', 'i-sm') + 'Start the ' + freeN + ' free lessons</a>' : '') + '</div>';
 
@@ -119,7 +119,7 @@
       (pkg ? pkg.courses : []).concat(st.site.courses.map(function (x) { return x.slug; })).filter(function (s, i, a) { return s !== c.slug && a.indexOf(s) === i && st.courseMap[s]; }).slice(0, 3)
         .map(function (s) { return U.courseCard(st.courseMap[s], { owned: U.owned(s) }); }).join('') + '</div></div></section>' +
 
-      (owned ? '' : '<div class="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 px-4 py-3 backdrop-blur lg:hidden" style="padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))"><div class="flex items-center gap-3"><div class="min-w-0 flex-1"><p class="text-xs text-ink-500">From</p><p class="font-display text-xl font-semibold tabular">' + U.inr(c.price) + '</p></div><button class="btn btn-ghost btn-sm" data-unlock>Options</button>' + (pkg ? '<a class="btn btn-buy btn-sm" href="checkout.html?plan=' + pkg.slug + '">Enroll</a>' : '') + '</div></div>');
+      (owned ? '' : '<div class="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 px-4 py-3 backdrop-blur lg:hidden" style="padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))"><div class="flex items-center gap-3"><div class="min-w-0 flex-1"><p class="text-xs text-ink-500">' + (pkg ? 'With ' + U.esc(pkg.name) : 'In packages') + '</p><p class="font-display text-xl font-semibold tabular">' + (pkg ? U.inr(pkg.price) : '') + '</p></div><button class="btn btn-ghost btn-sm" data-unlock>Options</button>' + (pkg ? '<a class="btn btn-buy btn-sm" href="checkout.html?plan=' + pkg.slug + '">Enroll</a>' : '') + '</div></div>');
 
     function res(ic, t, d, attr) { return '<button ' + attr + ' class="flex gap-4 rounded-2xl border border-line p-5 text-left transition hover:border-sky-300">' + U.icon(ic, 'i-lg mt-0.5 text-sky-600') + '<span><span class="block font-semibold">' + t + '</span><span class="text-[15px] text-ink-600">' + d + '</span></span></button>'; }
 

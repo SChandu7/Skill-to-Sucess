@@ -18,7 +18,7 @@
     U.$('#help-phone').textContent = s.phone;
     U.$('#quote-by').innerHTML = ['Free preview lessons in every course', 'Certificates anyone can verify online', 'Refer a friend, earn cashback. One level only.'].map(function (t) { return '<li class="flex items-center gap-2.5">' + U.icon('check-circle-2', 'text-orange-300') + t + '</li>'; }).join('');
     U.$('#side-stats').innerHTML = U.proof(st.site.stats, 3).map(function (x) { return '<div><p class="font-display text-3xl font-semibold tabular">' + x[0] + '</p><p class="text-sm text-sky-100">' + x[1] + '</p></div>'; }).join('');
-    if (s.play.enabled) U.$('#reg-lead').textContent = 'A free account opens every preview lesson and keeps your play rewards (up to ' + U.inr(s.play.daily_cap) + ' a day).';
+    if (s.play.enabled) U.$('#reg-lead').textContent = 'A free account opens every preview lesson and keeps your play rewards (up to ' + U.inr(s.play.total_cap) + ' per account).';
 
     function tab(which) {
       var reg = which === 'reg';

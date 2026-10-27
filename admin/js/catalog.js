@@ -21,9 +21,8 @@
             { name: 'is_published', label: 'Published and drafts', options: [{ value: 'true', label: 'Published' }, { value: 'false', label: 'Drafts' }] }],
           columns: [
             { label: 'Course', render: function (c) { return '<div class="flex items-center gap-3">' + thumb(c, 56) + '<div class="min-w-0"><p class="font-semibold text-ink-900">' + esc(c.title) + '</p><p class="text-xs text-ink-500">' + esc(c.code) + ' · ' + esc(c.category_label) + ' · ' + esc(c.level) + '</p></div></div>'; } },
-            { label: 'Price', right: true, render: function (c) { return '<b>' + U.inr(c.price) + '</b>' + (c.mrp ? '<br><s class="text-xs text-ink-400">' + U.inr(c.mrp) + '</s>' : ''); } },
             { label: 'Content', render: function (c) { return c.module_total + ' modules · ' + c.lesson_total + ' lessons<br><span class="text-xs text-ink-500">' + c.question_total + ' quiz questions</span>'; } },
-            { label: 'Learners', right: true, render: function (c) { return U.num(c.enrolled) + ' single<br><span class="text-xs text-ink-500">' + U.num(c.completions) + ' completed</span>'; } },
+            { label: 'Learners', right: true, render: function (c) { return U.num(c.enrolled) + ' enrolled<br><span class="text-xs text-ink-500">' + U.num(c.completions) + ' completed</span>'; } },
             { label: 'Status', render: function (c) { return c.is_published ? AD.tag('published') : AD.tag('draft'); } }
           ],
           href: function (c) { return '#/courses/' + c.id; }, empty: 'No courses yet', emptyIcon: 'book-open', emptyHint: write ? 'Click "New course" to add the first one.' : ''
@@ -45,9 +44,6 @@
       { name: 'language', label: 'Language', default: 'English' },
       { name: 'code', label: 'Two-letter code', maxlength: 2, required: true, help: 'Used in certificate IDs, e.g. IG. Cannot match another course.' },
       { name: 'slug', label: 'Web address', optional: true, omitEmpty: true, help: 'Leave empty to create it from the title. Changing it breaks old links.' },
-      { section: 'Price' },
-      { name: 'price', label: 'Single-course price', type: 'number', prefix: '₹', min: 0, required: true },
-      { name: 'mrp', label: 'Crossed-out price', type: 'number', prefix: '₹', min: 0, nullable: true, optional: true },
       { section: 'Look and media' },
       { name: 'color', label: 'Brand colour', type: 'color', help: 'Used when there is no cover image.' },
       { name: 'cover', label: 'Cover image', type: 'file', accept: 'image/*', image: true, help: 'JPG, PNG or WebP, 16:10, at least 960×600.' },

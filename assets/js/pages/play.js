@@ -11,7 +11,9 @@
   };
   var NOTES = {
     already_paid_today: 'You already earned from this one today, so this round is just for practice. Try another game or quiz.',
-    daily_cap: 'You reached today\'s reward limit. Come back tomorrow for more.',
+    total_cap: 'You have collected your full Play & earn reward. Keep playing for practice and XP.',
+    daily_cap: 'You have collected your full Play & earn reward. Keep playing for practice and XP.',
+    ip_cap: 'Rewards from this network are used up for today. Try again tomorrow.',
     too_slow: 'Time ran out before you submitted, so this round has no reward.'
   };
 
@@ -23,12 +25,14 @@
   function renderLobby() {
     var me = U.state.me, d = data;
     U.$('#paused').hidden = d.enabled;
-    var pct = d.daily_cap ? Math.min(100, Math.round(d.earned_today / d.daily_cap * 100)) : 0;
+    var cap = d.total_cap, got = d.earned_total || 0;
+    var pct = cap ? Math.min(100, Math.round(got / cap * 100)) : 0;
     U.$('#today').innerHTML =
-      '<div class="flex items-center justify-between"><p class="text-sm font-semibold text-ink-500">Earned today</p><span class="tag tag-orange">' + U.icon('flame', 'i-sm') + (me ? me.streak_days + '-day streak' : 'Guest') + '</span></div>' +
-      '<p class="mt-2 font-display text-[40px] font-semibold leading-none tabular">' + U.inr(d.earned_today) + '<span class="text-lg font-medium text-ink-400"> / ' + U.inr(d.daily_cap) + '</span></p>' +
+      '<div class="flex items-center justify-between"><p class="text-sm font-semibold text-ink-500">Your Play &amp; earn reward</p><span class="tag tag-orange">' + U.icon('flame', 'i-sm') + (me ? me.streak_days + '-day streak' : 'Guest') + '</span></div>' +
+      '<p class="mt-2 font-display text-[40px] font-semibold leading-none tabular">' + U.inr(got) + (cap ? '<span class="text-lg font-medium text-ink-400"> / ' + U.inr(cap) + '</span>' : '') + '</p>' +
+      (cap ? '<p class="mt-1 text-sm text-ink-500">' + (got >= cap ? 'Fully collected. Games still count for XP.' : U.inr(cap - got) + ' left to earn, once per account') + '</p>' : '') +
       '<div class="meter mt-4"><span style="width:' + pct + '%"></span></div>' +
-      (me ? '<p class="mt-4 text-sm text-ink-600">Rewards land in your wallet. Use up to ' + U.inr(d.checkout_max) + ' off your first package. <a class="link" href="dashboard.html#wallet">Open wallet</a></p>'
+      (me ? '<p class="mt-4 text-sm text-ink-600">Rewards land in your wallet. Take them off a package price at checkout, or withdraw them with your other earnings. <a class="link" href="dashboard.html#wallet">Open wallet</a></p>'
         : '<div class="mt-4 rounded-2xl bg-sky-50 p-4 text-[15px]">' + (d.guest_unclaimed ? '<p class="font-semibold text-sky-800">' + U.inr(d.guest_unclaimed) + ' is waiting for you.</p>' : '') +
           '<p class="text-ink-700">You can play as a guest. Create a free account to keep your rewards in a wallet.</p><a class="btn btn-primary btn-sm mt-3" href="login.html?next=play.html#register">Create free account</a></div>');
 
@@ -58,8 +62,8 @@
 
     U.$('#rules').innerHTML = [
       ['indian-rupee', 'Each game and each quiz pays once a day. Play again any time for practice.'],
-      ['target', 'You can earn up to ' + U.inr(d.daily_cap) + ' a day in total.'],
-      ['shopping-bag', 'Use up to ' + U.inr(d.checkout_max) + ' of play rewards off your first package.'],
+      ['target', 'You can earn up to ' + U.inr(d.total_cap) + ' in total per account. It is a one-time reward, not daily.'],
+      ['shopping-bag', 'Use it to reduce a package price at checkout, or withdraw it with your other earnings.'],
       ['timer', 'Rounds are timed on our server, so answers after time is up do not count.']
     ].map(function (r) { return '<li class="flex gap-3">' + U.icon(r[0], 'mt-0.5 flex-none text-sky-600') + '<span>' + r[1] + '</span></li>'; }).join('');
   }
@@ -105,7 +109,7 @@
       '<p class="font-display text-5xl font-semibold tabular">' + r.score + '<span class="text-2xl text-ink-400">/' + r.total + '</span></p>' +
       '<p class="mt-4 text-lg">' + (won ? 'You earned <b class="text-orange-600">' + U.inr(r.reward) + '</b>' + (me ? ', added to your wallet.' : '.') : 'No reward this round.') + '</p>' +
       (r.reward_note && NOTES[r.reward_note] ? '<p class="mx-auto mt-2 max-w-md text-[15px] text-ink-600">' + NOTES[r.reward_note] + '</p>' : '') +
-      (r.daily_cap ? '<p class="mt-3 text-sm text-ink-500">Today: ' + U.inr(r.earned_today) + ' of ' + U.inr(r.daily_cap) + '</p>' : '') +
+      (r.total_cap ? '<p class="mt-3 text-sm text-ink-500">Collected: ' + U.inr(r.earned_total) + ' of ' + U.inr(r.total_cap) + ' (once per account)</p>' : '') +
       (won && !me ? '<div class="mx-auto mt-6 max-w-md rounded-2xl bg-sky-50 p-4 text-[15px] text-ink-700">Guest rewards are kept in this browser for 7 days. <a class="link" href="login.html?next=play.html#register">Create a free account</a> to move them to your wallet.</div>' : '') +
       '</div>' + (o.review || '') +
       '<div class="mt-8 flex flex-col justify-center gap-2 sm:flex-row"><button class="btn btn-primary" data-again>' + U.icon('rotate-ccw', 'i-sm') + 'Play again</button><button class="btn btn-ghost" data-back>More games and quizzes</button></div>';

@@ -234,13 +234,13 @@ STS.ui = (function () {
 
   function unlock(slug, lessonTitle) {
     var c = state.courseMap[slug], p = cheapestPackageFor(slug), u = state.me, cur = u && u.package ? state.packageMap[u.package.slug] : null;
+    if (!p) { location.href = 'packages.html'; return; }
     var upg = cur && cur.price < p.price;
     modal({
       title: 'Unlock ' + c.title, icon: 'lock', tone: 'bg-orange-50 text-orange-700',
-      sub: lessonTitle ? '"' + esc(lessonTitle) + '" is part of the full course.' : 'Get every lesson, quiz and the certificate.',
+      sub: (lessonTitle ? '"' + esc(lessonTitle) + '" is part of the full course. ' : '') + 'Courses come inside packages: pick a package, then choose this course.',
       body: '<div class="grid gap-3">' +
-        '<a href="checkout.html?plan=' + p.slug + '" class="flex items-center gap-4 rounded-2xl border-2 border-sky-600 bg-sky-50/60 p-4 hover:bg-sky-50"><div class="min-w-0 flex-1"><p class="flex flex-wrap items-center gap-2 font-semibold">' + (upg ? 'Upgrade to ' : '') + esc(p.name) + ' package <span class="tag tag-orange">Best value</span></p><p class="mt-0.5 text-sm text-ink-600">' + p.courses.length + ' courses including this one, ' + p.lesson_count + ' lessons</p></div><p class="text-right"><span class="block font-display text-xl font-semibold tabular">' + inr(upg ? p.price - cur.price : p.price) + '</span>' + (upg ? '<span class="text-xs text-ink-500">difference only</span>' : '') + '</p></a>' +
-        '<a href="checkout.html?course=' + slug + '" class="flex items-center gap-4 rounded-2xl border border-line p-4 hover:border-sky-300"><div class="min-w-0 flex-1"><p class="font-semibold">Only this course</p><p class="mt-0.5 text-sm text-ink-600">' + c.lesson_count + ' lessons with certificate</p></div><p class="font-display text-xl font-semibold tabular">' + inr(c.price) + '</p></a>' +
+        '<a href="checkout.html?plan=' + p.slug + '" class="flex items-center gap-4 rounded-2xl border-2 border-sky-600 bg-sky-50/60 p-4 hover:bg-sky-50"><div class="min-w-0 flex-1"><p class="flex flex-wrap items-center gap-2 font-semibold">' + (upg ? 'Upgrade to ' : '') + esc(p.name) + ' package <span class="tag tag-orange">' + (upg ? 'Upgrade' : 'Lowest price') + '</span></p><p class="mt-0.5 text-sm text-ink-600">' + packageCourseLine(p) + ', this one included</p></div><p class="text-right"><span class="block font-display text-xl font-semibold tabular">' + inr(upg ? p.price - cur.price : p.price) + '</span>' + (upg ? '<span class="text-xs text-ink-500">difference only</span>' : '') + '</p></a>' +
         '<a href="packages.html" class="mt-1 text-center text-sm font-semibold text-sky-700 hover:underline">Compare all packages</a></div>'
     });
   }
@@ -274,7 +274,7 @@ STS.ui = (function () {
       '<h3 class="text-lg leading-snug">' + esc(c.title) + '</h3><p class="mt-1.5 text-[15px] text-ink-600">' + esc(c.short_description) + '</p>' +
       (pr ? '<div class="mt-auto pt-4"><div class="mb-1.5 flex justify-between text-sm"><span class="text-ink-600">' + pr.done + ' of ' + pr.total + ' lessons</span><span class="font-semibold tabular">' + pr.pct + '%</span></div><div class="meter"><span style="width:' + pr.pct + '%"></span></div></div>' :
         '<div class="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-4 text-sm text-ink-500">' + (c.rating_count ? '<span class="flex items-center gap-1 text-orange-500">' + icon('star', 'i-sm') + '<b class="text-ink-800">' + c.rating + '</b><span class="text-ink-500">(' + num(c.rating_count) + ')</span></span>' : '<span class="tag tag-orange">New</span>') + '<span class="flex items-center gap-1.5">' + icon('book-open', 'i-sm') + c.lesson_count + ' lessons</span><span class="flex items-center gap-1.5">' + icon('clock', 'i-sm') + c.hours + ' h</span></div>') +
-      (o.hideFoot ? '' : '<div class="mt-4 flex items-center gap-2.5 border-t border-line pt-4 text-sm">' + avatar(c.instructor ? c.instructor.name : c.title, 28) + '<span class="truncate text-ink-600">' + esc(c.instructor ? c.instructor.name : '') + '</span>' + (o.price === false ? '' : '<span class="ml-auto whitespace-nowrap font-semibold text-ink-900">from ' + inr(c.price) + '</span>') + '</div>') +
+      (o.hideFoot ? '' : '<div class="mt-4 flex items-center gap-2.5 border-t border-line pt-4 text-sm">' + avatar(c.instructor ? c.instructor.name : c.title, 28) + '<span class="truncate text-ink-600">' + esc(c.instructor ? c.instructor.name : '') + '</span>' + (o.price === false ? '' : '<span class="ml-auto whitespace-nowrap text-xs font-semibold text-sky-700">In packages</span>') + '</div>') +
       '</div></a>';
   }
 

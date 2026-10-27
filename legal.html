@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="logo.jpeg">
 <link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/app.css?v=8">
+<link rel="stylesheet" href="assets/css/app.css?v=9">
 <!--/HEAD-->
 </head>
 <body class="flex min-h-screen flex-col">
@@ -36,12 +36,12 @@
 </main>
 <div id="site-footer"></div>
 <!--CORE-->
-<script src="assets/js/core/icons.js?v=8"></script>
-<script src="assets/js/core/config.js?v=8"></script>
-<script src="assets/js/core/api.js?v=8"></script>
-<script src="assets/js/core/app.js?v=8"></script>
+<script src="assets/js/core/icons.js?v=9"></script>
+<script src="assets/js/core/config.js?v=9"></script>
+<script src="assets/js/core/api.js?v=9"></script>
+<script src="assets/js/core/app.js?v=9"></script>
 <!--/CORE-->
-<script src="assets/js/chatbot.js?v=8"></script>
+<script src="assets/js/chatbot.js?v=9"></script>
 <script>
 (function () {
   var U = STS.ui;
@@ -52,7 +52,7 @@
       sec('terms', 'Terms of use',
         '<p>These terms apply when you use ' + B + ' (the "site"), run from ' + U.esc(s.address) + '. By creating an account or buying a course you agree to them.</p>' +
         '<h3>Your account</h3><ul><li>You need a valid email and Indian mobile number. One person, one account.</li><li>Keep your password private. You are responsible for activity on your account.</li><li>We may block accounts that share course content, abuse rewards or harass others.</li></ul>' +
-        '<h3>What you buy</h3><ul><li>A package or single course gives you lifetime access to its lessons, quizzes and certificate for personal learning.</li><li>Course videos, text, images and files belong to ' + B + ' and our instructors. Do not download, re-upload or resell them.</li><li>Prices are in Indian rupees and <b>already include GST</b> at ' + ((s.gst || {}).percent || 0) + '%. Nothing is added at checkout, and your receipt email shows the split.' + ((s.gst || {}).number ? ' GSTIN ' + U.esc(s.gst.number) + '.' : '') + '</li><li>Payments are processed by Razorpay.</li></ul>' +
+        '<h3>What you buy</h3><ul><li>A package gives you lifetime access to the courses it includes (their lessons, quizzes and certificates) for personal learning. Courses are not sold one by one.</li><li>Course videos, text, images and files belong to ' + B + ' and our instructors. Do not download, re-upload or resell them.</li><li>Prices are in Indian rupees and <b>already include GST</b> at ' + ((s.gst || {}).percent || 0) + '%. Nothing is added at checkout, and your receipt email shows the split.' + ((s.gst || {}).number ? ' GSTIN ' + U.esc(s.gst.number) + '.' : '') + '</li><li>Payments are processed by Razorpay.</li></ul>' +
         '<h3>No income promise</h3><p>' + B + ' sells education. We do not promise jobs, clients or any income. Results depend on your own effort.</p>') +
       sec('refund', 'Refund policy',
         '<p>Access starts right after payment, so purchases are generally non-refundable. We do refund in full when:</p><ul><li>you were charged twice for the same order,</li><li>you were charged but did not get access within 24 hours and we cannot fix it, or</li><li>you were charged by mistake and have not opened any paid lesson.</li></ul>' +
@@ -71,8 +71,8 @@
       sec('play', 'Play &amp; earn rules',
         '<ul><li>Free quizzes pay ' + inr(p.per_correct) + ' per correct answer, up to ' + inr(p.per_quiz_cap) + ' a quiz. Games pay small fixed rewards.</li>' +
         '<li>Each quiz and each game pays once a day. You can play again for practice.</li>' +
-        '<li>You can earn up to ' + inr(p.daily_cap) + ' a day in total. Rounds are timed on our server.</li>' +
-        '<li>Play rewards can be used for up to ' + inr(p.checkout_max) + ' off your first package. They cannot be withdrawn as cash.</li>' +
+        '<li>You can earn up to ' + inr(p.total_cap) + ' in total per account. This is a one-time reward, not a daily one. Rounds are timed on our server.</li>' +
+        '<li>Play rewards can be taken off a package price at checkout, or withdrawn together with your other earnings (minimum withdrawal rules apply).</li>' +
         '<li>Rewards earned as a guest are kept for 7 days and move to your wallet when you create an account in the same browser.</li>' +
         '<li>Bots, scripts and multiple accounts are not allowed. We may remove rewards earned this way.</li></ul>') +
       sec('privacy', 'Privacy policy',

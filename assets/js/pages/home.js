@@ -38,7 +38,6 @@
       var pk = site.packages.slice().sort(function (a, b) { return a.price - b.price; }).filter(function (p) {
         return p.includes_future_courses || (p.course_slots ? p.course_slots >= want.length : want.every(function (x) { return p.courses.indexOf(x) >= 0; }));
       })[0] || site.packages[site.packages.length - 1];
-      var sum = want.reduce(function (t, x) { return t + st.courseMap[x].price; }, 0);
       U.$('#goal-panel').innerHTML = '<div class="grid gap-6 rounded-[28px] border border-line bg-white p-5 shadow-card sm:p-7 lg:grid-cols-[1.6fr_1fr]">' +
         '<div class="grid gap-4 ' + ['', 'sm:grid-cols-1', 'sm:grid-cols-2', 'sm:grid-cols-3'][Math.min(3, want.length)] + '">' + want.slice(0, 3).map(function (x) {
           var c = st.courseMap[x];
@@ -46,7 +45,7 @@
         }).join('') + '</div>' +
         '<div class="flex flex-col rounded-2xl bg-sky-50 p-6"><p class="text-sm font-semibold text-sky-700">Recommended</p><p class="mt-1 font-display text-2xl font-semibold">' + U.esc(pk.name) + ' package</p>' +
         '<p class="mt-1 text-ink-600">' + U.packageCourseLine(pk) + ' — ' + (want.length > 1 ? 'the ' + want.length + ' above fit inside' : 'the one above fits inside') + '.</p>' +
-        '<p class="mt-4 flex items-baseline gap-2"><span class="font-display text-4xl font-semibold tabular">' + U.inr(pk.price) + '</span>' + (sum > pk.price ? '<span class="text-sm text-ink-500">vs ' + U.inr(sum) + ' bought separately</span>' : '') + '</p>' +
+        '<p class="mt-4 flex items-baseline gap-2"><span class="font-display text-4xl font-semibold tabular">' + U.inr(pk.price) + '</span>' + (pk.mrp > pk.price ? '<s class="text-ink-400 tabular">' + U.inr(pk.mrp) + '</s>' : '') + '</p>' +
         '<div class="mt-auto flex flex-wrap gap-2 pt-6"><a class="btn btn-buy" href="checkout.html?plan=' + pk.slug + '">Enroll in ' + U.esc(pk.name) + '</a><a class="btn btn-ghost" href="course.html?c=' + want[0] + '">Try free lessons</a></div></div></div>';
     }
     gl.addEventListener('click', function (e) { var b = e.target.closest('[data-g]'); if (!b) return; U.$$('[data-g]', gl).forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); showGoal(Number(b.dataset.g)); });
@@ -111,7 +110,7 @@
 
     /* Play + verify */
     var P = s.play;
-    U.$('#play-lead').textContent = 'Free quizzes and quick games built from our courses. ' + U.inr(P.per_correct) + ' for each correct answer, up to ' + U.inr(P.daily_cap) + ' a day, and up to ' + U.inr(P.checkout_max) + ' can go towards your first package.';
+    U.$('#play-lead').textContent = 'Free quizzes and quick games built from our courses. ' + U.inr(P.per_correct) + ' for each correct answer, up to ' + U.inr(P.total_cap) + ' per account. Take it off your package price at checkout.';
     U.$('#home-verify').addEventListener('submit', function (e) { e.preventDefault(); var id = U.$('#hv-id').value.trim().toUpperCase(); try { sessionStorage.setItem('sts:nav', JSON.stringify({ page: 'verify', q: 'id=' + encodeURIComponent(id) })); } catch (er) { /* */ } location.href = 'verify.html?id=' + encodeURIComponent(id); });
 
     /* Testimonials */
@@ -136,6 +135,38 @@
       }).join('');
       U.accordions(U.$('#faq'));
     });
+
+    /* ---------- top earners and learners (real buyers only, worked out on the server) ---------- */
+    (function () {
+      var host = U.$('#top-list'), tabs = U.$('#top-tabs'), data = null, cur = 'earners';
+      var MEDAL = ['bg-orange-400 text-ink-900', 'bg-ink-200 text-ink-800', 'bg-orange-200 text-orange-800'];
+      function draw() {
+        var rows = data[cur] || [];
+        if (!rows.length) {
+          host.innerHTML = '<li class="rounded-3xl border border-dashed border-line p-8 text-center text-ink-600 sm:col-span-2">' + U.icon('trophy', 'i-lg text-orange-400') +
+            '<p class="mt-3 font-semibold text-ink-900">' + (cur === 'earners' ? 'No earners on the board yet' : 'No learners on the board yet') + '</p>' +
+            '<p class="mt-1 text-[15px]">The board fills up as our first learners finish courses and refer friends. Your name could be first.</p></li>';
+          return;
+        }
+        host.innerHTML = rows.map(function (r) {
+          var right = cur === 'earners'
+            ? '<p class="font-display text-xl font-semibold tabular text-good-600">' + U.inr(r.earned) + '</p><p class="text-xs text-ink-500">' + (r.friends ? r.friends + ' friend' + (r.friends === 1 ? '' : 's') + ' referred' : 'from courses') + '</p>'
+            : '<p class="font-display text-xl font-semibold tabular">' + r.courses + ' <span class="text-sm font-medium text-ink-500">course' + (r.courses === 1 ? '' : 's') + '</span></p><p class="text-xs text-ink-500">' + U.num(r.lessons) + ' lessons done</p>';
+          return '<li class="flex items-center gap-4 rounded-2xl border border-line bg-white p-4">' +
+            '<span class="grid h-9 w-9 flex-none place-items-center rounded-full text-sm font-bold ' + (MEDAL[r.rank - 1] || 'bg-cloud text-ink-600') + '">' + r.rank + '</span>' + U.avatar(r.name, 40) +
+            '<div class="min-w-0 flex-1"><p class="truncate font-semibold">' + U.esc(r.name) + '</p>' + (r.city ? '<p class="truncate text-sm text-ink-500">' + U.esc(r.city) + '</p>' : '') + '</div>' +
+            '<div class="text-right">' + right + '</div></li>';
+        }).join('');
+      }
+      tabs.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-top]');
+        if (!b || !data) return;
+        cur = b.dataset.top;
+        U.$$('[data-top]', tabs).forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+        draw();
+      });
+      A.get('/top/').then(function (d) { data = d; draw(); }, function () { U.$('#top').hidden = true; });
+    })();
 
     /* ---------- founder ---------- */
     (function () {
