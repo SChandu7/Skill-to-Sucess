@@ -86,7 +86,7 @@
     /* Refer */
     var R = s.referral, rates = site.packages.map(function (p) { return p.cashback_percent; });
     U.$('#refer-range').textContent = Math.min.apply(null, rates) + '–' + Math.max.apply(null, rates) + '% cashback';
-    U.$('#refer-lead').textContent = 'After your first purchase you get a personal code. Friends who use it save ' + U.inr(R.friend_discount) + ' on their first package, and you get cashback on what they pay. That is the whole programme.';
+    U.$('#refer-lead').textContent = 'After your first purchase you get a personal code. Friends who use it save ' + U.inr(R.friend_discount) + ' on their first package, and you get cashback on the package they buy. That is the whole programme.';
     U.$('#refer-rules').innerHTML = [
       ['clock', 'Cashback is held ' + R.hold_days + ' days while the refund window is open.'],
       R.learn_first ? ['graduation-cap', 'It unlocks after you complete your first course. Learn first, then earn.'] : null,
@@ -102,9 +102,11 @@
     var range = U.$('#calc-n'); range.addEventListener('input', runCalc);
     function runCalc() {
       var mine = st.packageMap[calc.mine], fr = st.packageMap[calc.friend], n = Number(range.value);
-      var pay = Math.max(1, fr.price - R.friend_discount), cb = Math.round(pay * mine.cashback_percent / 100) * n;
+      // Same rule as the server: cashback on the package price, at the lower of the two packages' rates.
+      var pay = Math.max(1, fr.price - R.friend_discount), rate = Math.min(mine.cashback_percent, fr.cashback_percent);
+      var cb = Math.round(fr.price * rate / 100) * n;
       U.$('#calc-nv').textContent = n; U.$('#calc-pay').textContent = U.inr(pay); U.$('#calc-off').textContent = 'after ' + U.inr(R.friend_discount) + ' off';
-      U.$('#calc-cb').textContent = U.inr(cb); U.$('#calc-rate').textContent = mine.cashback_percent + '% of ' + U.inr(pay) + (n > 1 ? ' × ' + n + ' friends' : '');
+      U.$('#calc-cb').textContent = U.inr(cb); U.$('#calc-rate').textContent = rate + '% of ' + U.inr(fr.price) + (rate < mine.cashback_percent ? ' (the friend\'s package rate is lower)' : '') + (n > 1 ? ' × ' + n + ' friends' : '');
     }
     runCalc();
 

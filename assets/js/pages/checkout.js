@@ -36,7 +36,7 @@
       '<div class="p-5"><p class="text-sm font-semibold">' + (q.kind === 'upgrade' ? 'You add ' + list.length + ' courses' : 'What you get') + '</p><ul class="mt-3 space-y-1.5 text-[15px] text-ink-700">' +
       list.map(function (s) { return st.courseMap[s] ? '<li class="flex items-center gap-2">' + U.icon('check', 'i-sm text-sky-600') + U.esc(st.courseMap[s].title) + '</li>' : ''; }).join('') +
       '<li class="flex items-center gap-2">' + U.icon('award', 'i-sm text-sky-600') + 'Quizzes, certificates and lifetime access</li>' +
-      (isCourse ? '' : '<li class="flex items-center gap-2">' + U.icon('gift', 'i-sm text-orange-500') + 'Your referral code at ' + p.cashback_percent + '% cashback</li>') + '</ul></div>' +
+      (isCourse ? '' : '<li class="flex items-center gap-2">' + U.icon('gift', 'i-sm text-orange-500') + 'Your referral code: up to ' + p.cashback_percent + '% cashback</li>') + '</ul></div>' +
       '<dl class="space-y-2 border-t border-line p-5 text-[15px]" aria-live="polite">' +
       '<div class="flex justify-between"><dt class="text-ink-600">' + (q.kind === 'upgrade' ? 'Upgrade price' : 'Price') + '</dt><dd class="tabular">' + (q.kind !== 'upgrade' && q.mrp > q.price ? '<s class="mr-2 text-ink-400">' + U.inr(q.mrp) + '</s>' : '') + U.inr(q.price) + '</dd></div>' +
       (q.discount ? '<div class="flex justify-between text-good-600"><dt>Referral discount (' + U.esc(q.ref_name) + ')</dt><dd class="tabular">−' + U.inr(q.discount) + '</dd></div>' : '') +
@@ -133,7 +133,7 @@
               : (o.first_lesson ? '<a class="btn btn-buy btn-lg" href="lesson.html?l=' + o.first_lesson + '">' + U.icon('play') + 'Start learning</a>' : '')) +
         '<a class="btn btn-ghost btn-lg" href="dashboard.html">Go to dashboard</a></div></div>' +
       (u.referral_code ? '<div class="mt-6 rounded-3xl bg-gradient-to-br from-sky-800 to-sky-600 p-6 text-white sm:p-8"><p class="text-sm text-sky-100">Your referral code</p><div class="mt-2 flex flex-wrap items-center gap-3"><span class="rounded-2xl bg-white/15 px-4 py-2 font-display text-2xl font-semibold tracking-wide">' + U.esc(u.referral_code) + '</span><button class="btn btn-buy btn-sm" data-copy>' + U.icon('copy', 'i-sm') + 'Copy invite link</button></div>' +
-        '<p class="mt-4 text-[15px] text-sky-50">Friends save ' + U.inr(U.state.site.settings.referral.friend_discount) + '. You get ' + u.cashback_percent + '% cashback on what they pay.' + (U.state.site.settings.referral.learn_first ? ' Cashback unlocks after you finish your first course.' : '') + '</p></div>' : '') + '</div>';
+        '<p class="mt-4 text-[15px] text-sky-50">Friends save ' + U.inr(U.state.site.settings.referral.friend_discount) + '. You get up to ' + u.cashback_percent + '% cashback on the package they buy.' + (U.state.site.settings.referral.learn_first ? ' Cashback unlocks after you finish your first course.' : '') + '</p></div>' : '') + '</div>';
     var cp = root.querySelector('[data-copy]');
     if (cp) cp.addEventListener('click', function () { U.copy(location.origin + '/?ref=' + u.referral_code, 'Invite link'); });
     window.scrollTo({ top: 0, behavior: 'smooth' });

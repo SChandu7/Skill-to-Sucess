@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="logo.jpeg">
 <link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/app.css?v=10">
+<link rel="stylesheet" href="assets/css/app.css?v=11">
 <!--/HEAD-->
 </head>
 <body class="flex min-h-screen flex-col">
@@ -79,12 +79,12 @@
 </main>
 <div id="site-footer"></div>
 <!--CORE-->
-<script src="assets/js/core/icons.js?v=10"></script>
-<script src="assets/js/core/config.js?v=10"></script>
-<script src="assets/js/core/api.js?v=10"></script>
-<script src="assets/js/core/app.js?v=10"></script>
+<script src="assets/js/core/icons.js?v=11"></script>
+<script src="assets/js/core/config.js?v=11"></script>
+<script src="assets/js/core/api.js?v=11"></script>
+<script src="assets/js/core/app.js?v=11"></script>
 <!--/CORE-->
-<script src="assets/js/chatbot.js?v=10"></script>
+<script src="assets/js/chatbot.js?v=11"></script>
 <script>
 (function () {
   var U = STS.ui, A = STS.api;
@@ -127,7 +127,7 @@
       row('<b>Most you can earn back</b>', function (p) { return '<b class="tabular text-good-600">' + U.inr(p.max_course_cashback) + '</b>'; }) +
       group('Learning') + row('Lesson quizzes and certificates', function () { return yes; }) + row('Free resources and cheat sheets', function () { return yes; }) + row('New courses added later', function (p) { return p.includes_future_courses ? yes : no; }) +
       group('Support') + row('Support', function (p) { return '<span class="text-xs text-ink-600">' + U.esc(p.support_text || 'Email') + '</span>'; }) +
-      group('Refer &amp; earn (one level)') + row('Your cashback per friend\'s purchase', function (p) { return '<b class="tabular text-orange-600">' + p.cashback_percent + '%</b>'; }) + row('Discount your friend gets', function () { return U.inr(R.friend_discount) + ' off'; }) +
+      group('Refer &amp; earn (one level)') + row('Your cashback per friend\'s purchase', function (p) { return '<b class="tabular text-orange-600">up to ' + p.cashback_percent + '%</b>'; }) + row('Discount your friend gets', function () { return U.inr(R.friend_discount) + ' off'; }) +
       '<tr><th class="!bg-white"></th>' + P.map(function (p) { return '<td class="text-center">' + (cur && cur.price >= p.price ? '' : '<a class="btn btn-sm ' + (p.is_popular ? 'btn-buy' : 'btn-ghost') + '" href="checkout.html?plan=' + p.slug + '">' + (cur ? 'Upgrade' : 'Choose') + '</a>') + '</td>'; }).join('') + '</tr></tbody>';
 
     var from = U.$('#up-from'), to = U.$('#up-to');

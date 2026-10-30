@@ -46,7 +46,7 @@ STS.chat = (function () {
       '<br><a href="dashboard.html#wallet">Open your wallet</a>'; } },
     { id: 'refer', re: /refer|referral|cashback|commission|invite|share code|my code/, a: function () {
       var u = U.state.me, r = R(), rates = S().packages.map(function (p) { return p.cashback_percent; });
-      var you = u && u.referral_code ? '<br><br>Your code is <b>' + U.esc(u.referral_code) + '</b> and your rate is <b>' + u.cashback_percent + '%</b>. <a href="dashboard.html#refer">Share it</a>' : '<br><br>You get your code after your first purchase.';
+      var you = u && u.referral_code ? '<br><br>Your code is <b>' + U.esc(u.referral_code) + '</b> and your rate is up to <b>' + u.cashback_percent + '%</b> (a friend on a smaller package pays that package\'s lower rate). <a href="dashboard.html#refer">Share it</a>' : '<br><br>You get your code after your first purchase.';
       return 'Refer & earn, in short:<br>1. Buy any package and get your personal code<br>2. A friend buys with your code and gets ' + U.inr(r.friend_discount) + ' off<br>3. You get cashback: ' + Math.min.apply(null, rates) + '% to ' + Math.max.apply(null, rates) + '% of what they paid, based on your package<br><br>Only people <b>you</b> invite count. One level, nothing more.' + you;
     } },
     { id: 'refund', re: /refund|money back|cancel|return/, a: function () { return 'Course access opens right after payment, so purchases are generally non-refundable.<br>If you were charged twice, charged by mistake, or did not get access, write to <b>' + U.esc(S().settings.email) + '</b> within 7 days with your order ID.<br><a href="legal.html#refund">Read the refund policy</a>'; } },

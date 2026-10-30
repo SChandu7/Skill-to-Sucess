@@ -76,7 +76,7 @@
     var tiers = (R.monthly_bonus || []).map(function (t) { return t.friends + ' friends → ' + U.inr(t.bonus); }).join(', ');
     var items = [
       ['graduation-cap', 'Finish a course', rewards.length ? U.inr(Math.min.apply(null, rewards)) + ' to ' + U.inr(Math.max.apply(null, rewards)) + ' per course' : 'Course rewards', 'Pass every lesson quiz and the reward lands in your wallet. Bigger packages pay more per course.'],
-      ['share-2', 'Refer a friend', pcts.length ? Math.min.apply(null, pcts) + '% to ' + Math.max.apply(null, pcts) + '% cashback' : 'Referral cashback', 'Your friend saves ' + U.inr(R.friend_discount) + ' on their first package and you get cashback on the package they choose.'],
+      ['share-2', 'Refer a friend', pcts.length ? Math.min.apply(null, pcts) + '% to ' + Math.max.apply(null, pcts) + '% cashback' : 'Referral cashback', 'Your friend saves ' + U.inr(R.friend_discount) + ' on their first package. You get cashback on the package they choose, at your package\'s rate or theirs, whichever is lower.'],
       ['calendar', 'Daily bonus', R.daily_bonus ? U.inr(R.daily_bonus) + ' a day' : 'Daily bonus', 'The first friend who buys with your code on any day earns you an extra bonus.'],
       ['target', 'Monthly milestones', tiers ? 'Up to ' + U.inr(Math.max.apply(null, (R.monthly_bonus || []).map(function (t) { return t.bonus; }))) : 'Milestones', tiers ? 'Bring friends within one month: ' + tiers + '.' : 'Reach a number of friends in a month for a one-off bonus.']
     ];
