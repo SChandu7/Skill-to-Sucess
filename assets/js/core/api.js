@@ -108,7 +108,11 @@ STS.api = (function () {
     chat: function (messages) { return post('/chat/', { messages: messages }, { noRefresh: true }); },
 
     // Auth
-    register: function (d) { d.guest_key = guestKey(); return post('/auth/register/', d).then(authDone); },
+    register: function (d) { d.guest_key = guestKey(); return post('/auth/register/', d, { noRefresh: true }); },      // emails a code
+    registerVerify: function (email, code) { return post('/auth/register/verify/', { email: email, code: code }, { noRefresh: true }).then(authDone); },
+    registerResend: function (email) { return post('/auth/register/resend/', { email: email }, { noRefresh: true }); },
+    forgotPassword: function (email) { return post('/auth/password/forgot/', { email: email }, { noRefresh: true }); },
+    resetPasswordEmail: function (email, code, password) { return post('/auth/password/reset/', { email: email, code: code, password: password }, { noRefresh: true }).then(authDone); },
     login: function (identifier, password) { return post('/auth/login/', { identifier: identifier, password: password }, { noRefresh: true }).then(authDone); },
     logout: function () { return post('/auth/logout/', { refresh: getRefresh() || '' }, { noRefresh: true }).finally(clearSession); },
     sendOtp: function (phone) { return post('/auth/otp/', { phone: phone }, { noRefresh: true }); },

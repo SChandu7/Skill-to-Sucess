@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="logo.jpeg">
 <link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/app.css?v=9">
+<link rel="stylesheet" href="assets/css/app.css?v=10">
 <!--/HEAD-->
 </head>
 <body class="min-h-screen bg-white">
@@ -23,7 +23,7 @@
       <section id="p-login" role="tabpanel" aria-labelledby="t-login">
         <h1 class="text-display-md">Welcome back</h1><p class="mt-2 text-ink-600">Pick up where you left off.</p>
         <form class="mt-8 grid gap-5" id="f-login" novalidate>
-          <div><label class="label" for="l-id">Email or mobile number</label><input class="input" id="l-id" name="identifier" autocomplete="username" required></div>
+          <div><label class="label" for="l-id">Email</label><input class="input" id="l-id" name="identifier" type="email" autocomplete="email" placeholder="you@gmail.com" required></div>
           <div><div class="flex items-center justify-between"><label class="label" for="l-pass">Password</label><button type="button" class="mb-1.5 text-sm font-semibold text-sky-700 hover:underline" id="forgot">Forgot password?</button></div>
             <div class="relative" data-field><input class="input pr-12" id="l-pass" name="password" type="password" autocomplete="current-password" required><button type="button" class="absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg text-ink-500 hover:bg-cloud" data-eye="l-pass" aria-label="Show password"><svg class="i i-sm" aria-hidden="true"><use href="#i-eye"></use></svg></button></div></div>
           <button class="btn btn-primary btn-lg btn-block">Log in</button>
@@ -35,11 +35,12 @@
         <form class="mt-8 grid gap-5" id="f-reg" novalidate>
           <div><label class="label" for="r-name">Full name</label><input class="input" id="r-name" name="name" autocomplete="name" required></div>
           <div><label class="label" for="r-phone">Mobile number</label><div class="flex" data-field><span class="grid place-items-center rounded-l-xl border border-r-0 border-line bg-cloud px-3 text-sm text-ink-600">+91</span><input class="input !rounded-l-none tabular" id="r-phone" name="phone" inputmode="numeric" maxlength="10" autocomplete="tel-national" required></div></div>
-          <div><label class="label" for="r-email">Email</label><input class="input" id="r-email" name="email" type="email" autocomplete="email" required></div>
+          <div><label class="label" for="r-email">Email</label><input class="input" id="r-email" name="email" type="email" autocomplete="email" placeholder="you@gmail.com" required><p class="hint">We email you a 6-digit code to confirm it.</p></div>
           <div><label class="label" for="r-pass">Password</label><div class="relative" data-field><input class="input pr-12" id="r-pass" name="password" type="password" minlength="8" autocomplete="new-password" placeholder="At least 8 characters, not only numbers" required><button type="button" class="absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg text-ink-500 hover:bg-cloud" data-eye="r-pass" aria-label="Show password"><svg class="i i-sm" aria-hidden="true"><use href="#i-eye"></use></svg></button></div></div>
           <label class="flex items-start gap-2.5 text-[15px]"><input type="checkbox" class="check" name="agree"><span>I agree to the <a class="link" href="legal.html#terms">Terms</a> and <a class="link" href="legal.html#privacy">Privacy policy</a>.</span></label>
           <p class="error -mt-3 hidden" id="agree-err">Please accept the terms to continue.</p>
           <button class="btn btn-buy btn-lg btn-block">Create account</button>
+          <p class="-mt-2 text-center text-sm text-ink-500">Already have an account? <button type="button" class="link" id="to-login">Log in</button></p>
         </form>
       </section>
     </div>
@@ -55,11 +56,11 @@
   </aside>
 </div>
 <!--CORE-->
-<script src="assets/js/core/icons.js?v=9"></script>
-<script src="assets/js/core/config.js?v=9"></script>
-<script src="assets/js/core/api.js?v=9"></script>
-<script src="assets/js/core/app.js?v=9"></script>
+<script src="assets/js/core/icons.js?v=10"></script>
+<script src="assets/js/core/config.js?v=10"></script>
+<script src="assets/js/core/api.js?v=10"></script>
+<script src="assets/js/core/app.js?v=10"></script>
 <!--/CORE-->
-<script src="assets/js/pages/login.js?v=9"></script>
+<script src="assets/js/pages/login.js?v=10"></script>
 </body>
 </html>

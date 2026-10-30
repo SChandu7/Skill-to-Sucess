@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<title>Top earners | SkillToSuccess</title>
+<meta name="description" content="Learners on SkillToSuccess earn while they learn: cashback for every finished course, referral cashback and bonuses. See the real top earners and learners.">
+<!--HEAD-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A7BC2">
+<link rel="icon" href="logo.jpeg">
+<link rel="apple-touch-icon" href="logo.jpeg">
+<link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/app.css?v=10">
+<!--/HEAD-->
+</head>
+<body class="flex min-h-screen flex-col">
+<div id="site-header" class="h-[72px]"></div>
+<main id="main" class="flex-1 pb-20" tabindex="-1">
+  <!-- Hero -->
+  <section class="hero-sky relative overflow-hidden border-b border-line">
+    <div class="container py-12 sm:py-16">
+      <div class="max-w-3xl">
+        <p class="eyebrow">Leaderboard</p>
+        <h1 class="text-display-xl">Learn. Finish. <span class="text-orange-500">Earn.</span></h1>
+        <p class="lead mt-4 max-w-2xl">On SkillToSuccess, learners earn while they learn: cashback for every course they finish, and cashback plus bonuses when friends join through them. These are the real numbers, from real buyers only.</p>
+        <div class="mt-7 flex flex-wrap gap-3"><a class="btn btn-buy btn-lg" href="packages.html">Start earning with a package</a><a class="btn btn-ghost btn-lg" href="#ways">How learners earn</a></div>
+      </div>
+      <dl class="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line lg:grid-cols-4" id="er-stats">
+        <div class="skel h-24"></div><div class="skel h-24"></div><div class="skel h-24"></div><div class="skel h-24"></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- Podium -->
+  <section class="container pt-14" aria-labelledby="h-podium">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div><h2 id="h-podium" class="text-display-md">The leaders so far</h2><p class="mt-2 text-ink-600">Names are shortened for privacy. Updated every few minutes.</p></div>
+      <div class="seg" role="tablist" id="er-tabs"><button role="tab" aria-pressed="true" data-tab="earners">Top earners</button><button role="tab" aria-pressed="false" data-tab="learners">Top learners</button></div>
+    </div>
+    <div class="mt-8 grid gap-4 md:grid-cols-3" id="er-podium"><div class="skel h-48"></div><div class="skel h-48"></div><div class="skel h-48"></div></div>
+  </section>
+
+  <!-- Full list + payouts -->
+  <section class="container mt-10 grid gap-6 lg:grid-cols-3">
+    <div class="lg:col-span-2">
+      <div class="overflow-hidden rounded-3xl border border-line bg-white">
+        <div class="flex items-center justify-between border-b border-line px-5 py-4"><h2 class="text-xl" id="er-list-title">Top earners</h2><span class="text-sm text-ink-500" id="er-count"></span></div>
+        <ol class="divide-y divide-line" id="er-list"><li class="p-5"><div class="skel h-10"></div></li></ol>
+      </div>
+    </div>
+    <aside class="grid content-start gap-6">
+      <div class="rounded-3xl border border-line bg-white p-5">
+        <h2 class="flex items-center gap-2 text-xl"><svg class="i text-good-600" aria-hidden="true"><use href="#i-banknote"></use></svg>Latest payouts to UPI</h2>
+        <ul class="mt-4 grid gap-3" id="er-payouts"><li class="skel h-12"></li></ul>
+      </div>
+      <div class="rounded-3xl bg-ink-900 p-6 text-white">
+        <p class="font-display text-2xl font-semibold">Your name could be here</p>
+        <p class="mt-2 text-[15px] text-ink-300">Pick a package, finish your courses and share your code. Every rupee you earn is tracked in your wallet and paid to UPI.</p>
+        <a class="btn btn-buy mt-5" href="packages.html">See packages</a>
+      </div>
+    </aside>
+  </section>
+
+  <!-- Ways to earn -->
+  <section class="container mt-20" id="ways" aria-labelledby="h-ways">
+    <p class="eyebrow">How learners earn</p>
+    <h2 id="h-ways" class="text-display-lg max-w-2xl">Four ways your learning pays you back</h2>
+    <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4" id="er-ways"></div>
+  </section>
+
+  <!-- Per package -->
+  <section class="container mt-16" aria-labelledby="h-pk">
+    <div class="overflow-hidden rounded-3xl border border-line bg-white">
+      <div class="border-b border-line px-5 py-4"><h2 id="h-pk" class="text-xl">What each package pays back</h2><p class="mt-1 text-sm text-ink-500">Bigger packages pay more for every finished course and a higher referral cashback.</p></div>
+      <div class="overflow-x-auto"><table class="w-full min-w-[560px] text-left text-[15px]" id="er-packages"></table></div>
+    </div>
+    <div class="mt-8 rounded-2xl bg-cloud p-5 text-[15px] text-ink-700">
+      <b>Honest note:</b> we sell courses, not income. What you earn depends on finishing your courses and on friends who choose to join.
+      Cashback is held for a few days in case of a refund, and past earnings shown here are not a promise of future income.
+      Referral is one level only: nobody earns from friends of friends.
+    </div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<!--CORE-->
+<script src="assets/js/core/icons.js?v=10"></script>
+<script src="assets/js/core/config.js?v=10"></script>
+<script src="assets/js/core/api.js?v=10"></script>
+<script src="assets/js/core/app.js?v=10"></script>
+<!--/CORE-->
+<script src="assets/js/chatbot.js?v=10"></script>
+<script src="assets/js/pages/earners.js?v=10"></script>
+</body>
+</html>

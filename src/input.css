@@ -82,6 +82,7 @@
   .input { @apply block w-full rounded-xl border border-line bg-white px-3.5 py-3 text-[15px] text-ink-900 placeholder:text-ink-400 transition; }
   .input:hover { @apply border-ink-300; }
   .input:focus { @apply border-sky-600 outline-none shadow-ring; }
+  .code-input { @apply text-center font-display text-2xl font-semibold tabular-nums; letter-spacing: 0.5em; padding-left: 1.25em; }
   .input[aria-invalid="true"] { @apply border-bad-500; }
   .hint { @apply mt-1.5 text-xs text-ink-500; }
   .error { @apply mt-1.5 text-xs font-medium text-bad-600; }

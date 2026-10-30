@@ -119,7 +119,7 @@ STS.ui = (function () {
   function savedRef() { try { return localStorage.getItem('sts:ref') || ''; } catch (e) { return ''; } }
 
   /* ------------------------------------------------------------------ header */
-  var NAV = [['courses', 'Courses'], ['packages', 'Pricing'], ['play', 'Play & earn'],
+  var NAV = [['courses', 'Courses'], ['packages', 'Pricing'], ['play', 'Play & earn'], ['earners', 'Top earners'],
              ['refer', 'Refer & earn', 'index.html#refer'], ['jobs', 'Job connect'], ['verify', 'Verify']];
   function header(opts) {
     opts = opts || {};
@@ -230,6 +230,41 @@ STS.ui = (function () {
     document.body.appendChild(ov); document.body.style.overflow = 'hidden';
     var f = ov.querySelector('input,select,textarea') || ov.querySelector('[data-x]'); if (f) f.focus({ preventScroll: true });
     return { close: close, el: ov, body: body };
+  }
+
+  /* ---------- 6-digit code from the email: finishes sign-up ---------- */
+  var CODE_FIELD = '<div><label class="label" for="ec-code">6-digit code</label><input class="input code-input" id="ec-code" name="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••"></div>';
+  function resendTimer(btn, seconds) {
+    var left = seconds || 60, t;
+    function tick() { btn.disabled = left > 0; btn.textContent = left > 0 ? 'Resend code in ' + left + 's' : 'Resend code'; if (left-- <= 0) clearInterval(t); }
+    tick(); t = setInterval(tick, 1000);
+    return function () { clearInterval(t); };
+  }
+  function onlyDigits(input) { input.addEventListener('input', function () { input.value = input.value.replace(/\D/g, '').slice(0, 6); }); }
+  // Resolves with the login reply ({access, user, ...}) once the code is right. Rejects with .cancelled if closed.
+  function signupCode(sent) {
+    return new Promise(function (resolve, reject) {
+      var done = false, stop = null, email = sent.email;
+      var form = h('<form class="grid gap-4" novalidate><p class="text-[15px] text-ink-600">' + esc(sent.detail) + ' It can take a minute. Check the spam folder too.</p>' + CODE_FIELD +
+        '<button class="btn btn-buy btn-lg btn-block">Verify and create account</button>' +
+        '<div class="flex items-center justify-between text-sm"><button type="button" class="font-semibold text-sky-700 hover:underline disabled:text-ink-400 disabled:no-underline" data-resend></button><button type="button" class="font-semibold text-ink-500 hover:underline" data-change>Change email</button></div></form>');
+      var m = modal({ title: 'Check your email', icon: 'mail', sub: 'Enter the code we sent to <b>' + esc(email) + '</b>', body: form,
+        onClose: function () { if (stop) stop(); if (!done) { var e = new Error('Your account is created only after you enter the code from the email.'); e.cancelled = true; reject(e); } } });
+      var code = form.querySelector('#ec-code'), rb = form.querySelector('[data-resend]');
+      onlyDigits(code);
+      stop = resendTimer(rb, sent.resend_in);
+      rb.addEventListener('click', function () {
+        fieldError(form, null); busy(rb, true, 'Sending');
+        A.registerResend(email).then(function (r) { busy(rb, false); toast('New code sent to ' + email, 'mail'); stop = resendTimer(rb, r.resend_in); }, function (err) { busy(rb, false); stop = resendTimer(rb, 0); failure(err, form); });
+      });
+      form.querySelector('[data-change]').addEventListener('click', function () { m.close(); });
+      form.addEventListener('submit', function (e) {
+        e.preventDefault(); fieldError(form, null);
+        if (!/^\d{6}$/.test(code.value)) return fieldError(form, 'code', 'Enter the 6-digit code from the email.');
+        var b = form.querySelector('.btn-buy'); busy(b, true, 'Checking');
+        A.registerVerify(email, code.value).then(function (r) { done = true; m.close(); resolve(r); }, function (err) { busy(b, false); failure(err, form); });
+      });
+    });
   }
 
   function unlock(slug, lessonTitle) {
@@ -388,7 +423,7 @@ STS.ui = (function () {
     shuffle: shuffle, param: param, savedRef: savedRef, owned: owned, progress: progress, cheapestPackageFor: cheapestPackageFor,
     packageCovers: packageCovers, packageCourseCount: packageCourseCount, packageCourseLine: packageCourseLine,
     courseReward: courseReward, gstLine: gstLine, setMe: setMe, refreshMe: refreshMe,
-    header: header, toast: toast, modal: modal, unlock: unlock, cover: cover, stars: stars, proof: proof, courseCard: courseCard, confetti: confetti,
+    header: header, toast: toast, modal: modal, signupCode: signupCode, CODE_FIELD: CODE_FIELD, resendTimer: resendTimer, onlyDigits: onlyDigits, unlock: unlock, cover: cover, stars: stars, proof: proof, courseCard: courseCard, confetti: confetti,
     accordions: accordions, copy: copy, busy: busy, fieldError: fieldError, failure: failure, requireAuth: requireAuth, boot: boot
   };
 })();

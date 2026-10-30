@@ -96,6 +96,7 @@
       var box = U.$('#pay-err'); box.hidden = true;
       var me = st.me, order = null;
       var ready = me ? Promise.resolve(me) : A.register({ name: U.$('#f-name').value, phone: U.$('#f-phone').value, email: U.$('#f-email').value, password: U.$('#f-pass').value })
+        .then(function (sent) { U.busy(btn, true, 'Waiting for the email code'); return U.signupCode(sent); })
         .then(function (r) { st.me = r.user; U.setMe(r.user); U.header(); if (r.claimed_play_rewards) U.toast(U.inr(r.claimed_play_rewards) + ' of play rewards moved to your wallet', 'gift'); return r.user; });
       ready.then(function () {
         return A.createOrder({ kind: item.kind, slug: item.slug, ref_code: opts.ref_code, use_play: opts.use_play });
