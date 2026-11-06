@@ -122,6 +122,10 @@
     { name: 'founder_title', label: 'Title under the name', type: 'text', help: 'Example: Founder · B.Tech student' },
     { name: 'founder_bio', label: 'Short bio', type: 'textarea', span: 2, rows: 3 },
     { name: 'founder_photo', label: 'Founder photo', type: 'file', span: 2, accept: 'image/*' },
+    { section: 'Certificate' },
+    { name: 'certificate_signer_name', label: 'Name under the signature', type: 'text', help: 'Leave empty to use the founder name.' },
+    { name: 'certificate_signer_title', label: 'Title under the name', type: 'text', help: 'Example: Founder, SkillToSuccess' },
+    { name: 'certificate_signature', label: 'Signature image', type: 'file', span: 2, accept: 'image/*', help: 'A photo or scan of the signature. PNG with a clear or white background looks best. It shows on every certificate.' },
     { section: 'Email alerts to the owner' },
     { name: 'alert_emails', label: 'Send alerts to', type: 'text', span: 2, help: 'One or more emails, separated by commas. Leave empty to stop all alerts.' },
     { name: 'alert_signups', label: 'New sign-ups', type: 'checkbox' }, { name: 'alert_logins', label: 'Every learner login', type: 'checkbox' },
@@ -135,6 +139,7 @@
     { name: 'play_checkout_max', label: 'Max play rewards usable on one package order', type: 'number', prefix: '₹', min: 0, span: 2 },
     { section: 'Lessons and quizzes' },
     { name: 'quiz_questions_per_lesson', label: 'Questions after each lesson', type: 'number', min: 1, max: 10 }, { name: 'quiz_pass_correct', label: 'Correct answers needed to pass', type: 'number', min: 1, max: 10 },
+    { name: 'daily_course_percent', label: 'Most of a course completed per day', type: 'number', suffix: '%', min: 0, max: 100, help: '33 = a third of a course a day, so a course takes at least 3 days. Reading and watching stay open. 0 = no limit.' },
     { name: 'free_preview_lessons', label: 'Free preview lessons per course', type: 'number', min: 0, help: 'A guide for new courses. Mark each free lesson in the course editor.' }
   ];
   AD.page('settings', {

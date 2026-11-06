@@ -121,7 +121,7 @@
           'Your ' + U.esc(d.package) + ' package lets you pick ' + d.slots + ' course' + (d.slots === 1 ? '' : 's') + '. ' +
           d.remaining + ' left to choose.') +
         (perCourse ? '<div class="mb-5 flex items-start gap-3 rounded-2xl border border-orange-200 bg-orange-50 p-4 text-[15px]">' + U.icon('wallet', 'text-orange-600 mt-0.5') +
-          '<p>Finish a course and <b>' + U.inr(perCourse) + '</b> goes to your wallet. All ' + d.slots + ' courses = <b>' + U.inr(perCourse * d.slots) + '</b>.</p></div>' : '') +
+          '<p><b>Cashback for every course you finish.</b> It goes straight to your wallet.</p></div>' : '') +
         '<div class="sticky top-[76px] z-10 mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-white/95 p-4 shadow-card backdrop-blur">' +
           '<p class="font-semibold" id="pick-count">0 of ' + d.remaining + ' chosen</p>' +
           '<button class="btn btn-buy" id="pick-save" disabled>Choose your courses</button></div>' +

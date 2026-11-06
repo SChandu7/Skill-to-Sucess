@@ -19,7 +19,7 @@ STS.chat = (function () {
 
   function pkgList() {
     return 'Here are the packages. Each is a one-time payment with lifetime access:<br>' +
-      S().packages.map(function (p) { return '• <b>' + U.esc(p.name) + '</b>: ' + U.inr(p.price) + ' — ' + U.packageCourseLine(p).toLowerCase() + ', ' + U.inr(U.courseReward(p)) + ' back per course you finish, refer & earn at ' + p.cashback_percent + '%'; }).join('<br>') +
+      S().packages.map(function (p) { return '• <b>' + U.esc(p.name) + '</b>: ' + U.inr(p.price) + ' — ' + U.packageCourseLine(p).toLowerCase() + ', cashback for every course you finish, refer & earn at ' + p.cashback_percent + '%'; }).join('<br>') +
       '<br>You choose your own courses from the dashboard right after paying.' +
       '<br><a href="packages.html">Compare packages side by side</a>';
   }
@@ -62,7 +62,7 @@ STS.chat = (function () {
       var cr = S().settings.course_reward || {};
       if (!cr.enabled) return 'Finish your lessons and you earn a certificate for each course.';
       return 'Finish a course and money goes to your wallet. Bigger packages pay more per course:<br>' +
-        S().packages.map(function (p) { return '• ' + U.esc(p.name) + ' (' + U.inr(p.price) + '): <b>' + U.inr(U.courseReward(p)) + '</b> a course, up to ' + U.inr(p.max_course_cashback); }).join('<br>') +
+        S().packages.map(function (p) { return '• ' + U.esc(p.name) + ' (' + U.inr(p.price) + '): cashback for every course you finish'; }).join('<br>') +
         '<br>It counts when you pass every lesson quiz, waits ' + cr.hold_days + ' days, then you can withdraw it.<br><a href="packages.html#calc-h">Try the cashback calculator</a>';
     } },
     { id: 'gst', re: /gst|tax|invoice|bill|extra charge/, a: function () {

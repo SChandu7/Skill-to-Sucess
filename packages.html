@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="logo.jpeg">
 <link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/app.css?v=11">
+<link rel="stylesheet" href="assets/css/app.css?v=12">
 <!--/HEAD-->
 </head>
 <body class="flex min-h-screen flex-col">
@@ -43,8 +43,8 @@
         <label class="label" for="cc-pkg">Package</label>
         <select class="input" id="cc-pkg"></select>
 
-        <div class="mt-6 flex items-end justify-between"><label class="label !mb-0" for="cc-courses">Courses you finish</label><b class="font-display text-xl tabular" id="cc-courses-v">0</b></div>
-        <input class="range mt-2" type="range" id="cc-courses" min="0" max="10" value="0">
+        <div class="mt-6 hidden items-end justify-between"><label class="label !mb-0" for="cc-courses">Courses you finish</label><b class="font-display text-xl tabular" id="cc-courses-v">0</b></div>
+        <input class="range mt-2 hidden" type="range" id="cc-courses" min="0" max="10" value="0">
 
         <div class="mt-6 flex items-end justify-between"><label class="label !mb-0" for="cc-friends">Friends who join with your code</label><b class="font-display text-xl tabular" id="cc-friends-v">0</b></div>
         <input class="range mt-2" type="range" id="cc-friends" min="0" max="25" value="0">
@@ -79,12 +79,12 @@
 </main>
 <div id="site-footer"></div>
 <!--CORE-->
-<script src="assets/js/core/icons.js?v=11"></script>
-<script src="assets/js/core/config.js?v=11"></script>
-<script src="assets/js/core/api.js?v=11"></script>
-<script src="assets/js/core/app.js?v=11"></script>
+<script src="assets/js/core/icons.js?v=12"></script>
+<script src="assets/js/core/config.js?v=12"></script>
+<script src="assets/js/core/api.js?v=12"></script>
+<script src="assets/js/core/app.js?v=12"></script>
 <!--/CORE-->
-<script src="assets/js/chatbot.js?v=11"></script>
+<script src="assets/js/chatbot.js?v=12"></script>
 <script>
 (function () {
   var U = STS.ui, A = STS.api;
@@ -95,7 +95,7 @@
     U.$('#plans').innerHTML = P.map(function (p) {
       var owned = cur && cur.slug === p.slug, below = cur && cur.price > p.price, pop = p.is_popular;
       var cta = owned ? '<span class="btn btn-soft btn-block">' + U.icon('check', 'i-sm') + 'Your package</span>' : below ? '<span class="btn btn-block border border-line text-ink-400">Included in yours</span>' :
-        (p.max_course_cashback ? '<p class="mt-4 flex items-center gap-2 rounded-xl bg-good-50 px-3 py-2 text-[13px] font-semibold text-good-700">' + U.icon('wallet', 'i-sm') + 'Earn back up to ' + U.inr(p.max_course_cashback) + ' by finishing them</p>' : '') +
+        (p.max_course_cashback ? '<p class="mt-4 flex items-center gap-2 rounded-xl bg-good-50 px-3 py-2 text-[13px] font-semibold text-good-700">' + U.icon('wallet', 'i-sm') + 'Cashback for every course you finish</p>' : '') +
         '<p class="mt-2 text-center text-[11px] text-ink-500">' + U.gstLine(p.price) + '</p>' +
         '<a class="btn btn-block ' + (pop ? 'btn-buy' : 'btn-primary') + '" href="checkout.html?plan=' + p.slug + '">' + (cur ? 'Upgrade for ' + U.inr(Math.max(1, (p.price - cur.price) - Math.round((p.price - cur.price) * UPD / 100))) : 'Enroll in ' + U.esc(p.name)) + '</a>';
       return '<article class="relative flex flex-col rounded-3xl border ' + (pop ? 'border-sky-600 bg-gradient-to-b from-sky-50 to-white shadow-lift ring-1 ring-sky-600' : 'border-line bg-white') + ' p-6">' +
@@ -123,8 +123,7 @@
       row('You choose them yourself', function (p) { return p.course_slots ? yes : p.includes_future_courses ? '<span class="text-xs text-ink-600">all included</span>' : no; }) +
       row('Any course in the library', function () { return yes; }) +
       row('<b>Lessons (about)</b>', function (p) { return '<b class="tabular">' + p.lesson_count + '</b>'; }) +
-      row('<b>Per course you finish</b>', function (p) { return '<b class="tabular text-good-600">' + U.inr(U.courseReward(p)) + '</b>'; }) +
-      row('<b>Most you can earn back</b>', function (p) { return '<b class="tabular text-good-600">' + U.inr(p.max_course_cashback) + '</b>'; }) +
+      row('<b>Cashback for every course you finish</b>', function (p) { return U.courseReward(p) ? yes : no; }) +
       group('Learning') + row('Lesson quizzes and certificates', function () { return yes; }) + row('Free resources and cheat sheets', function () { return yes; }) + row('New courses added later', function (p) { return p.includes_future_courses ? yes : no; }) +
       group('Support') + row('Support', function (p) { return '<span class="text-xs text-ink-600">' + U.esc(p.support_text || 'Email') + '</span>'; }) +
       group('Refer &amp; earn (one level)') + row('Your cashback per friend\'s purchase', function (p) { return '<b class="tabular text-orange-600">up to ' + p.cashback_percent + '%</b>'; }) + row('Discount your friend gets', function () { return U.inr(R.friend_discount) + ' off'; }) +
@@ -163,13 +162,16 @@
           '<b class="font-display text-lg tabular ' + (amount ? 'text-good-700' : 'text-ink-300') + '">' + U.inr(amount) + '</b></li>';
       }
       function paint(d) {
-        U.$('#cc-total').textContent = U.inr(d.total);
-        U.$('#cc-net').textContent = d.net_cost
-          ? 'That brings the ' + U.inr(d.package.price) + ' package down to ' + U.inr(d.net_cost) + '.'
-          : 'That is more than the ' + U.inr(d.package.price) + ' you paid.';
+        // Course cashback is shown without an amount, so it is left out of this total.
+        var total = d.total - d.course_reward.total, net = Math.max(0, d.package.price - total);
+        U.$('#cc-total').textContent = U.inr(total);
+        U.$('#cc-net').textContent = (net
+          ? 'That brings the ' + U.inr(d.package.price) + ' package down to ' + U.inr(net) + '.'
+          : 'That is more than the ' + U.inr(d.package.price) + ' you paid.') + ' Plus cashback for every course you finish.';
         var mb = d.monthly_bonus;
         U.$('#cc-rows').innerHTML =
-          row('Finishing courses', d.course_reward.courses + ' × ' + U.inr(d.course_reward.per_course) + ' a course', d.course_reward.total) +
+          '<li class="flex items-start justify-between gap-4 px-5 py-4"><div><p class="font-semibold">Finishing courses</p><p class="text-[13px] text-ink-500">Cashback for every course you finish</p></div>' +
+          '<span class="tag tag-good">' + U.icon('check', 'i-sm') + 'Included</span></li>' +
           row('Referral cashback', d.referral.friends + ' friends × ' + U.inr(d.referral.per_friend) + ' (' + d.package.cashback_percent + '% of ' + U.inr(d.package.price) + ')', d.referral.total) +
           row('Daily referral bonus', U.inr(d.daily_bonus.per_day) + ' on each day a friend joins', d.daily_bonus.total) +
           row('Monthly milestone', mb.reached ? mb.reached + ' friends in one month' : (mb.tiers[0] ? 'Reach ' + mb.tiers[0].friends + ' friends in a month' : 'Not running'), mb.total);

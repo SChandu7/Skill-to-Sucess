@@ -75,7 +75,7 @@
     var pcts = P.map(function (p) { return p.cashback_percent; });
     var tiers = (R.monthly_bonus || []).map(function (t) { return t.friends + ' friends → ' + U.inr(t.bonus); }).join(', ');
     var items = [
-      ['graduation-cap', 'Finish a course', rewards.length ? U.inr(Math.min.apply(null, rewards)) + ' to ' + U.inr(Math.max.apply(null, rewards)) + ' per course' : 'Course rewards', 'Pass every lesson quiz and the reward lands in your wallet. Bigger packages pay more per course.'],
+      ['graduation-cap', 'Finish a course', 'Cashback for every course you finish', 'Pass every lesson quiz and the reward lands in your wallet. Bigger packages pay more per course.'],
       ['share-2', 'Refer a friend', pcts.length ? Math.min.apply(null, pcts) + '% to ' + Math.max.apply(null, pcts) + '% cashback' : 'Referral cashback', 'Your friend saves ' + U.inr(R.friend_discount) + ' on their first package. You get cashback on the package they choose, at your package\'s rate or theirs, whichever is lower.'],
       ['calendar', 'Daily bonus', R.daily_bonus ? U.inr(R.daily_bonus) + ' a day' : 'Daily bonus', 'The first friend who buys with your code on any day earns you an extra bonus.'],
       ['target', 'Monthly milestones', tiers ? 'Up to ' + U.inr(Math.max.apply(null, (R.monthly_bonus || []).map(function (t) { return t.bonus; }))) : 'Milestones', tiers ? 'Bring friends within one month: ' + tiers + '.' : 'Reach a number of friends in a month for a one-off bonus.']
@@ -84,10 +84,10 @@
       return '<article class="rounded-3xl border border-line bg-white p-6"><span class="grid h-12 w-12 place-items-center rounded-2xl bg-sky-50 text-sky-700">' + U.icon(w[0], 'i-lg') + '</span>' +
         '<h3 class="mt-5 text-lg">' + w[1] + '</h3><p class="mt-1 font-display text-xl font-semibold text-orange-600">' + w[2] + '</p><p class="mt-2 text-[15px] text-ink-600">' + w[3] + '</p></article>';
     }).join('');
-    U.$('#er-packages').innerHTML = '<thead class="bg-cloud text-sm text-ink-500"><tr><th class="px-5 py-3 font-semibold">Package</th><th class="px-5 py-3 font-semibold">Price</th><th class="px-5 py-3 font-semibold">Courses</th><th class="px-5 py-3 font-semibold">Per finished course</th><th class="px-5 py-3 font-semibold">Referral cashback</th></tr></thead><tbody class="divide-y divide-line">' +
+    U.$('#er-packages').innerHTML = '<thead class="bg-cloud text-sm text-ink-500"><tr><th class="px-5 py-3 font-semibold">Package</th><th class="px-5 py-3 font-semibold">Price</th><th class="px-5 py-3 font-semibold">Courses</th><th class="px-5 py-3 font-semibold">Finished courses</th><th class="px-5 py-3 font-semibold">Referral cashback</th></tr></thead><tbody class="divide-y divide-line">' +
       P.map(function (p) {
         return '<tr><td class="px-5 py-3 font-semibold">' + U.esc(p.name) + '</td><td class="px-5 py-3 tabular">' + U.inr(p.price) + '</td><td class="px-5 py-3">' + U.packageCourseCount(p) + '</td>' +
-          '<td class="px-5 py-3 font-semibold tabular text-good-600">' + U.inr(U.courseReward(p)) + '</td><td class="px-5 py-3 tabular">' + p.cashback_percent + '%</td></tr>';
+          '<td class="px-5 py-3 font-semibold text-good-600">' + (U.courseReward(p) ? 'Cashback' : '-') + '</td><td class="px-5 py-3 tabular">' + p.cashback_percent + '%</td></tr>';
       }).join('') + '</tbody>';
   }
 

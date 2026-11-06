@@ -35,12 +35,14 @@
     var buyBody = owned ?
       '<div class="p-6"><p class="flex items-center gap-2 text-sm font-semibold text-good-700">' + U.icon('check-circle-2', 'i-sm') + 'In your library</p>' +
       '<div class="mt-4"><div class="mb-1.5 flex justify-between text-sm"><span>' + doneCount + ' of ' + lessons.length + ' lessons</span><b class="tabular">' + pct + '%</b></div><div class="meter"><span style="width:' + pct + '%"></span></div></div>' +
+      (c.me.daily && c.me.daily.limit != null && pct < 100 ? '<p class="mt-3 flex items-center gap-2 text-sm text-ink-600">' + U.icon(c.me.daily.left ? 'target' : 'clock', 'i-sm ' + (c.me.daily.left ? 'text-sky-600' : 'text-orange-600')) +
+        (c.me.daily.left ? 'You can complete ' + c.me.daily.left + ' more lesson' + (c.me.daily.left === 1 ? '' : 's') + ' today (' + c.me.daily.limit + ' a day).' : 'Today\'s limit reached. Continue tomorrow; reading stays open.') + '</p>' : '') +
       (next ? '<a class="btn btn-primary btn-lg btn-block mt-5" href="lesson.html?l=' + next.id + '">' + U.icon('play') + (doneCount ? 'Continue: lesson ' + next.n : 'Start lesson 1') + '</a>' : '') +
       (c.me.certificate ? '<a class="btn btn-ghost btn-block mt-2" href="certificate.html?id=' + c.me.certificate + '">' + U.icon('award') + 'View certificate</a>' : '') + '</div>' :
       '<div class="p-6">' + (pkg ? '<p class="text-sm text-ink-500">' + (pkg.course_slots ? 'Pick it with the ' + U.esc(pkg.name) + ' package' : 'Included in ' + U.esc(pkg.name)) + (pkgs.length > 1 ? ' or any higher package' : '') + '</p>' +
         '<p class="mt-1 flex items-baseline gap-2"><span class="font-display text-4xl font-semibold tabular">' + U.inr(upg ? Math.max(1, (pkg.price - cur.price) - Math.round((pkg.price - cur.price) * UPD / 100)) : pkg.price) + '</span>' + (upg ? '<span class="text-sm text-ink-500">to upgrade from ' + U.esc(cur.name) + '</span>' : (pkg.mrp ? '<s class="text-ink-400 tabular">' + U.inr(pkg.mrp) + '</s>' : '')) + '</p>' +
         '<p class="mt-1 text-sm text-ink-600">' + U.packageCourseLine(pkg) + ' — this one included</p>' +
-        (U.courseReward(pkg) ? '<p class="mt-1 flex items-center gap-1.5 text-sm font-semibold text-good-700">' + U.icon('wallet', 'i-sm') + U.inr(U.courseReward(pkg)) + ' back when you finish this course</p>' : '') +
+        (U.courseReward(pkg) ? '<p class="mt-1 flex items-center gap-1.5 text-sm font-semibold text-good-700">' + U.icon('wallet', 'i-sm') + 'Cashback when you finish this course</p>' : '') +
         '<a class="btn btn-buy btn-lg btn-block mt-5" href="checkout.html?plan=' + pkg.slug + '">' + (upg ? 'Upgrade to ' : 'Enroll with ') + U.esc(pkg.name) + '</a>' : '') +
       '<p class="mt-3 text-center text-sm text-ink-500">Courses are sold only inside packages. <a class="link" href="packages.html">Compare packages</a></p>' +
       (ref && !(me && me.has_purchased) ? '<p class="mt-3 flex items-center gap-2 rounded-xl bg-orange-50 px-3 py-2 text-sm text-orange-800">' + U.icon('gift', 'i-sm') + U.inr(R.friend_discount) + ' referral discount is applied at checkout</p>' : '') +

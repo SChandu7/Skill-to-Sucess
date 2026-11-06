@@ -83,9 +83,17 @@
 
     var noteKey = 'sts:note:' + l.id, note = ''; try { note = localStorage.getItem(noteKey) || ''; } catch (e) { /* */ }
     var isDone = l.done, next = l.next, prev = l.prev;
+    // Daily pace: a share of the course can be completed each day. Reading stays open.
+    function dailyNote(d) {
+      if (!d || d.limit == null) return '';
+      var full = d.left === 0;
+      return '<div class="mt-4 flex items-start gap-3 rounded-2xl ' + (full ? 'border border-orange-200 bg-orange-50' : 'bg-cloud') + ' p-4 text-[15px]">' + U.icon(full ? 'clock' : 'target', 'mt-0.5 flex-none ' + (full ? 'text-orange-600' : 'text-sky-600')) +
+        '<p>' + (full ? '<b>Today\'s limit reached.</b> You completed ' + d.done_today + ' lessons of this course today. Come back tomorrow to complete more. You can still read and watch every lesson.'
+          : '<b>Today: ' + d.done_today + ' of ' + d.limit + ' lessons completed.</b> You can complete ' + d.left + ' more in this course today (about ' + d.percent + '% of the course a day, so learning sticks).') + '</p></div>';
+    }
     root.innerHTML = head + media + (body ? '<article class="prose-lesson mt-8">' + body + '</article>' : '') +
       '<section class="mt-12 rounded-3xl border border-line bg-white p-5 shadow-card sm:p-8" id="quiz-box" aria-labelledby="quiz-h"><div class="flex flex-wrap items-center justify-between gap-3"><h2 id="quiz-h" class="text-xl">' + (l.quiz_count ? 'Lesson quiz' : 'Finish this lesson') + '</h2><span id="quiz-tag">' + (isDone ? '<span class="tag tag-good">' + U.icon('check', 'i-sm') + 'Completed' + (isDone.total ? ' with ' + isDone.score + '/' + isDone.total : '') + '</span>' : (l.quiz_count ? '<span class="text-sm text-ink-500">' + l.quiz_count + ' questions, ' + st.site.settings.quiz.pass + ' right to complete</span>' : '')) + '</span></div>' +
-      '<div id="quiz" class="mt-5"><p class="text-ink-600">' + (isDone ? 'You have completed this lesson. ' + (l.quiz_count ? 'Retake the quiz any time to practise.' : '') : l.quiz_count ? 'Check what you learned. Passing marks the lesson complete and adds XP.' : 'Mark the lesson as done when you have finished it.') + '</p>' +
+      '<div id="daily-note">' + (isDone ? '' : dailyNote(l.daily)) + '</div><div id="quiz" class="mt-5"><p class="text-ink-600">' + (isDone ? 'You have completed this lesson. ' + (l.quiz_count ? 'Retake the quiz any time to practise.' : '') : l.quiz_count ? 'Check what you learned. Passing marks the lesson complete and adds XP.' : 'Mark the lesson as done when you have finished it.') + '</p>' +
       (l.quiz_count ? '<button class="btn btn-dark mt-4" data-start>' + U.icon('list-checks', 'i-sm') + (isDone ? 'Retake quiz' : 'Start quiz') + '</button>' : (!isDone && owned ? '<button class="btn btn-dark mt-4" data-done>' + U.icon('check', 'i-sm') + 'Mark as done</button>' : '')) + '</div></section>' +
       '<section class="mt-8"><label for="notes" class="label flex items-center gap-2">' + U.icon('pen-line', 'i-sm text-ink-400') + 'My notes for this lesson</label><textarea id="notes" rows="3" class="input" placeholder="Write anything you want to remember. Saved on this device.">' + U.esc(note) + '</textarea></section>' +
       '<nav class="mt-10 flex items-center justify-between gap-3 border-t border-line pt-6" aria-label="Lesson navigation">' +
@@ -96,7 +104,7 @@
     var z = root.querySelector('[data-zoom]'); if (z) z.addEventListener('click', function () { U.modal({ title: l.title, wide: true, body: '<img src="' + U.esc(ct.image) + '" alt="" class="w-full rounded-2xl">' }); });
     var nl = root.querySelector('[data-next-lock]'); if (nl) nl.addEventListener('click', function () { U.unlock(c.slug, next.title); });
     var sb = root.querySelector('[data-start]'); if (sb) sb.addEventListener('click', startQuiz);
-    var db = root.querySelector('[data-done]'); if (db) db.addEventListener('click', function () { U.busy(db, true, 'Saving'); A.completeLesson(l.id).then(saved, function (e) { U.busy(db, false); U.failure(e); }); });
+    var db = root.querySelector('[data-done]'); if (db) db.addEventListener('click', function () { U.busy(db, true, 'Saving'); A.completeLesson(l.id).then(saved, function (e) { U.busy(db, false); if (e.code === 'daily_limit') U.$('#daily-note').innerHTML = dailyNote(e.data.daily); else U.failure(e); }); });
 
     function startQuiz() {
       var box = U.$('#quiz'); box.innerHTML = '<div class="skel h-40"></div>';
@@ -113,6 +121,12 @@
         box.innerHTML = '<div class="rounded-2xl bg-bad-50 p-5"><p class="font-display text-xl font-semibold">' + r.score + ' of ' + r.total + ' correct</p><p class="mt-1 text-ink-700">You need ' + r.pass + ' to complete the lesson. Read the key ideas again, then retry.</p><button class="btn btn-dark mt-4" data-retry>' + U.icon('rotate-ccw', 'i-sm') + 'Try again</button></div>';
         box.querySelector('[data-retry]').addEventListener('click', startQuiz); return;
       }
+      if (r.limit_reached) {
+        box.innerHTML = '<div class="rounded-2xl border border-orange-200 bg-orange-50 p-5"><p class="font-display text-xl font-semibold text-orange-800">' + r.score + ' of ' + r.total + '. You passed.</p><p class="mt-1 text-ink-700">' + U.esc(r.message) + '</p>' +
+          '<div class="mt-4 flex flex-wrap gap-2">' + (next && !next.locked ? '<a class="btn btn-ghost" href="lesson.html?l=' + next.id + '">Read the next lesson</a>' : '') + '<a class="btn btn-ghost" href="course.html?c=' + c.slug + '">Back to course</a></div></div>';
+        U.$('#daily-note').innerHTML = '';
+        return;
+      }
       if (!r.saved) {
         var pkg = U.cheapestPackageFor(c.slug);
         box.innerHTML = '<div class="rounded-2xl bg-sky-50 p-5"><p class="font-display text-xl font-semibold text-sky-900">' + r.score + ' of ' + r.total + '. You passed.</p><p class="mt-1 text-ink-700">' + U.esc(r.message || 'Buy the course to save progress and earn the certificate.') + '</p>' +
@@ -123,6 +137,7 @@
     }
     function saved(r) {
       done[l.id] = { score: r.score || 0, total: r.total || 0 };
+      if (r.daily && r.daily.left === 0) U.$('#daily-note').innerHTML = dailyNote(r.daily); else U.$('#daily-note').innerHTML = '';
       if (r.xp) U.toast('+' + r.xp + ' XP. Lesson complete.', 'zap'); else U.toast('Lesson complete');
       U.$('#quiz').innerHTML = '<div class="rounded-2xl bg-good-50 p-5"><p class="font-display text-xl font-semibold text-good-700">' + (r.total ? r.score + ' of ' + r.total + '. ' : '') + 'Lesson complete.</p><p class="mt-1 text-ink-700">' + r.progress.done + ' of ' + r.progress.total + ' lessons done in this course.</p>' +
         (next ? '<a class="btn btn-primary mt-4" href="lesson.html?l=' + next.id + '">Next lesson' + U.icon('arrow-right', 'i-sm') + '</a>' : '') + '</div>';

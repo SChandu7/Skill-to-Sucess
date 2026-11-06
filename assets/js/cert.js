@@ -1,9 +1,12 @@
-/* Certificate renderer (verify page, certificate page, dashboard). Scales with container-query units. */
+/* Certificate renderer (verify page, certificate page, dashboard). A4 landscape, scales with container-query units (cqw),
+ * prints to PDF from the certificate page. The signature is the image uploaded in Admin → Site settings → Certificate. */
 window.STS = window.STS || {};
 
 STS.cert = (function () {
   'use strict';
   var U = STS.ui;
+  var NAVY = '#0C2238', SKY = '#0A7BC2', GOLD = '#C8963E', ORANGE = '#F27F1B', MUTED = '#5B6B7E';
+  var SERIF = "Georgia,'Times New Roman',serif";
 
   function verifyUrl(code) { return location.origin + location.pathname.replace(/[^/]*$/, '') + 'verify.html?id=' + encodeURIComponent(code); }
   function qr(code) {
@@ -11,33 +14,75 @@ STS.cert = (function () {
     var q = window.qrcode(0, 'M'); q.addData(verifyUrl(code)); q.make();
     return q.createSvgTag({ cellSize: 2, margin: 0, scalable: true });
   }
+
+  // Gold rosette with ribbon tails: the "verified" seal.
+  function seal() {
+    var pts = [];
+    for (var i = 0; i < 48; i++) { var r = i % 2 ? 44 : 48, a = Math.PI * i / 24; pts.push((50 + r * Math.cos(a)).toFixed(2) + ',' + (50 + r * Math.sin(a)).toFixed(2)); }
+    return '<svg viewBox="0 0 100 130" style="width:100%;height:100%" aria-hidden="true">' +
+      '<path d="M30 80 18 128 33 118 42 131 50 88Z" fill="' + SKY + '"/><path d="M70 80 82 128 67 118 58 131 50 88Z" fill="#075E95"/>' +
+      '<polygon points="' + pts.join(' ') + '" fill="' + GOLD + '"/>' +
+      '<circle cx="50" cy="50" r="38" fill="#E9C77E"/><circle cx="50" cy="50" r="33" fill="none" stroke="#fff" stroke-width="1.2" stroke-dasharray="2 2"/>' +
+      '<path d="M37 51 46 60 64 40" fill="none" stroke="' + NAVY + '" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<text x="50" y="76" text-anchor="middle" font-family="Lexend,Arial,sans-serif" font-size="7.5" font-weight="700" fill="' + NAVY + '" letter-spacing="1">VERIFIED</text></svg>';
+  }
+
+  // Thin corner flourish, used four times.
+  function corner(style) {
+    return '<svg viewBox="0 0 60 60" style="position:absolute;width:6.5cqw;height:6.5cqw;' + style + '" aria-hidden="true">' +
+      '<path d="M2 58V14C2 7 7 2 14 2h44" fill="none" stroke="' + GOLD + '" stroke-width="1.6"/>' +
+      '<path d="M9 58V19c0-6 4-10 10-10h39" fill="none" stroke="' + GOLD + '" stroke-width=".8" opacity=".7"/>' +
+      '<circle cx="14" cy="14" r="2.4" fill="' + GOLD + '"/></svg>';
+  }
+
+  function signatureBlock(signer) {
+    var mark = signer.signature
+      ? '<img src="' + U.esc(signer.signature) + '" alt="Signature of ' + U.esc(signer.name) + '" style="display:block;max-width:19cqw;max-height:5.6cqw;margin:0 auto -.4cqw;object-fit:contain;mix-blend-mode:multiply;filter:grayscale(1) contrast(1.7) brightness(1.08)">'
+      : '<span style="display:block;font-family:\'Segoe Script\',\'Brush Script MT\',\'Lucida Handwriting\',cursive;font-size:3cqw;line-height:1.2;color:' + NAVY + ';white-space:nowrap">' + U.esc(signer.name) + '</span>';
+    return '<div style="text-align:center;min-width:20cqw">' + '<div style="height:6cqw;display:flex;align-items:flex-end;justify-content:center">' + mark + '</div>' +
+      '<div style="border-top:.14cqw solid ' + NAVY + ';margin-top:.5cqw;padding-top:.7cqw"><div style="font-size:1.45cqw;font-weight:700;color:' + NAVY + '">' + U.esc(signer.name) + '</div>' +
+      '<div style="font-size:1.2cqw;color:' + MUTED + ';margin-top:.15cqw">' + U.esc(signer.title) + '</div></div></div>';
+  }
+
   function render(c) {
     var s = U.state.site.settings;
+    var signer = c.signer || { name: s.founder, title: 'Founder, ' + s.brand, signature: '' };
     var d = new Date(c.issued_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    var host = location.host || 'skilltosuccess.org';
     return '<div class="cert shadow-pop" role="img" aria-label="Certificate of completion for ' + U.esc(c.name) + ', ' + U.esc(c.course.title) + ', ID ' + U.esc(c.code) + '">' +
-      '<div style="position:absolute;inset:0;background:linear-gradient(135deg,#F1F8FE 0%,#fff 45%,#FFF5EB 100%)"></div>' +
-      '<div style="position:absolute;left:0;top:0;bottom:0;width:2.2cqw;background:linear-gradient(180deg,#0A7BC2,#45A8E8 70%,#FF9A3D)"></div>' +
-      '<div style="position:absolute;inset:0;padding:6cqw 7cqw 6cqw 9cqw;display:flex;flex-direction:column">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:1.2cqw"><span style="width:4.4cqw;height:4.4cqw;display:block">' + U.LOGO_SVG + '</span>' +
-      '<span class="font-display" style="font-size:2.3cqw;font-weight:600;color:#0C2238">Skill<span style="color:#F27F1B">To</span>Success</span></div>' +
-      '<span style="font-size:1.45cqw;color:#64758A" class="tabular">ID ' + U.esc(c.code) + '</span></div>' +
-      '<div style="margin-top:5cqw"><p class="font-display" style="font-size:1.8cqw;color:#0A7BC2;font-weight:600">Certificate of completion</p>' +
-      '<p style="font-size:1.7cqw;color:#64758A;margin-top:2cqw">This certifies that</p>' +
-      '<p class="font-display" style="font-size:5.2cqw;line-height:1.05;font-weight:600;letter-spacing:-.02em;color:#0C2238;margin-top:.8cqw">' + U.esc(c.name) + '</p>' +
-      '<p style="font-size:1.7cqw;color:#64758A;margin-top:2cqw">has completed all ' + c.course.lesson_count + ' lessons and quizzes of</p>' +
-      '<p class="font-display" style="font-size:2.9cqw;font-weight:600;color:#075E95;margin-top:.6cqw">' + U.esc(c.course.title) + '</p>' +
-      '<p style="font-size:1.6cqw;color:#2B4560;margin-top:1.2cqw">Average quiz score ' + c.score + '%, issued on ' + d + '</p></div>' +
-      '<div style="margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:3cqw"><div style="display:flex;gap:5cqw">' +
-      sig(c.course.instructor || 'Instructor', 'Course instructor', 'M4 30c10-18 18-22 20-12s-6 14 2 4 14-20 18-10-4 16 6 8 12-14 18-6 6 4 14-2 16-6 30-4') +
-      sig(s.founder, 'Founder, ' + s.brand, 'M6 26c8-2 14-16 22-14s-8 18 2 16 10-14 18-12-2 10 8 8 14-10 22-8 10 6 30 2') + '</div>' +
-      '<div style="display:flex;align-items:center;gap:1.5cqw"><div style="text-align:right;font-size:1.2cqw;color:#64758A;line-height:1.35">Scan to verify<br>' + U.esc(location.host) + '</div><div style="width:9cqw;height:9cqw;padding:.6cqw;background:#fff;border:.12cqw solid #E3EAF2;border-radius:.6cqw">' + qr(c.code) + '</div></div></div></div>' +
-      '<div style="position:absolute;right:7cqw;top:14cqw;width:11cqw;height:11cqw;border-radius:50%;background:#FF9A3D;display:grid;place-items:center;box-shadow:0 0 0 .6cqw #FFF5EB,0 0 0 .8cqw #FFB774">' +
-      '<div style="text-align:center;color:#0C2238"><svg viewBox="0 0 32 32" style="width:4.2cqw;height:4.2cqw"><path d="M8 22.5 13.5 17l4 3 6.5-8.5" fill="none" stroke="#0C2238" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="font-display" style="font-size:1.2cqw;font-weight:700;margin-top:.2cqw">VERIFIED</div></div></div>' +
-      (c.revoked ? '<div style="position:absolute;inset:0;display:grid;place-items:center;background:rgba(255,255,255,.7)"><span class="font-display" style="font-size:6cqw;font-weight:700;color:#C2362B;transform:rotate(-12deg);border:.5cqw solid #C2362B;padding:1cqw 3cqw;border-radius:1cqw">REVOKED</span></div>' : '') +
+      // paper, watermark and frame
+      '<div style="position:absolute;inset:0;background:radial-gradient(120% 90% at 100% 0%,#FFF6E9 0%,rgba(255,255,255,0) 55%),radial-gradient(90% 80% at 0% 100%,#EEF6FD 0%,rgba(255,255,255,0) 55%),#FFFDF9"></div>' +
+      '<div style="position:absolute;right:-6cqw;bottom:-9cqw;width:46cqw;height:46cqw;opacity:.045">' + U.LOGO_SVG + '</div>' +
+      '<div style="position:absolute;inset:2.2cqw;border:.32cqw solid ' + NAVY + '"></div>' +
+      '<div style="position:absolute;inset:3cqw;border:.1cqw solid ' + GOLD + '"></div>' +
+      corner('left:3.6cqw;top:3.6cqw') + corner('right:3.6cqw;top:3.6cqw;transform:scaleX(-1)') +
+      corner('left:3.6cqw;bottom:3.6cqw;transform:scaleY(-1)') + corner('right:3.6cqw;bottom:3.6cqw;transform:scale(-1,-1)') +
+      // content
+      '<div style="position:absolute;inset:0;padding:6.4cqw 8cqw 5.6cqw;display:flex;flex-direction:column">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">' +
+        '<div style="display:flex;align-items:center;gap:1.2cqw"><span style="width:4.6cqw;height:4.6cqw;display:block;border-radius:.8cqw;overflow:hidden">' + U.LOGO_SVG + '</span>' +
+        '<div><div class="font-display" style="font-size:2.3cqw;font-weight:600;color:' + NAVY + ';line-height:1">Skill<span style="color:' + ORANGE + '">To</span>Success</div>' +
+        '<div style="font-size:1.05cqw;letter-spacing:.18em;color:' + MUTED + ';margin-top:.45cqw">LEARN · FINISH · GROW</div></div></div>' +
+        '<div style="text-align:right;font-size:1.15cqw;color:' + MUTED + ';line-height:1.5">Certificate ID<br><b class="tabular" style="font-size:1.45cqw;color:' + NAVY + ';letter-spacing:.04em">' + U.esc(c.code) + '</b></div></div>' +
+      '<div style="margin-top:3.6cqw;padding-right:16cqw">' +
+        '<div style="display:flex;align-items:center;gap:1.2cqw"><span style="width:3.5cqw;height:.3cqw;background:' + ORANGE + '"></span>' +
+        '<span class="font-display" style="font-size:1.55cqw;font-weight:700;letter-spacing:.32em;color:' + SKY + '">CERTIFICATE OF COMPLETION</span></div>' +
+        '<p style="font-size:1.6cqw;color:' + MUTED + ';margin-top:2.4cqw">This is to certify that</p>' +
+        '<p style="font-family:' + SERIF + ';font-size:5.4cqw;line-height:1.08;font-weight:700;color:' + NAVY + ';margin-top:.6cqw;letter-spacing:-.01em">' + U.esc(c.name) + '</p>' +
+        '<div style="width:34cqw;height:.12cqw;background:linear-gradient(90deg,' + GOLD + ',rgba(200,150,62,0));margin-top:1.2cqw"></div>' +
+        '<p style="font-size:1.6cqw;color:' + MUTED + ';margin-top:1.6cqw">has successfully completed the online course</p>' +
+        '<p class="font-display" style="font-size:2.75cqw;line-height:1.2;font-weight:600;color:#075E95;margin-top:.7cqw">' + U.esc(c.course.title) + '</p>' +
+        '<p style="font-size:1.4cqw;color:#2B4560;margin-top:1.3cqw">' + c.course.lesson_count + ' lessons and every lesson quiz passed &nbsp;·&nbsp; Average quiz score <b>' + c.score + '%</b> &nbsp;·&nbsp; Issued on <b>' + d + '</b></p>' +
+      '</div>' +
+      '<div style="margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:3cqw">' +
+        signatureBlock(signer) +
+        (c.course.instructor ? '<div style="text-align:center;min-width:16cqw"><div style="height:6cqw"></div><div style="border-top:.14cqw solid #B3C0CE;margin-top:.5cqw;padding-top:.7cqw"><div style="font-size:1.45cqw;font-weight:700;color:' + NAVY + '">' + U.esc(c.course.instructor) + '</div><div style="font-size:1.2cqw;color:' + MUTED + ';margin-top:.15cqw">Course instructor</div></div></div>' : '') +
+        '<div style="display:flex;align-items:center;gap:1.4cqw"><div style="text-align:right;font-size:1.1cqw;color:' + MUTED + ';line-height:1.45">Scan to verify<br><b style="color:' + NAVY + '">' + U.esc(host) + '/verify</b></div>' +
+        '<div style="width:8.6cqw;height:8.6cqw;padding:.6cqw;background:#fff;border:.12cqw solid #E3EAF2;border-radius:.6cqw">' + qr(c.code) + '</div></div>' +
+      '</div></div>' +
+      '<div style="position:absolute;right:8.5cqw;top:12.5cqw;width:13cqw;height:17cqw">' + seal() + '</div>' +
+      (c.revoked ? '<div style="position:absolute;inset:0;display:grid;place-items:center;background:rgba(255,255,255,.72)"><span class="font-display" style="font-size:6cqw;font-weight:700;color:#C2362B;transform:rotate(-12deg);border:.5cqw solid #C2362B;padding:1cqw 3cqw;border-radius:1cqw">REVOKED</span></div>' : '') +
       '</div>';
-  }
-  function sig(name, role, d) {
-    return '<div><svg viewBox="0 0 120 40" style="width:13cqw;height:4.2cqw"><path d="' + d + '" fill="none" stroke="#0C2238" stroke-width="2" stroke-linecap="round"/></svg><div style="border-top:.12cqw solid #B3C0CE;padding-top:.6cqw;font-size:1.35cqw"><b>' + U.esc(name) + '</b><br><span style="color:#64758A">' + U.esc(role) + '</span></div></div>';
   }
   return { render: render, verifyUrl: verifyUrl };
 })();
