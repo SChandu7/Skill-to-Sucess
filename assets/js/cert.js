@@ -37,9 +37,9 @@ STS.cert = (function () {
 
   function signatureBlock(signer) {
     var mark = signer.signature
-      ? '<img src="' + U.esc(signer.signature) + '" alt="Signature of ' + U.esc(signer.name) + '" style="display:block;max-width:19cqw;max-height:5.6cqw;margin:0 auto -.4cqw;object-fit:contain;mix-blend-mode:multiply;filter:grayscale(1) contrast(1.7) brightness(1.08)">'
+      ? '<img src="' + U.esc(signer.signature) + '" alt="Signature of ' + U.esc(signer.name) + '" style="display:block;max-width:24cqw;max-height:7.6cqw;margin:0 auto -.6cqw;object-fit:contain;mix-blend-mode:multiply;filter:contrast(1.2) brightness(1.05)">'
       : '<span style="display:block;font-family:\'Segoe Script\',\'Brush Script MT\',\'Lucida Handwriting\',cursive;font-size:3cqw;line-height:1.2;color:' + NAVY + ';white-space:nowrap">' + U.esc(signer.name) + '</span>';
-    return '<div style="text-align:center;min-width:20cqw">' + '<div style="height:6cqw;display:flex;align-items:flex-end;justify-content:center">' + mark + '</div>' +
+    return '<div style="text-align:center;min-width:22cqw">' + '<div style="height:7.8cqw;display:flex;align-items:flex-end;justify-content:center">' + mark + '</div>' +
       '<div style="border-top:.14cqw solid ' + NAVY + ';margin-top:.5cqw;padding-top:.7cqw"><div style="font-size:1.45cqw;font-weight:700;color:' + NAVY + '">' + U.esc(signer.name) + '</div>' +
       '<div style="font-size:1.2cqw;color:' + MUTED + ';margin-top:.15cqw">' + U.esc(signer.title) + '</div></div></div>';
   }
@@ -76,7 +76,7 @@ STS.cert = (function () {
       '</div>' +
       '<div style="margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:3cqw">' +
         signatureBlock(signer) +
-        (c.course.instructor ? '<div style="text-align:center;min-width:16cqw"><div style="height:6cqw"></div><div style="border-top:.14cqw solid #B3C0CE;margin-top:.5cqw;padding-top:.7cqw"><div style="font-size:1.45cqw;font-weight:700;color:' + NAVY + '">' + U.esc(c.course.instructor) + '</div><div style="font-size:1.2cqw;color:' + MUTED + ';margin-top:.15cqw">Course instructor</div></div></div>' : '') +
+        (c.course.instructor ? '<div style="text-align:center;min-width:16cqw"><div style="height:7.8cqw"></div><div style="border-top:.14cqw solid #B3C0CE;margin-top:.5cqw;padding-top:.7cqw"><div style="font-size:1.45cqw;font-weight:700;color:' + NAVY + '">' + U.esc(c.course.instructor) + '</div><div style="font-size:1.2cqw;color:' + MUTED + ';margin-top:.15cqw">Course instructor</div></div></div>' : '') +
         '<div style="display:flex;align-items:center;gap:1.4cqw"><div style="text-align:right;font-size:1.1cqw;color:' + MUTED + ';line-height:1.45">Scan to verify<br><b style="color:' + NAVY + '">' + U.esc(host) + '/verify</b></div>' +
         '<div style="width:8.6cqw;height:8.6cqw;padding:.6cqw;background:#fff;border:.12cqw solid #E3EAF2;border-radius:.6cqw">' + qr(c.code) + '</div></div>' +
       '</div></div>' +
