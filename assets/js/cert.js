@@ -62,7 +62,8 @@ STS.cert = (function () {
       '<div style="display:flex;justify-content:space-between;align-items:flex-start">' +
         '<div style="display:flex;align-items:center;gap:1.2cqw"><span style="width:4.6cqw;height:4.6cqw;display:block;border-radius:.8cqw;overflow:hidden">' + U.LOGO_SVG + '</span>' +
         '<div><div class="font-display" style="font-size:2.3cqw;font-weight:600;color:' + NAVY + ';line-height:1">Skill<span style="color:' + ORANGE + '">To</span>Success</div>' +
-        '<div style="font-size:1.05cqw;letter-spacing:.18em;color:' + MUTED + ';margin-top:.45cqw">LEARN · FINISH · GROW</div></div></div>' +
+        '<div style="font-size:1.05cqw;letter-spacing:.18em;color:' + MUTED + ';margin-top:.45cqw">LEARN · FINISH · GROW</div>' +
+        (s.msme && s.msme.number ? '<div style="font-size:1cqw;color:' + MUTED + ';margin-top:.4cqw">Govt. of India registered MSME · ' + U.esc(s.msme.number) + '</div>' : '') + '</div></div>' +
         '<div style="text-align:right;font-size:1.15cqw;color:' + MUTED + ';line-height:1.5">Certificate ID<br><b class="tabular" style="font-size:1.45cqw;color:' + NAVY + ';letter-spacing:.04em">' + U.esc(c.code) + '</b></div></div>' +
       '<div style="margin-top:3.6cqw;padding-right:16cqw">' +
         '<div style="display:flex;align-items:center;gap:1.2cqw"><span style="width:3.5cqw;height:.3cqw;background:' + ORANGE + '"></span>' +

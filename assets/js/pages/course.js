@@ -11,7 +11,17 @@
   });
 
   function render(st, c) {
-    document.title = c.title + ' | SkillToSuccess';
+    var niceTitle = c.title.toLowerCase().replace(/(^|[\s&+/-])([a-z])/g, function (m, a, b) { return a + b.toUpperCase(); });
+    U.seo({
+      title: niceTitle + ' course online with certificate | Skill To Success',
+      description: (c.short_description || c.title) + ' Learn ' + niceTitle + ' on Skill To Success: ' + c.lesson_count + ' short lessons, a quiz after each one, free preview lessons and a verifiable certificate.',
+      image: c.cover || undefined,
+      path: 'course.html?c=' + encodeURIComponent(c.slug),
+      jsonld: { '@context': 'https://schema.org', '@type': 'Course', name: niceTitle, description: c.short_description || c.title,
+        url: 'https://skilltosuccess.org/course.html?c=' + encodeURIComponent(c.slug), inLanguage: c.language || 'en', image: c.cover || undefined,
+        educationalLevel: c.level, numberOfLessons: c.lesson_count, isAccessibleForFree: false,
+        provider: { '@type': 'EducationalOrganization', name: 'Skill To Success', sameAs: 'https://skilltosuccess.org/' } }
+    });
     var meta = document.querySelector('meta[name="description"]'); if (meta) meta.setAttribute('content', c.short_description + ' ' + c.lesson_count + ' lessons, free previews and a verified certificate.');
     var me = st.me, owned = !!(c.me && c.me.owned), done = (c.me && c.me.done) || {};
     var lessons = c.modules.reduce(function (a, m) { return a.concat(m.lessons); }, []);

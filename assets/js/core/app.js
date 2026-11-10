@@ -196,7 +196,7 @@ STS.ui = (function () {
       col('Company', [['About us', 'about.html'], ['Refer & earn', 'index.html#refer'], ['Help & FAQ', 'help.html'], ['Contact', 'contact.html']]) +
       col('Policies', [['Terms of use', 'legal.html#terms'], ['Refund policy', 'legal.html#refund'], ['Referral terms', 'legal.html#referral'], ['Privacy policy', 'legal.html#privacy']]) +
       '</div><div class="mt-12 flex flex-col gap-4 border-t border-line pt-6 text-sm text-ink-500 sm:flex-row sm:items-center sm:justify-between">' +
-      '<p>© ' + new Date().getFullYear() + ' ' + esc(s.brand) + '. Payments secured by Razorpay. Prices include GST.</p>' +
+      '<div class="space-y-1.5"><p>© ' + new Date().getFullYear() + ' ' + esc(s.brand) + '. Payments secured by Razorpay. Prices include GST.</p>' + msmeBadge('line') + '</div>' +
       '<p class="flex items-center gap-2">' + icon('shield-check', 'text-sky-600') + 'Referral cashback is one level only. No chains, no targets.</p></div></div></footer>';
   }
 
@@ -397,6 +397,54 @@ STS.ui = (function () {
     }
   }
 
+  /* ---------- per-page SEO for pages filled in by JavaScript (course pages) ---------- */
+  var SITE_URL = 'https://skilltosuccess.org/';
+  function seo(o) {
+    function meta(attr, key, val) {
+      var el = document.head.querySelector('meta[' + attr + '="' + key + '"]');
+      if (!el) { el = document.createElement('meta'); el.setAttribute(attr, key); document.head.appendChild(el); }
+      el.setAttribute('content', val);
+    }
+    if (o.title) { document.title = o.title; meta('property', 'og:title', o.title); meta('name', 'twitter:title', o.title); }
+    if (o.description) { meta('name', 'description', o.description); meta('property', 'og:description', o.description); meta('name', 'twitter:description', o.description); }
+    if (o.image) { meta('property', 'og:image', o.image); meta('name', 'twitter:image', o.image); }
+    if (o.path) {
+      var url = SITE_URL + o.path, link = document.head.querySelector('link[rel="canonical"]');
+      if (!link) { link = document.createElement('link'); link.rel = 'canonical'; document.head.appendChild(link); }
+      link.href = url; meta('property', 'og:url', url);
+    }
+    if (o.jsonld) {
+      var tag = document.getElementById('page-jsonld') || document.createElement('script');
+      tag.type = 'application/ld+json'; tag.id = 'page-jsonld'; tag.textContent = JSON.stringify(o.jsonld);
+      if (!tag.parentNode) document.head.appendChild(tag);
+    }
+  }
+
+  /* ---------- government registration badge (Admin → Site settings → MSME) ---------- */
+  function msmeBadge(kind) {
+    var m = state.site && state.site.settings.msme;
+    if (!m) return '';
+    var num = m.number ? '<span class="tabular">' + esc(m.number) + '</span>' : '';
+    if (kind === 'pill') {
+      return '<span class="inline-flex items-center gap-2">' + icon('shield-check', 'text-good-600') + 'Registered MSME (Udyam) · Govt. of India</span>';
+    }
+    if (kind === 'line') {
+      return '<p class="flex flex-wrap items-center gap-2">' + icon('landmark', 'text-sky-600') + 'Registered MSME (Udyam), Ministry of MSME, Govt. of India' + (num ? ' · ' + num : '') + '</p>';
+    }
+    var links = (m.certificate ? '<a class="btn btn-primary btn-sm" target="_blank" rel="noopener" href="' + esc(m.certificate) + '">' + icon('file-text', 'i-sm') + 'View certificate</a>' : '') +
+      (m.number ? '<a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="' + esc(m.verify_url) + '">' + icon('external-link', 'i-sm') + 'Verify on the Udyam portal</a>' : '');
+    return '<div class="flex flex-col gap-5 rounded-3xl border border-line bg-white p-6 shadow-card sm:flex-row sm:items-center sm:p-8">' +
+      '<span class="grid h-16 w-16 flex-none place-items-center rounded-2xl bg-good-50 text-good-700">' + icon('landmark', 'i-lg') + '</span>' +
+      '<div class="min-w-0 flex-1"><p class="eyebrow !mb-1">Government registered</p><h2 class="text-2xl">Registered MSME (Udyam)</h2>' +
+      '<p class="mt-2 text-[15px] text-ink-600">' + esc(state.site.settings.brand) + ' is registered' + (m.category ? ' as a ' + esc(m.category.toLowerCase()) + ' enterprise' : '') +
+      ' under Udyam, the official MSME registration of the Ministry of Micro, Small and Medium Enterprises, Government of India.</p>' +
+      (num ? '<p class="mt-3 text-sm text-ink-500">Udyam Registration Number <b class="text-ink-900">' + num + '</b></p>' : '') +
+      (links ? '<div class="mt-4 flex flex-wrap gap-2">' + links + '</div>' : '') + '</div></div>';
+  }
+  function fillBadges() {
+    $$('[data-msme]').forEach(function (el) { var html = msmeBadge(el.dataset.msme); el.innerHTML = html; el.hidden = !html; });
+  }
+
   function boot(opts) {
     opts = opts || {};
     if (booted) return booted;
@@ -407,6 +455,7 @@ STS.ui = (function () {
         throw new Error('maintenance');
       }
       if (!opts.noShell) { header(opts); footer(); poster(); }
+      fillBadges();
       captureRef();
       if (STS.chat && !opts.noChat) STS.chat.mount();
       return state;
@@ -423,7 +472,7 @@ STS.ui = (function () {
     shuffle: shuffle, param: param, savedRef: savedRef, owned: owned, progress: progress, cheapestPackageFor: cheapestPackageFor,
     packageCovers: packageCovers, packageCourseCount: packageCourseCount, packageCourseLine: packageCourseLine,
     courseReward: courseReward, gstLine: gstLine, setMe: setMe, refreshMe: refreshMe,
-    header: header, toast: toast, modal: modal, signupCode: signupCode, CODE_FIELD: CODE_FIELD, resendTimer: resendTimer, onlyDigits: onlyDigits, unlock: unlock, cover: cover, stars: stars, proof: proof, courseCard: courseCard, confetti: confetti,
+    header: header, msmeBadge: msmeBadge, seo: seo, toast: toast, modal: modal, signupCode: signupCode, CODE_FIELD: CODE_FIELD, resendTimer: resendTimer, onlyDigits: onlyDigits, unlock: unlock, cover: cover, stars: stars, proof: proof, courseCard: courseCard, confetti: confetti,
     accordions: accordions, copy: copy, busy: busy, fieldError: fieldError, failure: failure, requireAuth: requireAuth, boot: boot
   };
 })();
