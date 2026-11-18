@@ -445,7 +445,17 @@ STS.ui = (function () {
     $$('[data-msme]').forEach(function (el) { var html = msmeBadge(el.dataset.msme); el.innerHTML = html; el.hidden = !html; });
   }
 
+  /* Counts website visits on api.chandus7.in (once per browser session). Nothing about the visitor is sent. */
+  function trackVisit() {
+    try { if (sessionStorage.getItem('sts:tracked')) return; sessionStorage.setItem('sts:tracked', '1'); } catch (e) { /* */ }
+    try {
+      fetch('https://api.chandus7.in/api/track-visit/', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ app_name: 'Skill To Success' }), keepalive: true, credentials: 'omit' }).catch(function () { /* */ });
+    } catch (e) { /* */ }
+  }
+
   function boot(opts) {
+    trackVisit();
     opts = opts || {};
     if (booted) return booted;
     booted = Promise.all([loadSite(), loadMe()]).then(function (r) {
