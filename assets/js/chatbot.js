@@ -41,7 +41,7 @@ STS.chat = (function () {
   var intents = [
     { id: 'human', re: /human|person|agent|call|phone|whatsapp|contact|support|talk to/, a: function () { var s = S().settings; return 'Our team is available ' + U.esc(s.hours) + ':<br>• Phone / WhatsApp: <b>' + U.esc(s.phone) + '</b><br>• Email: <b>' + U.esc(s.email) + '</b><br><a href="https://wa.me/' + s.whatsapp + '" target="_blank" rel="noopener">Open WhatsApp chat</a> or use the <a href="contact.html">contact form</a>.'; } },
     { id: 'guarantee', re: /guarantee|job guarantee|income|salary|how much can i earn|per month|mlm|scam|chain|level/, a: function () { return 'Straight answer: we sell courses, not income. There is no guaranteed job or earning.<br>Refer & earn is <b>one level only</b>. You get cashback when a friend buys with your code, and that is where it stops. No teams, no levels, no targets.'; } },
-    { id: 'withdraw', re: /withdraw|payout|upi id|bank|transfer|redeem|cash out/, a: function () { var r = R(); return 'Withdrawals go to your UPI ID:<br>• Minimum ' + U.inr(r.min_withdraw) + '<br>• Cashback is held ' + r.hold_days + ' days (refund window)' + (r.learn_first ? '<br>• Complete at least one course to unlock withdrawals' : '') + '<br>• Paid within ' + r.payout_hours + ' hours of your request' +
+    { id: 'withdraw', re: /withdraw|payout|upi id|bank|transfer|redeem|cash out/, a: function () { var r = R(); return 'Withdrawals go to your UPI ID:<br>• Minimum ' + U.inr(r.min_withdraw) + (r.hold_days ? '<br>• Cashback is held ' + r.hold_days + ' days (refund window)' : '<br>• Cashback shows in your wallet straight away') + (r.learn_first ? '<br>• Complete at least one course to unlock withdrawals' : '') + '<br>• Paid within ' + r.payout_hours + ' hours of your request' +
       (r.withdraw_play_cap ? '<br>• Only ' + U.inr(r.withdraw_play_cap) + ' of a withdrawal can be Play &amp; earn money — the rest comes from finished courses and referrals' : '') +
       '<br><a href="dashboard.html#wallet">Open your wallet</a>'; } },
     { id: 'refer', re: /refer|referral|cashback|commission|invite|share code|my code/, a: function () {
@@ -63,7 +63,7 @@ STS.chat = (function () {
       if (!cr.enabled) return 'Finish your lessons and you earn a certificate for each course.';
       return 'Finish a course and money goes to your wallet. Bigger packages pay more per course:<br>' +
         S().packages.map(function (p) { return '• ' + U.esc(p.name) + ' (' + U.inr(p.price) + '): cashback for every course you finish'; }).join('<br>') +
-        '<br>It counts when you pass every lesson quiz, waits ' + cr.hold_days + ' days, then you can withdraw it.<br><a href="packages.html#calc-h">Try the cashback calculator</a>';
+        '<br>It counts when you pass every lesson quiz and goes straight to your wallet.<br><a href="packages.html#calc-h">Try the cashback calculator</a>';
     } },
     { id: 'gst', re: /gst|tax|invoice|bill|extra charge/, a: function () {
       var g = S().settings.gst || {};

@@ -88,7 +88,7 @@
     U.$('#refer-range').textContent = Math.min.apply(null, rates) + '–' + Math.max.apply(null, rates) + '% cashback';
     U.$('#refer-lead').textContent = 'After your first purchase you get a personal code. Friends who use it save ' + U.inr(R.friend_discount) + ' on their first package, and you get cashback on the package they buy. That is the whole programme.';
     U.$('#refer-rules').innerHTML = [
-      ['clock', 'Cashback is held ' + R.hold_days + ' days while the refund window is open.'],
+      ['clock', R.hold_days ? 'Cashback is held ' + R.hold_days + ' days while the refund window is open.' : 'Cashback lands in your wallet straight away.'],
       R.learn_first ? ['graduation-cap', 'It unlocks after you complete your first course. Learn first, then earn.'] : null,
       ['indian-rupee', 'Withdraw to any UPI ID from ' + U.inr(R.min_withdraw) + ', paid in ' + R.payout_days + ' working days.'],
       ['shield-check', 'No purchase is ever needed to keep your account or access.']
@@ -152,7 +152,7 @@
         }
         host.innerHTML = rows.map(function (r) {
           var right = cur === 'earners'
-            ? '<p class="font-display text-xl font-semibold tabular text-good-600">' + U.inr(r.earned) + '</p><p class="text-xs text-ink-500">' + (r.friends ? r.friends + ' friend' + (r.friends === 1 ? '' : 's') + ' referred' : 'from courses') + '</p>'
+            ? '<p class="font-display text-xl font-semibold tabular text-good-600">' + U.inr(r.earned) + '</p><p class="text-xs text-ink-500">' + (U.earnSplit(r.breakdown) || 'Total earned') + '</p>'
             : '<p class="font-display text-xl font-semibold tabular">' + r.courses + ' <span class="text-sm font-medium text-ink-500">course' + (r.courses === 1 ? '' : 's') + '</span></p><p class="text-xs text-ink-500">' + U.num(r.lessons) + ' lessons done</p>';
           return '<li class="flex items-center gap-4 rounded-2xl border border-line bg-white p-4">' +
             '<span class="grid h-9 w-9 flex-none place-items-center rounded-full text-sm font-bold ' + (MEDAL[r.rank - 1] || 'bg-cloud text-ink-600') + '">' + r.rank + '</span>' + U.avatar(r.name, 40) +

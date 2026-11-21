@@ -420,6 +420,13 @@ STS.ui = (function () {
     }
   }
 
+  /* ---------- how a top earner's total is made up (courses, referrals, bonuses, starter bonus) ---------- */
+  function earnSplit(b) {
+    if (!b) return '';
+    return [['courses', 'Courses'], ['referrals', 'Referrals'], ['bonuses', 'Bonuses'], ['starter', 'Starter']]
+      .filter(function (x) { return b[x[0]] > 0; }).map(function (x) { return x[1] + ' ' + inr(b[x[0]]); }).join(' · ');
+  }
+
   /* ---------- government registration badge (Admin → Site settings → MSME) ---------- */
   function msmeBadge(kind) {
     var m = state.site && state.site.settings.msme;
@@ -454,8 +461,44 @@ STS.ui = (function () {
     } catch (e) { /* */ }
   }
 
+  /* ---------- usage tracking for the /track panel: page views, clicks, time on page ----------
+   * Anonymous visitor id (this browser) + session id (this tab visit). Logged-in learners are linked by their token.
+   * Nothing typed into forms is ever sent. */
+  var TRACK_URL = STS.config.API_BASE + '/track/collect/', tq = [], tTimer = null;
+  function tId(store, key) {
+    try { var v = store.getItem(key); if (!v) { v = Math.random().toString(36).slice(2) + Date.now().toString(36); store.setItem(key, v); } return v; } catch (e) { return 'x' + Date.now().toString(36); }
+  }
+  function tSend(beacon) {
+    if (!tq.length) return;
+    var body = JSON.stringify({ v: tId(localStorage, 'sts:vid'), s: tId(sessionStorage, 'sts:sid'), t: A.token ? A.token() : null, e: tq.splice(0, 30) });
+    try {
+      if (beacon && navigator.sendBeacon && navigator.sendBeacon(TRACK_URL, new Blob([body], { type: 'text/plain' }))) return;
+      fetch(TRACK_URL, { method: 'POST', body: body, headers: { 'Content-Type': 'text/plain' }, keepalive: true, credentials: 'omit' }).catch(function () { /* */ });
+    } catch (e) { /* tracking must never break the site */ }
+  }
+  function tPush(e) { e.p = location.pathname; tq.push(e); clearTimeout(tTimer); tTimer = setTimeout(tSend, 2500); }
+  var tracking = false;
+  function startTracking() {
+    if (tracking || /\/(track|admin)\//.test(location.pathname)) return;
+    tracking = true;
+    setTimeout(function () { tPush({ k: 'view', q: location.search.slice(0, 200), ti: document.title, r: document.referrer, w: screen.width || 0 }); }, 1200);
+    document.addEventListener('click', function (ev) {
+      var el = ev.target.closest && ev.target.closest('a,button,[role="tab"]');
+      if (!el) return;
+      var label = (el.getAttribute('aria-label') || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 80);
+      var href = el.tagName === 'A' ? (el.getAttribute('href') || '') : '';
+      if (label || href) tPush({ k: 'click', l: label + (href && href.charAt(0) !== '#' ? ' → ' + href.slice(0, 60) : '') });
+    }, true);
+    var shown = Date.now();
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'hidden') { tq.push({ k: 'leave', p: location.pathname, d: Math.round((Date.now() - shown) / 1000) }); tSend(true); }
+      else shown = Date.now();
+    });
+  }
+
   function boot(opts) {
     trackVisit();
+    startTracking();
     opts = opts || {};
     if (booted) return booted;
     booted = Promise.all([loadSite(), loadMe()]).then(function (r) {
@@ -482,7 +525,7 @@ STS.ui = (function () {
     shuffle: shuffle, param: param, savedRef: savedRef, owned: owned, progress: progress, cheapestPackageFor: cheapestPackageFor,
     packageCovers: packageCovers, packageCourseCount: packageCourseCount, packageCourseLine: packageCourseLine,
     courseReward: courseReward, gstLine: gstLine, setMe: setMe, refreshMe: refreshMe,
-    header: header, msmeBadge: msmeBadge, seo: seo, toast: toast, modal: modal, signupCode: signupCode, CODE_FIELD: CODE_FIELD, resendTimer: resendTimer, onlyDigits: onlyDigits, unlock: unlock, cover: cover, stars: stars, proof: proof, courseCard: courseCard, confetti: confetti,
+    header: header, msmeBadge: msmeBadge, earnSplit: earnSplit, seo: seo, toast: toast, modal: modal, signupCode: signupCode, CODE_FIELD: CODE_FIELD, resendTimer: resendTimer, onlyDigits: onlyDigits, unlock: unlock, cover: cover, stars: stars, proof: proof, courseCard: courseCard, confetti: confetti,
     accordions: accordions, copy: copy, busy: busy, fieldError: fieldError, failure: failure, requireAuth: requireAuth, boot: boot
   };
 })();

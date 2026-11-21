@@ -96,6 +96,7 @@ STS.api = (function () {
     request: request, get: get, post: post, patch: patch, del: del,
     guestKey: guestKey, maybeLoggedIn: maybeLoggedIn, clearSession: clearSession, refresh: refresh,
     hasToken: function () { return !!access; },
+    token: function () { return access; },
     absolute: absolute,
 
     // Public

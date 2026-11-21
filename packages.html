@@ -59,7 +59,7 @@
 <link rel="apple-touch-icon" href="logo.jpeg">
 <link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/app.css?v=15">
+<link rel="stylesheet" href="assets/css/app.css?v=16">
 <!--/HEAD-->
 </head>
 <body class="flex min-h-screen flex-col">
@@ -126,12 +126,12 @@
 </main>
 <div id="site-footer"></div>
 <!--CORE-->
-<script src="assets/js/core/icons.js?v=15"></script>
-<script src="assets/js/core/config.js?v=15"></script>
-<script src="assets/js/core/api.js?v=15"></script>
-<script src="assets/js/core/app.js?v=15"></script>
+<script src="assets/js/core/icons.js?v=16"></script>
+<script src="assets/js/core/config.js?v=16"></script>
+<script src="assets/js/core/api.js?v=16"></script>
+<script src="assets/js/core/app.js?v=16"></script>
 <!--/CORE-->
-<script src="assets/js/chatbot.js?v=15"></script>
+<script src="assets/js/chatbot.js?v=16"></script>
 <script>
 (function () {
   var U = STS.ui, A = STS.api;
@@ -224,7 +224,7 @@
           row('Monthly milestone', mb.reached ? mb.reached + ' friends in one month' : (mb.tiers[0] ? 'Reach ' + mb.tiers[0].friends + ' friends in a month' : 'Not running'), mb.total);
         var g = d.package.gst;
         U.$('#cc-gst').textContent = 'The ' + U.inr(d.package.price) + ' price already includes ' + U.inr(g.tax) + ' GST at ' + g.percent + '%. Nothing is added at checkout.';
-        U.$('#cc-note').innerHTML = 'Cashback waits ' + d.rules.hold_days + ' days (the refund window)' +
+        U.$('#cc-note').innerHTML = (d.rules.hold_days ? 'Cashback waits ' + d.rules.hold_days + ' days (the refund window)' : 'Cashback goes straight to your wallet') +
           (d.rules.learn_first ? ' and unlocks after you finish one course' : '') +
           '. Withdraw from ' + U.inr(d.rules.min_withdraw) + ' to UPI, paid within ' + d.rules.payout_hours + ' hours. ' +
           '<b>This is a calculator, not a promise</b> — you only earn if friends actually buy.';

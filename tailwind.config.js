@@ -1,6 +1,6 @@
 /** SkillToSuccess design tokens — sky blue + light orange on white.  Build: npm run build:css */
 module.exports = {
-  content: ['./*.html', './admin/**/*.{html,js}', './assets/js/**/*.js'],
+  content: ['./*.html', './admin/**/*.{html,js}', './track/**/*.html', './assets/js/**/*.js'],
   theme: {
     container: { center: true, padding: { DEFAULT: '1rem', sm: '1.5rem', lg: '2rem' }, screens: { xl: '1560px' } },
     extend: {

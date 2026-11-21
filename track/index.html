@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Visitor tracking | Skill To Success</title>
+<link rel="icon" href="../logo.jpeg">
+<link rel="stylesheet" href="../assets/css/app.css?v=16">
+<style>
+  .bar { transition: height .3s; }
+  .tl-dot { width: .7rem; height: .7rem; border-radius: 999px; flex: none; margin-top: .35rem; }
+</style>
+</head>
+<body class="min-h-screen bg-cloud">
+
+<!-- passcode -->
+<main id="gate" class="grid min-h-screen place-items-center px-4">
+  <form id="gate-form" class="w-full max-w-sm rounded-3xl border border-line bg-white p-8 text-center shadow-card" autocomplete="off">
+    <img src="../logo.jpeg" alt="" class="mx-auto h-14 w-14 rounded-2xl object-cover">
+    <h1 class="mt-4 text-2xl">Visitor tracking</h1>
+    <p class="mt-1 text-sm text-ink-500">Skill To Success · private panel</p>
+    <label for="pc" class="label mt-6 text-left">Passcode</label>
+    <input id="pc" class="input text-center font-display text-2xl tracking-widest" type="password" inputmode="numeric" maxlength="20" required>
+    <p id="gate-err" class="error mt-2 hidden"></p>
+    <button class="btn btn-primary btn-block mt-5">Open panel</button>
+  </form>
+</main>
+
+<!-- dashboard -->
+<div id="app" hidden>
+  <header class="sticky top-0 z-20 border-b border-line bg-white/95 backdrop-blur">
+    <div class="container flex flex-wrap items-center justify-between gap-3 py-3">
+      <div class="flex items-center gap-3"><img src="../logo.jpeg" alt="" class="h-9 w-9 rounded-xl object-cover"><div><p class="font-display font-semibold leading-tight">Visitor tracking</p><p class="text-xs text-ink-500" id="updated">Loading…</p></div></div>
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="seg" id="range"><button data-d="1">Today</button><button data-d="7" aria-pressed="true">7 days</button><button data-d="30">30 days</button><button data-d="90">90 days</button></div>
+        <button class="btn btn-ghost btn-sm" id="refresh">Refresh</button>
+        <button class="btn btn-ghost btn-sm" id="lock">Lock</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container space-y-6 py-6">
+    <section class="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8" id="kpis"></section>
+
+    <section class="grid gap-6 xl:grid-cols-3">
+      <div class="rounded-3xl border border-line bg-white p-5 xl:col-span-2">
+        <div class="flex items-center justify-between"><h2 class="text-lg">Visitors and page views</h2><p class="flex items-center gap-3 text-xs text-ink-500"><span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-sm bg-sky-600"></span>Visitors</span><span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-sm bg-orange-300"></span>Page views</span></p></div>
+        <div class="mt-4 flex h-56 items-end gap-1" id="chart"></div>
+        <div class="mt-2 flex justify-between text-[11px] text-ink-400" id="chart-x"></div>
+      </div>
+      <div class="rounded-3xl border border-line bg-white p-5">
+        <div class="flex items-center justify-between"><h2 class="flex items-center gap-2 text-lg"><span class="h-2.5 w-2.5 animate-pulse rounded-full bg-good-500"></span>Live now</h2><span class="text-xs text-ink-500">last 5 min · auto refresh</span></div>
+        <ul class="mt-3 divide-y divide-line" id="live"></ul>
+      </div>
+    </section>
+
+    <section class="grid gap-6 xl:grid-cols-2">
+      <div class="rounded-3xl border border-line bg-white p-5"><h2 class="text-lg">Top pages</h2><div class="mt-3 overflow-x-auto"><table class="tbl w-full text-sm" id="pages"></table></div></div>
+      <div class="rounded-3xl border border-line bg-white p-5"><h2 class="text-lg">What people click</h2><div class="mt-3 overflow-x-auto"><table class="tbl w-full text-sm" id="clicks"></table></div></div>
+    </section>
+
+    <section class="grid gap-6 md:grid-cols-3">
+      <div class="rounded-3xl border border-line bg-white p-5"><h2 class="text-lg">Where visitors come from</h2><ul class="mt-3 space-y-2" id="refs"></ul></div>
+      <div class="rounded-3xl border border-line bg-white p-5"><h2 class="text-lg">Devices</h2><ul class="mt-3 space-y-2" id="devices"></ul></div>
+      <div class="rounded-3xl border border-line bg-white p-5"><h2 class="text-lg">Browsers</h2><ul class="mt-3 space-y-2" id="browsers"></ul></div>
+    </section>
+
+    <section class="rounded-3xl border border-line bg-white p-5">
+      <div class="flex flex-wrap items-center justify-between gap-2"><h2 class="text-lg">Visits (newest first)</h2><p class="text-xs text-ink-500">Click a visit to see every step that person took</p></div>
+      <div class="mt-3 overflow-x-auto"><table class="tbl w-full min-w-[820px] text-sm" id="sessions"></table></div>
+    </section>
+
+    <section class="grid gap-6 xl:grid-cols-2">
+      <div class="rounded-3xl border border-line bg-white p-5"><h2 class="text-lg">Logged-in learners</h2><div class="mt-3 overflow-x-auto"><table class="tbl w-full text-sm" id="users"></table></div></div>
+      <div class="rounded-3xl border border-line bg-white p-5"><h2 class="text-lg">Activity feed</h2><ul class="mt-3 max-h-[480px] divide-y divide-line overflow-y-auto pr-1 text-sm" id="recent"></ul></div>
+    </section>
+  </main>
+</div>
+
+<!-- one visit -->
+<div id="drawer" class="fixed inset-0 z-50 hidden bg-ink-900/40" role="dialog" aria-modal="true">
+  <div class="absolute inset-y-0 right-0 flex w-full max-w-lg flex-col bg-white shadow-pop">
+    <div class="flex items-start justify-between border-b border-line p-5"><div><p class="text-xs text-ink-500">Visit timeline</p><h2 class="text-xl" id="d-who"></h2><p class="text-sm text-ink-500" id="d-sub"></p></div><button class="btn btn-ghost btn-sm" id="d-close">Close</button></div>
+    <ol class="flex-1 space-y-4 overflow-y-auto p-5" id="d-list"></ol>
+  </div>
+</div>
+
+<script src="../assets/js/core/config.js?v=16"></script>
+<script>
+(function () {
+  'use strict';
+  var API = STS.config.API_BASE + '/track/stats/', KEY = 'sts:trackpass', days = 7, data = null, timer = null;
+  function $(s) { return document.querySelector(s); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function num(n) { return Math.round(Number(n) || 0).toLocaleString('en-IN'); }
+  function dur(s) { s = Math.round(s || 0); if (s < 60) return s + 's'; if (s < 3600) return Math.floor(s / 60) + 'm ' + (s % 60) + 's'; return Math.floor(s / 3600) + 'h ' + Math.floor(s % 3600 / 60) + 'm'; }
+  function when(v) { return new Date(v).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }); }
+  function ago(v) { var s = Math.max(1, Math.round((Date.now() - new Date(v)) / 1000)); return s < 60 ? s + 's ago' : s < 3600 ? Math.round(s / 60) + ' min ago' : s < 86400 ? Math.round(s / 3600) + ' h ago' : when(v); }
+  function page(p) { return p === '/' || p === '/index.html' ? 'Home' : p.replace(/^\//, '').replace('.html', ''); }
+  function pass() { try { return sessionStorage.getItem(KEY) || ''; } catch (e) { return ''; } }
+
+  function call(body) {
+    body.passcode = pass();
+    return fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(body), credentials: 'omit' })
+      .then(function (r) { return r.json().then(function (j) { if (!r.ok) { var e = new Error(j.detail || 'Could not load'); e.status = r.status; throw e; } return j; }); });
+  }
+
+  // ---------------------------------------------------------------- gate
+  function showGate(msg) {
+    clearInterval(timer); $('#app').hidden = true; $('#gate').hidden = false;
+    var e = $('#gate-err'); e.textContent = msg || ''; e.classList.toggle('hidden', !msg); $('#pc').value = ''; $('#pc').focus();
+  }
+  $('#gate-form').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    try { sessionStorage.setItem(KEY, $('#pc').value.trim()); } catch (e) { /* */ }
+    load(true);
+  });
+  $('#lock').addEventListener('click', function () { try { sessionStorage.removeItem(KEY); } catch (e) { /* */ } showGate(); });
+
+  // ---------------------------------------------------------------- dashboard
+  function load(first) {
+    $('#updated').textContent = 'Loading…';
+    call({ days: days }).then(function (d) {
+      data = d; $('#gate').hidden = true; $('#app').hidden = false; render();
+      if (first) { clearInterval(timer); timer = setInterval(function () { if (!document.hidden) load(false); }, 20000); }
+    }, function (err) { if (err.status === 403 || err.status === 429) showGate(err.message); else $('#updated').textContent = err.message; });
+  }
+
+  function bars(list, key, total) {
+    return list.length ? list.map(function (x) {
+      var pct = total ? Math.round(x.count * 100 / total) : 0;
+      return '<li><div class="flex justify-between text-sm"><span class="capitalize">' + esc(x[key] || 'unknown') + '</span><b class="tabular">' + num(x.count) + ' <span class="font-normal text-ink-400">' + pct + '%</span></b></div><div class="meter mt-1"><span style="width:' + pct + '%"></span></div></li>';
+    }).join('') : '<li class="text-sm text-ink-500">No data yet.</li>';
+  }
+
+  function render() {
+    var k = data.kpis;
+    $('#updated').textContent = 'Updated ' + new Date(data.generated_at).toLocaleTimeString('en-IN') + ' · last ' + (data.days === 1 ? 'day' : data.days + ' days');
+    $('#kpis').innerHTML = [['Live now', k.live_now, 'text-good-600'], ['Visitors today', k.visitors_today], ['Visitors', k.visitors], ['Visits', k.sessions],
+      ['Page views', k.views], ['Pages per visit', k.avg_pages_per_visit], ['Avg time on a page', dur(k.avg_time_per_page)], ['Logged-in learners', k.logged_in_users]]
+      .map(function (x) { return '<div class="rounded-2xl border border-line bg-white p-4"><p class="text-xs text-ink-500">' + x[0] + '</p><p class="mt-1 font-display text-2xl font-semibold tabular ' + (x[2] || '') + '">' + (typeof x[1] === 'number' ? num(x[1]) : x[1]) + '</p></div>'; }).join('');
+
+    var s = data.series, max = Math.max.apply(null, s.map(function (x) { return Math.max(x.views, x.visitors); }).concat([1]));
+    $('#chart').innerHTML = s.map(function (x) {
+      return '<div class="flex h-full flex-1 items-end justify-center gap-px" title="' + esc(x.day) + ': ' + x.visitors + ' visitors, ' + x.views + ' page views">' +
+        '<div class="bar w-1/2 max-w-[18px] rounded-t bg-sky-600" style="height:' + (x.visitors / max * 100) + '%"></div><div class="bar w-1/2 max-w-[18px] rounded-t bg-orange-300" style="height:' + (x.views / max * 100) + '%"></div></div>';
+    }).join('');
+    var lbl = function (v) { return new Date(v).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }); };
+    $('#chart-x').innerHTML = s.length ? '<span>' + lbl(s[0].day) + '</span><span>' + lbl(s[s.length - 1].day) + '</span>' : '';
+
+    $('#live').innerHTML = data.live.length ? data.live.map(function (x) {
+      return '<li class="flex cursor-pointer items-center justify-between gap-3 py-2.5 hover:bg-cloud" data-s="' + esc(x.session) + '"><div class="min-w-0"><p class="truncate font-semibold">' + esc(x.who) + '</p><p class="truncate text-xs text-ink-500">on ' + esc(page(x.page)) + ' · ' + esc(x.device) + '</p></div><span class="text-xs text-ink-500">' + ago(x.last) + '</span></li>';
+    }).join('') : '<li class="py-3 text-sm text-ink-500">Nobody on the site right now.</li>';
+
+    $('#pages').innerHTML = '<thead><tr><th>Page</th><th class="text-right">Views</th><th class="text-right">Visitors</th><th class="text-right">Avg time</th></tr></thead><tbody>' +
+      (data.pages.map(function (x) { return '<tr><td>' + esc(page(x.path)) + '</td><td class="text-right tabular">' + num(x.views) + '</td><td class="text-right tabular">' + num(x.visitors) + '</td><td class="text-right tabular">' + dur(x.avg_time) + '</td></tr>'; }).join('') || '<tr><td colspan="4" class="text-ink-500">No views yet.</td></tr>') + '</tbody>';
+    $('#clicks').innerHTML = '<thead><tr><th>Clicked</th><th>On page</th><th class="text-right">Times</th></tr></thead><tbody>' +
+      (data.clicks.map(function (x) { return '<tr><td class="max-w-[260px] truncate">' + esc(x.label) + '</td><td>' + esc(page(x.path)) + '</td><td class="text-right tabular">' + num(x.count) + '</td></tr>'; }).join('') || '<tr><td colspan="3" class="text-ink-500">No clicks yet.</td></tr>') + '</tbody>';
+
+    var tot = function (l) { return l.reduce(function (a, b) { return a + b.count; }, 0); };
+    $('#refs').innerHTML = data.referrers.length ? bars(data.referrers, 'host', tot(data.referrers)) : '<li class="text-sm text-ink-500">All visits so far came directly (typed address, app or WhatsApp).</li>';
+    $('#devices').innerHTML = bars(data.devices, 'device', tot(data.devices));
+    $('#browsers').innerHTML = bars(data.browsers, 'browser', tot(data.browsers));
+
+    $('#sessions').innerHTML = '<thead><tr><th>Who</th><th>Started</th><th>First page</th><th>Last page</th><th class="text-right">Pages</th><th class="text-right">Clicks</th><th class="text-right">Time</th><th>Device</th></tr></thead><tbody>' +
+      (data.sessions.map(function (x) {
+        return '<tr class="cursor-pointer hover:bg-cloud" data-s="' + esc(x.session) + '"><td><p class="font-semibold">' + esc(x.who) + '</p>' + (x.email ? '<p class="text-xs text-ink-500">' + esc(x.email) + '</p>' : '') + '</td><td class="whitespace-nowrap">' + when(x.start) + '</td><td>' + esc(page(x.entry)) + '</td><td>' + esc(page(x.exit)) + '</td>' +
+          '<td class="text-right tabular">' + x.pages + '</td><td class="text-right tabular">' + x.clicks + '</td><td class="text-right tabular">' + dur(x.time) + '</td><td class="capitalize">' + esc(x.device) + ' · ' + esc(x.browser) + '</td></tr>';
+      }).join('') || '<tr><td colspan="8" class="text-ink-500">No visits yet.</td></tr>') + '</tbody>';
+
+    $('#users').innerHTML = '<thead><tr><th>Learner</th><th class="text-right">Page views</th><th class="text-right">Time</th><th>Last seen</th></tr></thead><tbody>' +
+      (data.users.map(function (x) { return '<tr><td><p class="font-semibold">' + esc(x.name) + '</p><p class="text-xs text-ink-500">' + esc(x.email) + '</p></td><td class="text-right tabular">' + num(x.views) + '</td><td class="text-right tabular">' + dur(x.time) + '</td><td class="whitespace-nowrap">' + ago(x.last) + '</td></tr>'; }).join('') || '<tr><td colspan="4" class="text-ink-500">No logged-in learners in this period.</td></tr>') + '</tbody>';
+
+    var verb = { view: 'opened', click: 'clicked', leave: 'left', event: 'did' };
+    $('#recent').innerHTML = data.recent.map(function (x) {
+      return '<li class="cursor-pointer py-2 hover:bg-cloud" data-s="' + esc(x.session) + '"><p><b>' + esc(x.who) + '</b> ' + verb[x.kind] + ' ' + (x.kind === 'click' ? '<span class="text-sky-700">' + esc(x.label) + '</span> on ' : '') + esc(page(x.path)) + (x.kind === 'leave' ? ' after ' + dur(x.duration) : '') + '</p><p class="text-xs text-ink-500">' + ago(x.at) + '</p></li>';
+    }).join('') || '<li class="py-3 text-ink-500">Nothing yet.</li>';
+  }
+
+  // ---------------------------------------------------------------- one visit
+  document.addEventListener('click', function (ev) {
+    var row = ev.target.closest('[data-s]'); if (!row) return;
+    $('#drawer').classList.remove('hidden'); $('#d-who').textContent = 'Loading…'; $('#d-sub').textContent = ''; $('#d-list').innerHTML = '';
+    call({ session: row.dataset.s }).then(function (t) {
+      var ev0 = t.events[0] || {};
+      $('#d-who').textContent = t.who; $('#d-sub').textContent = (t.email ? t.email + ' · ' : '') + (ev0.device || '') + ' · ' + (ev0.browser || '') + (ev0.referrer ? ' · came from ' + ev0.referrer : '');
+      var color = { view: 'bg-sky-600', click: 'bg-orange-400', leave: 'bg-ink-300', event: 'bg-good-500' };
+      $('#d-list').innerHTML = t.events.map(function (e) {
+        var text = e.kind === 'view' ? 'Opened <b>' + esc(page(e.path)) + '</b>' + (e.query ? ' <span class="text-ink-500">' + esc(e.query) + '</span>' : '') + (e.title ? '<br><span class="text-xs text-ink-500">' + esc(e.title) + '</span>' : '')
+          : e.kind === 'click' ? 'Clicked <b>' + esc(e.label) + '</b> on ' + esc(page(e.path))
+          : e.kind === 'leave' ? 'Left ' + esc(page(e.path)) + ' after <b>' + dur(e.duration) + '</b>' : esc(e.label);
+        return '<li class="flex gap-3"><span class="tl-dot ' + color[e.kind] + '"></span><div class="text-sm"><p>' + text + '</p><p class="text-xs text-ink-400">' + when(e.at) + '</p></div></li>';
+      }).join('');
+    }, function (err) { $('#d-who').textContent = err.message; });
+  });
+  $('#d-close').addEventListener('click', function () { $('#drawer').classList.add('hidden'); });
+  $('#drawer').addEventListener('click', function (e) { if (e.target.id === 'drawer') $('#drawer').classList.add('hidden'); });
+
+  $('#range').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-d]'); if (!b) return;
+    days = Number(b.dataset.d);
+    document.querySelectorAll('#range [data-d]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    load(false);
+  });
+  $('#refresh').addEventListener('click', function () { load(false); });
+
+  if (pass()) load(true); else showGate();
+})();
+</script>
+</body>
+</html>

@@ -14,13 +14,13 @@
 
   function value(r) {
     return tab === 'earners'
-      ? { big: U.inr(r.earned), small: r.friends ? r.friends + ' friend' + (r.friends === 1 ? '' : 's') + ' referred' : 'from finished courses', tone: 'text-good-600' }
+      ? { big: U.inr(r.earned), small: (U.earnSplit(r.breakdown) || 'Total earned') + (r.friends ? ' · ' + r.friends + ' friend' + (r.friends === 1 ? '' : 's') : ''), tone: 'text-good-600' }
       : { big: r.courses + ' course' + (r.courses === 1 ? '' : 's'), small: U.num(r.lessons) + ' lessons done', tone: 'text-ink-900' };
   }
 
   function stats(st) {
     var s = data.stats || {};
-    var tiles = [['wallet', U.inr(s.earned), 'Earned by learners'], ['banknote', U.inr(s.paid_out), 'Paid out to UPI'],
+    var tiles = [['wallet', U.inr(s.earned), 'Earned by learners (total)'], ['banknote', U.inr(s.paid_out), 'Paid out to UPI'],
                  ['users', U.num(s.earners), 'Learners earning'], ['award', U.num(s.certificates), 'Certificates earned']];
     U.$('#er-stats').innerHTML = tiles.map(function (t) {
       return '<div class="bg-white px-5 py-5 sm:px-7"><dt class="flex items-center gap-2 text-sm text-ink-500">' + U.icon(t[0], 'i-sm text-sky-600') + t[2] + '</dt>' +

@@ -167,7 +167,7 @@ def write_pages(site):
 
 def write_robots_and_sitemap(site):
     (ROOT / 'robots.txt').write_text(
-        'User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /dashboard.html\nDisallow: /checkout.html\n'
+        'User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /track/\nDisallow: /dashboard.html\nDisallow: /checkout.html\n'
         f'\nSitemap: {SITE}/sitemap.xml\n', encoding='utf-8', newline='')
     today = date.today().isoformat()
     urls = [(SITE + '/' if p == 'index.html' else f'{SITE}/{p}', c[2], c[3]) for p, c in PAGES.items() if c and c[2]]

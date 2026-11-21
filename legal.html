@@ -59,7 +59,7 @@
 <link rel="apple-touch-icon" href="logo.jpeg">
 <link rel="preload" href="assets/fonts/lexend-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/figtree-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/app.css?v=15">
+<link rel="stylesheet" href="assets/css/app.css?v=16">
 <!--/HEAD-->
 </head>
 <body class="flex min-h-screen flex-col">
@@ -84,12 +84,12 @@
 </main>
 <div id="site-footer"></div>
 <!--CORE-->
-<script src="assets/js/core/icons.js?v=15"></script>
-<script src="assets/js/core/config.js?v=15"></script>
-<script src="assets/js/core/api.js?v=15"></script>
-<script src="assets/js/core/app.js?v=15"></script>
+<script src="assets/js/core/icons.js?v=16"></script>
+<script src="assets/js/core/config.js?v=16"></script>
+<script src="assets/js/core/api.js?v=16"></script>
+<script src="assets/js/core/app.js?v=16"></script>
 <!--/CORE-->
-<script src="assets/js/chatbot.js?v=15"></script>
+<script src="assets/js/chatbot.js?v=16"></script>
 <script>
 (function () {
   var U = STS.ui;
@@ -110,7 +110,7 @@
         '<ul><li><b>One level only.</b> You earn cashback only when someone buys with your own code. You never earn from people your friends refer. There are no teams, targets or joining fees.</li>' +
         '<li>You get a referral code after your first purchase. Your cashback rate depends on your package and is shown in your dashboard.</li>' +
         '<li>Your friend gets ' + inr(r.friend_discount) + ' off their first package. Cashback counts only on their first purchase.</li>' +
-        '<li>Cashback is held for ' + r.hold_days + ' days (the refund window), then becomes available.' + (r.learn_first ? ' To withdraw, you must also have completed at least one course.' : '') + '</li>' +
+        '<li>' + (r.hold_days ? 'Cashback is held for ' + r.hold_days + ' days (the refund window), then becomes available.' : 'Cashback shows in your wallet as soon as it is earned. If the friend\'s purchase is refunded, the cashback is reversed.') + (r.learn_first ? ' To withdraw, you must also have completed at least one course.' : '') + '</li>' +
         '<li>Minimum withdrawal is ' + inr(r.min_withdraw) + ' to your own UPI ID. We process it within ' + r.payout_hours + ' hours of the request.</li>' +
         (r.withdraw_play_cap ? '<li>At most ' + inr(r.withdraw_play_cap) + ' of any single withdrawal may come from Play &amp; earn rewards. The rest must be cashback you earned by finishing courses or referring friends.</li>' : '') +
         (r.daily_bonus ? '<li>A daily bonus of ' + inr(r.daily_bonus) + ' is paid for the first friend who buys on a day, on any package. Monthly milestone bonuses are shown in your dashboard. Both follow the same hold and reversal rules as cashback.</li>' : '') +
